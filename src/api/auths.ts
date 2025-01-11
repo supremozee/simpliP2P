@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { forgotData, LoginFormData, LoginResponse, RegisterFormData, RegisterResponse, ResetFormData } from "@/types"
+import { forgotData, verifyData, LoginFormData, LoginResponse, RegisterFormData, RegisterResponse, ResetFormData } from "@/types"
 import { BASE_URL } from "./base-url"
 import { apiRequest } from "./apiRequest"
 import Cookies from "js-cookie"
@@ -36,7 +36,7 @@ const auth = {
 
     return response;
   },
-  verifyEmail: async(token:forgotData):Promise<any> => {
+  verifyEmail: async(token:verifyData):Promise<any> => {
     const response = await apiRequest(`${BASE_URL}/auth/verify-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,7 +44,7 @@ const auth = {
     });
     return response;
   },
-  forgotPassword:async(email:string):Promise<any> => {
+  forgotPassword:async(email:forgotData):Promise<any> => {
     const response = await apiRequest(`${BASE_URL}/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

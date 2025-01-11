@@ -3,7 +3,7 @@ import { auth } from '@/api/auths';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import useNotify from './useNotify';
-import { forgotData } from '@/types';
+import { verifyData } from '@/types';
 
 const useVerifyEmail = () => {
   const [loading, setLoading] = useState(false);
@@ -39,7 +39,7 @@ const useVerifyEmail = () => {
     },
   });
 
-  const verifyEmail = (token: forgotData) => {
+  const verifyEmail = (token: verifyData) => {
     return verifyEmailMutation(token);
   };
 

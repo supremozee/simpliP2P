@@ -20,6 +20,9 @@ export type RegisterFormData = {
     password: string;
   }
   export interface forgotData { 
+    email:string;
+  }
+  export interface verifyData { 
     token:string;
   }
   export interface ResetFormData { 
