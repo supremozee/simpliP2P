@@ -11,6 +11,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ onClick }) => {
   const {success} = useNotify()
   const handleLogout = () => {
     Cookies.remove('simpliToken', { domain: 'localhost', path: '/' });
+    Cookies.remove('simpliToken', { domain: 'simplip2p.vercel.app', path: '/' });
     success('Logged out successfully');
     router.push('/login');
     if (onClick) {

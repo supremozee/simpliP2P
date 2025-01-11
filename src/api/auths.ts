@@ -27,7 +27,7 @@ const auth = {
       expires: 7
     });
     Cookies.set('simpliToken', response.data.access_token, {
-      domain: '',
+      domain: 'simplip2p.vercel.app',
       path: "/",
       secure: true,
       sameSite: "strict", 
