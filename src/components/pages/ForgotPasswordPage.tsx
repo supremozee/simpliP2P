@@ -8,6 +8,7 @@ import useForgotPassword from '@/hooks/useForgotPassword';
 import { useForm } from 'react-hook-form';
 import Loader from '../molecules/Loader';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { forgotData } from '@/types';
 const ForgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address').nonempty('Email is required'),
 });
@@ -19,8 +20,8 @@ const ForgotPasswordPage = () => {
     resolver: zodResolver(ForgotPasswordSchema),
   });
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
-    await forgotPassword(data.email);
+  const onSubmit = async (data: forgotData) => {
+    await forgotPassword(data);
   };
 
   return (

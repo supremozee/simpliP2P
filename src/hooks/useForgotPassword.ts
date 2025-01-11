@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import useNotify from './useNotify';
 import { auth } from '@/api/auths';
+import { forgotData } from '@/types';
 
 const useForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -38,7 +39,7 @@ const useForgotPassword = () => {
     },
   });
 
-  const forgotPassword = async (email: string) => {
+  const forgotPassword = async (email: forgotData) => {
     return forgotPasswordMutation(email);
   };
 
