@@ -47,14 +47,14 @@ const RegisterPage = () => {
   const {
     register,
     handleSubmit,
-    // watch,
+    watch,
     reset,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(RegisterSchema),
   });
 
-  // const password = watch("password");
+  const password = watch("password");
   const onSubmit = async (data: RegisterFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirm_password, agreeToTerms , ...payload } = data;
@@ -158,6 +158,7 @@ const RegisterPage = () => {
               
               <InputField
                 label='Password'
+                value={password}
                 type='password'
                 placeholder='********'
                 {...register('password')}

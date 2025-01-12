@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
+import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 
 const InputContainer = ({ children }: { children: React.ReactNode }) => (
   <div className="mb-2 relative font-roboto">{children}</div>
@@ -86,6 +87,9 @@ const InputField = ({
           onChange={onChange}
           {...props}
         />
+         {type === 'password' && value && (
+        <PasswordStrengthIndicator password={value} />
+      )}
         {type === 'password' && (
           <VisibilityToggle onClick={togglePasswordVisibility}>
             {showPassword ? <IoEyeOutline size={20} />:<IoEyeOffOutline size={20} /> }

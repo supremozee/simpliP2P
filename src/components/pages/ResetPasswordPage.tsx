@@ -27,7 +27,7 @@ type ResetPasswordFormData = z.infer<typeof ResetPasswordSchema>;
 
 const ResetPasswordPage = () => {
   const { resetPassword, loading, errorMessage, successMessage, token } = useResetPassword();
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ResetPasswordFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: { token: '' },
   });
@@ -36,6 +36,7 @@ const ResetPasswordPage = () => {
       setValue('token', token);
     }
   }, [token, setValue]);
+  const password = watch('new_password');
   const onSubmit = async (data: ResetPasswordFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {confirm_password, ...payload} = data
@@ -61,6 +62,7 @@ const ResetPasswordPage = () => {
           <InputField
             label='Password'
             type='password'
+            value={password}
             placeholder='Enter your new password'
             {...register('new_password')}
           />
