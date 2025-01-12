@@ -1,16 +1,23 @@
+"use client"
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import useNotify from './useNotify';
 import { auth } from '@/api/auths';
-import { ResetFormData } from '@/types';
+import { ResetFormData, ResetResponse } from '@/types';
+import { useRouter } from 'next/navigation';
 
 const useResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { success: notifySuccess, error: notifyError } = useNotify();
-
+  const [token, setToken] = useState<string | null>(null);
+const router = useRouter()
+useEffect(() => {
+  const param = new URLSearchParams(window.location.search).get('token');
+  setToken(param);
+}, []);
   const { mutateAsync: resetPasswordMutation } = useMutation({
     mutationFn: auth.resetPassword,
     onMutate: () => {
@@ -18,11 +25,12 @@ const useResetPassword = () => {
       setErrorMessage(null);
       setSuccessMessage(null);
     },
-    onSuccess: (response) => {
+    onSuccess: (response:ResetResponse) => {
       setLoading(false);
       if (response.status === 'success') {
-        setSuccessMessage(response.message || 'Password reset successfully');
-        notifySuccess(response.message || 'Password reset successfully');
+        setSuccessMessage(response.message );
+        notifySuccess(response.message );
+        router.push('/login')
       } else {
         setErrorMessage(response.message || 'Password reset failed');
         notifyError(response.message || 'Password reset failed');
@@ -43,7 +51,7 @@ const useResetPassword = () => {
     return resetPasswordMutation(data);
   };
 
-  return { resetPassword, loading, errorMessage, successMessage };
+  return { resetPassword, loading, errorMessage, successMessage, token };
 };
 
 export default useResetPassword;

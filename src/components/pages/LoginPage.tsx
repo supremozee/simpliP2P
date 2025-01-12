@@ -64,7 +64,7 @@ const LoginPage = () => {
             <div className='w-10 border-t border-[#BDBDBD]'></div>
           </div>
         </form>
-        <LoginWithGoogle/>
+        <LoginWithGoogle />
           <div className='flex justify-center items-center text-center'>
             <p>Don’t have an account? </p>
             <Link href={'/register'} className='text-primary font-[500] underline'>

@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { forgotData, verifyData, LoginFormData, LoginResponse, RegisterFormData, RegisterResponse, ResetFormData } from "@/types"
+import { forgotData, verifyData, LoginFormData, LoginResponse, RegisterFormData, RegisterResponse, ResetFormData, InitiateGoogleResponse, CallbackType, CallbackResponse, ResetResponse } from "@/types"
 import { BASE_URL } from "./base-url"
 import { apiRequest } from "./apiRequest"
 import Cookies from "js-cookie"
 const auth = {
-  register: async (registerData:RegisterFormData):Promise<RegisterResponse | any>=> {
-   await apiRequest(`${BASE_URL}/auth/signup`, {
+  register: async (registerData:RegisterFormData):Promise<any>=> {
+   const response:RegisterResponse = await apiRequest(`${BASE_URL}/auth/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(registerData),
    })
+   return response
   },
   login: async (data: LoginFormData): Promise<any> => {
     const response:LoginResponse = await apiRequest(`${BASE_URL}/auth/login`, {
@@ -19,14 +20,14 @@ const auth = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    Cookies.set('simpliToken', response.data.access_token, {
+    Cookies.set('simpliToken', response.data?.access_token, {
       domain: 'localhost',
       path: "/",
       secure: true,
       sameSite: "strict", 
       expires: 7
     });
-    Cookies.set('simpliToken', response.data.access_token, {
+    Cookies.set('simpliToken', response.data?.access_token, {
       domain: 'simplip2p.vercel.app',
       path: "/",
       secure: true,
@@ -53,7 +54,7 @@ const auth = {
     return response;
   },
   resetPassword:async(data:ResetFormData):Promise<any> => {
-    const response = await apiRequest(`${BASE_URL}/auth/forgot-password`, {
+    const response:ResetResponse = await apiRequest(`${BASE_URL}/auth/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
@@ -61,7 +62,7 @@ const auth = {
     return response;
   },
   initiateGoogle: async (): Promise<any> => {
-    const response = await apiRequest(`${BASE_URL}/auth/google/initiate`, {
+    const response:InitiateGoogleResponse = await apiRequest(`${BASE_URL}/auth/google/initiate`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -69,11 +70,25 @@ const auth = {
     });
     return response;
   },
-  handleGoogleCallback: async(code:string):Promise<any>=> {
-    const response = await apiRequest(`${BASE_URL}/auth/google/callback`, {
+  handleGoogleCallback: async(code:CallbackType):Promise<any>=> {
+    const response:CallbackResponse = await apiRequest(`${BASE_URL}/auth/google/callback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(code)
+    });
+    Cookies.set('simpliToken', response.data?.token, {
+      domain: 'localhost',
+      path: "/",
+      secure: true,
+      sameSite: "strict", 
+      expires: 7
+    });
+    Cookies.set('simpliToken', response.data?.token, {
+      domain: 'simplip2p.vercel.app',
+      path: "/",
+      secure: true,
+      sameSite: "strict", 
+      expires: 7
     });
     return response;
   },

@@ -20,7 +20,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ onClick }) => {
   };
 
   return (
-    <div className="flex mt gap-3 my-10 ml-1 sm:ml-5 font-roboto text-red-500 cursor-pointer" onClick={handleLogout}>
+    <div className="flex gap-3 my-10 ml-1 sm:ml-5 font-roboto text-red-500 cursor-pointer items-center" onClick={handleLogout}>
       <FiLogOut />
       <p>Logout</p>
     </div>

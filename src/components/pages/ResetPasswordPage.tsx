@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import InputField from '../atoms/Input';
 import Button from '../atoms/Button';
 import Link from 'next/link';
@@ -8,31 +8,37 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import useResetPassword from '@/hooks/useResetPassword';
 import Loader from '../molecules/Loader';
-import { usePathname } from 'next/navigation';
 
 const ResetPasswordSchema = z.object({
-  token: z.string().nonempty('Token is required'),
-  new_password: z.string().min(6, 'Password must be at least 6 characters long').nonempty('Password is required'),
-  confirm_Password: z.string().min(6, 'Confirm Password must be at least 6 characters long').nonempty('Confirm Password is required'),
-}).refine((data) => data.new_password === data.confirm_Password, {
+  token: z.string(),
+  new_password: z.string()
+  .min(6, "Password must be at least 6 characters long")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
+  confirm_password: z.string().min(6, 'Confirm Password must be at least 6 characters long')
+}).refine((data) => data.new_password === data.confirm_password, {
   message: 'Passwords do not match',
-  path: ['confirmPassword'],
+  path: ['confirm_password'],
 });
 
 type ResetPasswordFormData = z.infer<typeof ResetPasswordSchema>;
 
 const ResetPasswordPage = () => {
-    const pathname = usePathname()
-    const token = pathname.split('/').pop()
-  const { resetPassword, loading, errorMessage, successMessage } = useResetPassword();
-  const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordFormData>({
+  const { resetPassword, loading, errorMessage, successMessage, token } = useResetPassword();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(ResetPasswordSchema),
-    defaultValues: { token: token }
+    defaultValues: { token: '' },
   });
-
+  useEffect(() => {
+    if (token) {
+      setValue('token', token);
+    }
+  }, [token, setValue]);
   const onSubmit = async (data: ResetPasswordFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {confirm_Password, ...payload} = data
+    const {confirm_password, ...payload} = data
     await resetPassword(payload);
   };
 
@@ -47,7 +53,7 @@ const ResetPasswordPage = () => {
       <div className='flex justify-center flex-col gap-4 w-full sm:w-1/2 p-5 sm:p-[150px]'>
         <div className='flex flex-col items-center justify-center'>
           <strong className='text-[24px] sm:text-[30px] font-[700]'>Reset Your Password</strong>
-          <p className='text-[10px] sm:text-[12px] text-[#9E9E9E] text-center sm:text-left'>
+          <p className='text-[12px] sm:text-[12px] text-[#9E9E9E] text-center sm:text-left'>
             Enter your new password to reset your account password
           </p>
         </div>
@@ -63,19 +69,19 @@ const ResetPasswordPage = () => {
             label='Confirm Password'
             type='password'
             placeholder='Confirm your new password'
-            {...register('confirm_Password')}
+            {...register('confirm_password')}
           />
-          {errors.confirm_Password && <p className="text-red-500">{errors.confirm_Password.message}</p>}
+          {errors.confirm_password && <p className="text-red-500">{errors.confirm_password.message}</p>}
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           {successMessage && <p className="text-green-500">{successMessage}</p>}
           <Button className='text-white rounded-[12px]' type="submit">Reset Password</Button>
-          <div className='flex justify-center items-center text-center'>
+        </form>
+        <div className='flex justify-center items-center text-center'>
             <p>Remembered your password? </p>
             <Link href={'/login'} className='text-primary font-[500] underline'>
               Log in
             </Link>
           </div>
-        </form>
       </div>
     </div>
   );

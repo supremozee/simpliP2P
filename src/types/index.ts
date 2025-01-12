@@ -53,3 +53,25 @@ export type RegisterFormData = {
       access_token: string;
     };
   }
+  export interface ResetResponse {
+    status: string;
+    message: string;
+    data: null;
+  }
+  export interface InitiateGoogleResponse {
+    status: string;
+    message: string;
+    data: {
+      url: string;
+    };
+  }
+  export interface CallbackResponse {
+    status: string;
+    message: string;
+    data: {
+      token: string;
+    };
+  }
+  export interface CallbackType {
+    code:string
+  }

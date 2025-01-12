@@ -14,12 +14,7 @@ export const apiRequest = async (url: string, init: RequestInit = {}) => {
 
   try {
     const response = await fetch(url, config);
-   
-    if (response.status === 409) {
-      throw new Error("Email or phone number already exists.");
-    }
-
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 403) {
       const currentPath = window.location.pathname;
       if (!['/login', '/register', '/'].includes(currentPath)) {
         console.log("Redirecting to login due to status code:", response.status);

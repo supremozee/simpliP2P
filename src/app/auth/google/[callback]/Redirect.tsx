@@ -8,7 +8,7 @@ import Loader from '@/components/molecules/Loader';
 
 const GoogleCallback = () => {
   const router = useRouter();
-  const { success, error } = useNotify();
+  const { error } = useNotify();
   const { handleCallback } = useGoogleLogin();
   useEffect(() => {
     const handleGoogleCallback = async () => {
@@ -16,9 +16,8 @@ const GoogleCallback = () => {
       const code = params.get('code');
       if (code) {
         try {
-           handleCallback(code);
-          success( "Login successful");
-          router.push('/'); 
+           handleCallback({ code });
+          router.push('/dashboard'); 
         } catch (err: any) {
           const errorMessage = err.response?.error || "An unknown error occurred";
           error(errorMessage);

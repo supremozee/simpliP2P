@@ -35,7 +35,7 @@ const ForgotPasswordPage = () => {
       <div className='flex justify-center flex-col gap-4 w-full sm:w-1/2 p-5 sm:p-[150px]'>
         <div className='flex flex-col items-center justify-center'>
           <strong className='text-[24px] sm:text-[30px] font-[700]'>Reset Your Password</strong>
-          <p className='text-[10px] sm:text-[12px] text-[#9E9E9E] text-center sm:text-left'>
+          <p className='text-[14px] sm:text-[12px] text-[#9E9E9E] text-center sm:text-left'>
             Enter your email to receive a password reset link
           </p>
         </div>

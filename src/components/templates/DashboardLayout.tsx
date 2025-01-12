@@ -4,6 +4,7 @@ import { Sidebar } from '../layouts/SideBar';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import useClickOutside from '@/hooks/useClickOutside';
 import MobileHeader from '../organisms/MobileHeader';
+import { cn } from '@/utils/cn';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isDesktopDevice = useMediaQuery("(min-width: 768px)");
@@ -27,14 +28,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className='overflow-y-scroll'>
+    <div className=''>
       <MobileHeader collapsed={collapsed} ref={sidebarRef} toggleSidebar={toggleSidebar} isOpen={isOpen}/>
       <div className='w-full flex sm:flex-row'>
         {!isDesktopDevice && isOpen && (
         <div className="fixed inset-0 w-full bg-black bg-opacity-15 z-[99]" onClick={toggleSidebar}></div>
       )}
       <Sidebar collapsed={collapsed} ref={sidebarRef} isOpen={isOpen} toggleSidebar={toggleSidebar} />
-      <div className='min-h-screen w-full'>
+      <div className={cn('min-h-screen w-full', 
+        isOpen && "hidden sm:block"
+      )}>
         {children}
       </div>
     </div>

@@ -28,8 +28,8 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ collapsed, isOpe
       <aside
         ref={ref}
         className={cn(
-          "drop-shadow-lg shadow-inner z-[100] sm:flex hidden h-screen w-[290px] flex-col bg-white overflow-x-hidden  transition-transform duration-300",
-          !isDesktop && (isOpen ? "translate-x-0 flex w-[290px] min-h-screen fixed pt-10 px-5 overflow-y-scroll " : "-translate-x-full")
+          "drop-shadow-lg shadow-inner z-[100] sm:flex hidden min-h-screen w-[290px] flex-col bg-white overflow-x-hidden transition-transform duration-300",
+          !isDesktop && (isOpen ? "translate-x-0 flex w-[270px] min-h-screen pt-10 px-5  " : "-translate-x-full")
         )}
       >
          { isDesktop ? <div className="sm:flex hidden gap-2 justify-center px-[2%] pt-[12%] pb-[24%]">
@@ -43,7 +43,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ collapsed, isOpe
                <Profile/>
             </div>
           )}
-        <div className="overflow-y-auto overflow-x-hidden sm:p-3 [scrollbar-width:_thin]">
+        <div className="overflow-x-hidden sm:p-3 [scrollbar-width:_thin]">
           {navbarLinks.map((navbarLink, index) => (
             <nav
               key={index}
