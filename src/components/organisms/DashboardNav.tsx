@@ -11,7 +11,7 @@ const DashboardNav = () => {
 
   return (
     <div className="sticky top-0 z-30 cursor-pointer bg-[#808080] bg-opacity-15 border-b border-gray-100 w-full shadow-lg drop-shadow-lg">
-      <div className="px-6 py-4 flex items-center justify-between">
+      <div className="px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-semibold text-gray-800 capitalize">
             {title.replaceAll("-", " ")}

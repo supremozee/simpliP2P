@@ -87,7 +87,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ isOpen, toggleSi
       >
         <div className="flex flex-col h-full">
           {/* Header Section */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="px-4 py-2 border-b border-gray-100">
             {isDesktop ? (
               <div className="flex items-center justify-between">
                 <AnimatePresence>
