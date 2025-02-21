@@ -1,5 +1,3 @@
-"use client";
-
 import { usePathname, useRouter } from "next/navigation";
 import useStore from "@/store";
 import Card from "../atoms/Card";
@@ -7,7 +5,7 @@ import useGetUser from "@/hooks/useGetUser";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { IoBusinessOutline, IoAddCircle } from "react-icons/io5";
+import { IoBusinessOutline, IoAddCircle, IoChevronForward } from "react-icons/io5";
 import Button from "../atoms/Button";
 
 const OrganizationsPage: React.FC = () => {
@@ -19,45 +17,61 @@ const OrganizationsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoaderSpinner size="lg" text="Loading organizations..." />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-white p-8 rounded-2xl shadow-sm">
+          <LoaderSpinner size="lg" text="Loading organizations..." />
+        </div>
       </div>
     );
   }
 
   if (!findUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <IoBusinessOutline className="w-16 h-16 text-gray-400 mb-4" />
-        <h2 className="text-xl font-semibold text-gray-800">User Not Found</h2>
-        <p className="text-gray-500 mt-2">We couldn&apos;t find the user you&apos;re looking for.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full mx-4">
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <IoBusinessOutline className="w-10 h-10 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-3">User Not Found</h2>
+          <p className="text-gray-500">We couldn&apos;t find the user you&apos;re looking for.</p>
+          <Button
+            onClick={() => router.push('/login')}
+            className="mt-6 bg-gray-100 text-gray-700 px-6 py-2 rounded-xl hover:bg-gray-200 transition-colors"
+          >
+            Back to Login
+          </Button>
+        </div>
       </div>
     );
   }
 
   if (!organizationByAdmin && (!organizationByUser || organizationByUser.length === 0)) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md text-center">
-          <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <IoBusinessOutline className="w-8 h-8 text-primary" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md text-center"
+        >
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <IoBusinessOutline className="w-10 h-10 text-primary" />
             </div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-3">
-              No Organizations Found
+              Create Your First Organization
             </h2>
             <p className="text-gray-500 mb-8">
-              Get started by creating your first organization. Set up your procurement workspace and invite team members.
+              Get started by creating your organization. Set up your procurement workspace and streamline your operations.
             </p>
             <Button
               onClick={() => router.push('/create-organization')}
-              className="bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 justify-center w-full"
+              className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-primary/90 transition-all transform hover:scale-[1.02] flex items-center gap-3 justify-center w-full shadow-sm"
             >
-              <IoAddCircle className="w-5 h-5" />
-              Create Organization
+              <IoAddCircle className="w-6 h-6" />
+              <span className="font-medium">Create Organization</span>
             </Button>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -90,9 +104,9 @@ const OrganizationsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
       >
-        <h1 className="text-3xl font-bold text-gray-900">Select an Organization</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Choose an organization to access its dashboard and resources
+        <h1 className="text-4xl font-bold text-gray-900 mb-3">Welcome Back!</h1>
+        <p className="text-lg text-gray-600">
+          Select an organization to access its dashboard and resources
         </p>
       </motion.div>
 
@@ -100,16 +114,18 @@ const OrganizationsPage: React.FC = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="w-full max-w-4xl grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="w-full max-w-5xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
       >
         <motion.div variants={item}>
           <Card
             onClick={() => router.push('/create-organization')}
-            className="group relative p-6 bg-white hover:bg-primary/5 transition-all duration-200 cursor-pointer rounded-xl shadow-sm hover:shadow-md border-2 border-dashed border-gray-200 hover:border-primary flex flex-col items-center justify-center min-h-[160px]"
+            className="group relative p-8 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border-2 border-dashed border-primary/20 hover:border-primary/30 flex flex-col items-center justify-center min-h-[200px]"
           >
-            <IoAddCircle className="w-10 h-10 text-primary mb-3" />
-            <h3 className="text-lg font-medium text-gray-900">Create New</h3>
-            <p className="text-sm text-gray-500 text-center mt-1">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300">
+              <IoAddCircle className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900">Create New</h3>
+            <p className="text-gray-500 text-center mt-2">
               Set up a new organization
             </p>
           </Card>
@@ -120,10 +136,13 @@ const OrganizationsPage: React.FC = () => {
             <Card
               key={organizationByAdmin?.org_id}
               onClick={() => handleCardClick(organizationByAdmin.org_id, organizationByAdmin.name)}
-              className="group relative p-6 bg-white hover:bg-gray-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm hover:shadow-md"
+              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100"
             >
-              <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100 ring-2 ring-primary/10">
+              <div className="absolute top-4 right-4 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                Admin
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-primary/10 mb-4 group-hover:ring-primary/20 transition-all duration-300">
                   <Image
                     src={organizationByAdmin?.logo || "/placeholder-org.png"}
                     alt={organizationByAdmin?.name}
@@ -131,11 +150,13 @@ const OrganizationsPage: React.FC = () => {
                     className="object-cover"
                   />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-lg font-semibold text-gray-900 truncate group-hover:text-primary transition-colors">
-                    {organizationByAdmin?.name}
-                  </h2>
-                  <p className="text-sm text-primary font-medium">Administrator</p>
+                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2">
+                  {organizationByAdmin?.name}
+                </h2>
+                <p className="text-sm text-gray-500">Administrator Access</p>
+                <div className="mt-6 flex items-center gap-2 text-primary">
+                  <span className="text-sm font-medium">Open Dashboard</span>
+                  <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </Card>
@@ -146,10 +167,13 @@ const OrganizationsPage: React.FC = () => {
           <motion.div key={org.org_id} variants={item}>
             <Card
               onClick={() => handleCardClick(org.org_id, org.name)}
-              className="group relative p-6 bg-white hover:bg-gray-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm hover:shadow-md"
+              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100"
             >
-              <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100 ring-2 ring-primary/10">
+              <div className="absolute top-4 right-4 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+                Member
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-gray-100 mb-4 group-hover:ring-gray-200 transition-all duration-300">
                   <Image
                     src={org?.logo || "/placeholder-org.png"}
                     alt={org?.name}
@@ -157,11 +181,13 @@ const OrganizationsPage: React.FC = () => {
                     className="object-cover"
                   />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-lg font-semibold text-gray-900 truncate group-hover:text-primary transition-colors">
-                    {org?.name}
-                  </h2>
-                  <p className="text-sm text-gray-500">Member</p>
+                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2">
+                  {org?.name}
+                </h2>
+                <p className="text-sm text-gray-500">Member Access</p>
+                <div className="mt-6 flex items-center gap-2 text-primary">
+                  <span className="text-sm font-medium">Open Dashboard</span>
+                  <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </Card>
@@ -171,5 +197,4 @@ const OrganizationsPage: React.FC = () => {
     </div>
   );
 };
-
 export default OrganizationsPage;
