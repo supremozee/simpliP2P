@@ -2,7 +2,7 @@ import React from 'react';
 import Hero from '../organisms/Hero';
 import Features from '../organisms/Features';
 import DemoRequest from '../organisms/DemoRequest';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 const OnBoarding = () => {
   const router = useRouter();
   const handleGetStarted = () => {

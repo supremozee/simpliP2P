@@ -11,7 +11,6 @@ interface HeroProps {
 const Hero: React.FC<HeroProps> = ({ onGetStarted, onRequestDemo }) => {
   return (
     <div className="relative min-h-[90vh] flex items-center">
-      {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-95 z-10" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.1),transparent_50%)] z-20" />
