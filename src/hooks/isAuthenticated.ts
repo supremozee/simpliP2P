@@ -1,5 +1,9 @@
 import Cookies from "js-cookie";
 
 export default function isAuthenticated(): boolean {
-    return Cookies.get('simpliToken') !== undefined;
+    const token = Cookies.get('accessToken')
+    if (!token || token === undefined || token === "") {
+        return false;
+    }
+    return true
 }

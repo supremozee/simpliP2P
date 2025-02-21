@@ -10,9 +10,7 @@ const ProfilePicturePage = () => {
   const { uploadProfilePicture, loading, errorMessage } = useUploadProfilePicture();
   const handleFileChange = async(event:React.ChangeEvent<HTMLInputElement>)=> {
 if(event.target.files && event.target.files[0]) {
-  const formData = new FormData();
-  formData.append('profilePicture', event.target.files[0]);
-  await uploadProfilePicture(formData)
+  await uploadProfilePicture(event.target.files[0])
 }
   }
   return (
@@ -39,7 +37,7 @@ if(event.target.files && event.target.files[0]) {
         </div>
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         <div className='flex flex-col gap-4 mt-4'>
-          <Button kind='white' className='text-[#888888]'>Skip</Button>
+          <Button kind='white' className='text-[#888888] justify-center items-center'>Skip</Button>
         </div>
       </div>
     </div>

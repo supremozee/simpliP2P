@@ -9,7 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import useLogin from '@/hooks/useLogin';
 import Loader from '../molecules/Loader';
 import LoginWithGoogle from '../molecules/LoginWithGoogle';
-
 const LoginPage = () => {
   const { login, loading, errorMessage } = useLogin();
   const LoginSchema = z.object({
@@ -26,12 +25,12 @@ const LoginPage = () => {
   return (
     <div className='flex h-screen w-full font-roboto'>
       {loading && <Loader/>}
-      <div className="bg-[url('/loginImage.png')] w-full sm:w-1/2 h-1/3 sm:h-full object-cover bg-cover sm:flex hidden flex-col justify-center items-center pt-10">
+      <div className="bg-[url('/loginImage.png')] w-full sm:w-1/2 h-1/3 sm:h-full object-cover bg-cover lg:flex hidden flex-col justify-center items-center pt-10">
         <p className='w-[90%] sm:w-[600px] mt-10 sm:mt-28 text-white text-[14px] sm:text-[16px] text-center sm:text-left'>
         Enter your email or username and password to access your account
         </p>
       </div>
-      <div className='flex justify-center flex-col gap-4 w-full sm:w-1/2 p-5 sm:p-[150px]'>
+      <div className='flex justify-center flex-col gap-4 w-full lg:w-1/2 p-5 lg:p-[100px]'>
         <div className='flex flex-col items-center justify-center'>
           <strong className='text-[36px] sm:text-[30px] font-[700]'>Welcome Back</strong>
           <p className='text-[16px] sm:text-[12px] text-[#9E9E9E] text-center sm:text-left'>
@@ -54,10 +53,10 @@ const LoginPage = () => {
           />
           {errors.password && <p className="text-red-500">{errors.password.message}</p>}
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-          <Link href={'/forgot-password'} className='font-bold text-end text-[#4B5E7E]'>
+          <Link href={'/forgot-password'} className='font-bold text-end text-[#4B5E7E] underline text-[12px]'>
             Forgot Password?
           </Link>
-          <Button className='text-white rounded-[12px]' type='submit'>Sign in</Button>
+          <Button className='text-white rounded-[12px] justify-center' type='submit'>{loading ? "Processing...": "Login"}</Button>
           <div className='flex items-center justify-center gap-2 my-4'>
             <div className='w-10 border-t border-[#BDBDBD]'></div>
             <p className="text-center mb-0 px-2 text-[#BDBDBD]">Or</p>
@@ -67,7 +66,7 @@ const LoginPage = () => {
         <LoginWithGoogle />
           <div className='flex justify-center items-center text-center'>
             <p>Don’t have an account? </p>
-            <Link href={'/register'} className='text-primary font-[500] underline'>
+            <Link href={'/register'} className='text-primary font-[500] underline ml-0.5'>
               Sign up for free
             </Link>
           </div>

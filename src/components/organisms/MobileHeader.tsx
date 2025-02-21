@@ -11,7 +11,7 @@ collapsed: boolean;
 const MobileHeader = forwardRef<HTMLElement, MobileHeaderProps>(({collapsed, isOpen, toggleSidebar}, ref)=> {
     
    return (
-    collapsed && !isOpen&&( <header className='flex w-full bg-[#808080] bg-opacity-15 fixed top-0 font-roboto justify-between items-center px-5 py-4' ref={ref}>
+    collapsed && !isOpen&&( <header className='flex w-full bg-[#808080] bg-opacity-15 fixed top-0 font-roboto justify-between items-center px-5 py-4 z-50 cursor-pointer' ref={ref}>
         <CgMenuLeft size={22} onClick={toggleSidebar} />
             <Image
             src={'/mobile-header-logo.png'}

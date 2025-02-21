@@ -35,7 +35,7 @@ const useUploadProfilePicture = () => {
     },
   });
 
-  const uploadProfilePicture = async (formData: FormData) => {
+  const uploadProfilePicture = async (formData: File) => {
     return uploadProfilePictureMutation(formData);
   };
 

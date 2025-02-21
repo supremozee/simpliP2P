@@ -24,7 +24,7 @@ const Input = ({
     onChange={onChange}
     value={value}
     {...props}
-    className={`w-full p-2 border border-[#BDBDBD] font-[400] rounded-md bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#424242] focus:outline-none focus:border-[#BDBDBD] placeholder:pl-2 ${
+    className={`w-full p-2 border border-[#dddada] font-[400] rounded-[12px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] placeholder:text-[10px] placeholder:pl-2 ${
       isDropdown ? 'pr-10' : ''
     } ${className || ''}`}
   />
@@ -51,10 +51,17 @@ interface Props {
   type: string;
   value?: string;
   placeholder: string;
-  label: string;
+  label?: string;
   className?: string;
+  step?:string;
   dropdownOptions?: string[];
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  readOnly?:boolean;
+  onPaste?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  onFocus?: () => void;
+  disabled?: boolean;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
 const InputField = ({
@@ -66,6 +73,12 @@ const InputField = ({
   className,
   dropdownOptions,
   onChange,
+  onPaste,
+  step,
+  required,
+  onFocus,
+  disabled,
+  ref,
   ...props
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -76,15 +89,22 @@ const InputField = ({
 
   return (
     <InputContainer>
-    <label className='text-[12px] text-[#424242] font-bold'>{label}</label>
+    <label className='text-[12px] text-[#424242] font-bold'>
+      {label} {required && <span className="text-red-500">*</span>}
+      </label>
         <Input
           name={name}
+          disabled={disabled}
           type={type === 'password' && showPassword ? 'text' : type}
           placeholder={placeholder}
           className={className}
           readOnly={!!dropdownOptions}
           value={value}
           onChange={onChange}
+          onPaste={onPaste}
+          onFocus={onFocus}
+          step={step}
+          ref={ref}
           {...props}
         />
          {type === 'password' && value && (

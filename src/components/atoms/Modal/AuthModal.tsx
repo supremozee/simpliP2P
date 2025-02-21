@@ -37,12 +37,12 @@ const AuthModal: React.FC<GlobalModalProps> = ({ isOpen, onClose, children }) =>
 
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-50 flex bg-black bg-opacity-50 auth-modal"
+      className="fixed inset-0 z-50 flex bg-black bg-opacity-50 auth-modal w-full justify-center h-full items-center"
       onClick={handleBackgroundClick}
       aria-modal="true"
       role="dialog"
     >
-      <div className="modal-content bg-white rounded-md shadow-lg max-w-lg w-full">
+      <div className="modal-content bg-white h-full rounded-md shadow-lg max-w-lg w-full">
         {children}
       </div>
       <style jsx>{`

@@ -4,7 +4,7 @@ import InputField from '../atoms/Input';
 import Button from '../atoms/Button';
 import Link from 'next/link';
 import { z } from 'zod';
-import AuthModal from '../atoms/AuthModal';
+import AuthModal from '../atoms/Modal/AuthModal';
 import Logo from '../atoms/Logo';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,9 +15,6 @@ import LoginWithGoogle from '../molecules/LoginWithGoogle';
 const RegisterSchema = z.object({
   first_name: z.string().min(1, 'First Name is required'),
   last_name: z.string().min(1, 'Last Name is required'),
-  company_name: z.string().min(1, 'Company Name is required'),
-  company_role: z.string().min(1, 'Company Role is required'),
-  company_address: z.string().min(1, 'Company Address is required'),
   email: z.string().email('Invalid email address'),
   password: z
     .string()
@@ -70,17 +67,17 @@ const RegisterPage = () => {
     return (
       <AuthModal onClose={() => setSuccessSignup(false)} isOpen>
         <div className="w-full h-[339px] justify-center items-center flex flex-col gap-10 rounded-t-[17px] text-black">
-          <p className="font-bold text-primary text-lg">
+          <p className="font-bold text-primary text-[28px] mt-5 translate-x-1 transition-all animate-pulse">
             Welcome To SimpliP2P!
           </p>
           <Logo theme='black' />
           <p className="text-center text-xl">
             A confirmation mail was sent to your mail, please click on it to verify your account. Thank you! <br /><br />
-            <Link href="/login" className="text-[#346D4D] ml-2 underline font-bold">
-              Click here to Login after confirmation
+            <Link href="/create-organization" className="text-[#346D4D] ml-2 underline font-bold">
+              Kindly click here to Create organization after confirmation
             </Link>
           </p>
-        </div>
+        </div> 
       </AuthModal>
     );
   }
@@ -114,32 +111,7 @@ const RegisterPage = () => {
                 type='text'
                 {...register('last_name')}
               />
-              {errors.last_name && <p className="text-red-500">{errors.last_name.message}</p>}
-              
-              <InputField
-                label='Company Name'
-                placeholder='Company Name'
-                type='text'
-                {...register('company_name')}
-              />
-              {errors.company_name && <p className="text-red-500">{errors.company_name.message}</p>}
-              
-              <InputField
-                label='Role'
-                placeholder='Role'
-                type='text'
-                {...register('company_role')}
-              />
-              {errors.company_role && <p className="text-red-500">{errors.company_role.message}</p>}
-              
-              <InputField
-                label='Company Address'
-                placeholder='Company Address'
-                type='text'
-                {...register('company_address')}
-              />
-              {errors.company_address && <p className="text-red-500">{errors.company_address.message}</p>}
-              
+              {errors.last_name && <p className="text-red-500">{errors.last_name.message}</p>}    
               <InputField
                 label='Email'
                 placeholder='johndoe@gmail.com'
@@ -158,7 +130,7 @@ const RegisterPage = () => {
               
               <InputField
                 label='Password'
-                value={password}
+                value={password || ""}
                 type='password'
                 placeholder='********'
                 {...register('password')}
@@ -170,6 +142,7 @@ const RegisterPage = () => {
                 type='password'
                 placeholder='********'
                 {...register('confirm_password')}
+                onPaste={(e) => e.preventDefault()}
               />
               {errors.confirm_password && <p className="text-red-500">{errors.confirm_password.message}</p>}
               
@@ -186,7 +159,7 @@ const RegisterPage = () => {
               {errors.agreeToTerms && <p className="text-red-500">{errors.agreeToTerms.message}</p>}
               
               <p className='text-red-500 text-lg'>{errorMessage}</p>
-              <Button className='text-white rounded-[12px]' type="submit">{loading ? "Processing..." : "Create Account"}</Button>
+              <Button className='text-white rounded-[12px] justify-center' type="submit">{loading ? "Processing..." : "Create Account"}</Button>
             </form>
         <div className='flex items-center justify-center gap-2 my-4'>
           <div className='w-10 border-t border-[#BDBDBD]'></div>

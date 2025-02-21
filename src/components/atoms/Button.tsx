@@ -1,20 +1,21 @@
 'use client';
 import React from 'react';
-import classNames from 'classnames';
+// import classNames from 'classnames';
+import { cn } from '@/utils/cn';
 
 interface ButtonProps {
   radius?: 'none' | 'xs' | 'xxs' | 'full'| 'default';
   padding?: 'lg' | 'sm' | 'xs' | 'xxs' | 'default';
-  width?: 'wide' | 'book' | 'full' | 'default';
+  width?: 'wide' | 'book' | 'full' |  'round'| 'default';
   maxwidth?: 'wide' | 'default';
-  kind?: 'tertiary' | 'secondary' | 'grey' | 'white'| 'default';
+  kind?: 'tertiary' | 'secondary' | 'grey' | 'white' | 'default' ;
   fontSize?: string;
   hovercolor?: string;
   disabled?: boolean;
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
-  type?:'submit'|'reset';
+  type?:'submit'|'reset' | 'button';
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -44,13 +45,14 @@ const Button: React.FC<ButtonProps> = ({
     sm: 'py-6 px-6',
     xs: 'py-2 px-8',
     xxs: 'py-2 px-2',
-    default: 'py-6 px-10',
+    default: 'py-3.5 px-10',
   };
 
   const widthClasses = {
     wide: 'w-56',
     book: 'w-40',
     full: 'w-full',
+    round: 'w-8',
     default: 'w-auto',
   };
 
@@ -71,8 +73,8 @@ const Button: React.FC<ButtonProps> = ({
     <button
     type={type}
     onClick={onClick}
-      className={classNames(
-        'focus:outline-none inline-flex items-center justify-center h-10 font-bold font-roboto z-10',
+      className={cn(
+        'focus:outline-none flex font-bold font-roboto z-10',
         radiusClasses[radius],
         paddingClasses[padding],
         widthClasses[width],

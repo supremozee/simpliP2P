@@ -22,7 +22,6 @@ export default function useRegister() {
     onSuccess: (response) => {
       setLoading(false);
       if (response && response.status === 'success') {
-        console.log(response)
         notifySuccess("Successfully registered");
         setSuccessSignup(true);
       } else {

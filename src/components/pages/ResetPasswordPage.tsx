@@ -72,11 +72,12 @@ const ResetPasswordPage = () => {
             type='password'
             placeholder='Confirm your new password'
             {...register('confirm_password')}
+            onPaste={(e) => e.preventDefault()}
           />
           {errors.confirm_password && <p className="text-red-500">{errors.confirm_password.message}</p>}
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           {successMessage && <p className="text-green-500">{successMessage}</p>}
-          <Button className='text-white rounded-[12px]' type="submit">Reset Password</Button>
+          <Button className='text-white rounded-[12px] justify-center w-full items-center' type="submit">Reset Password</Button>
         </form>
         <div className='flex justify-center items-center text-center'>
             <p>Remembered your password? </p>

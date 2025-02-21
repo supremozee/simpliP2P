@@ -1,19 +1,31 @@
+"use client"
 import React from 'react'
 import Search from '../atoms/Search'
 import Notifications from '../atoms/Notifications'
 import Profile from '../atoms/Profile'
+import { usePathname } from 'next/navigation'
 
-const DashboardNav = ({title}: {title:string}) => {
+const DashboardNav = () => {
+  const pathname = usePathname()
+  const title = pathname.split('/').pop() || 'Dashboard'
+
   return (
-    <div className ="sm:flex hidden justify-between w-full items-center">
-        <h2 className='text-[28px] text-[#4C5661] font-semibold w-[70%]'>{title}</h2>
-        <div className='flex gap-3 items-center justify-between w-[30%]'>
-        <div className='flex gap-4'>
-          <Search/>
-          <Notifications/>
+    <div className="sticky top-0 z-30 cursor-pointer bg-[#808080] bg-opacity-15 border-b border-gray-100 w-full shadow-lg drop-shadow-lg">
+      <div className="px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-semibold text-gray-800 capitalize">
+            {title.replaceAll("-", " ")}
+          </h2>
         </div>
-          <Profile/>
+
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
+            <Search />
+            <Notifications />
+          </div>
+            <Profile />
         </div>
+      </div>
     </div>
   )
 }

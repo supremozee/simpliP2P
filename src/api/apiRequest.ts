@@ -1,9 +1,10 @@
+import useStore from "@/store";
 import Cookies from "js-cookie";
 
 export const apiRequest = async (url: string, init: RequestInit = {}) => {
-  const token = Cookies.get('simpliToken');
-  const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
-
+  const token = Cookies.get('accessToken');
+  const authHeader = token ? { Authorization: `Bearer ${token}` } :{};
+ const {setError} = useStore.getState()
   const config: RequestInit = {
     ...init,
     headers: {
@@ -14,35 +15,52 @@ export const apiRequest = async (url: string, init: RequestInit = {}) => {
 
   try {
     const response = await fetch(url, config);
+    if (response.status === 401) {
+      Cookies.remove('accessToken');
+      window.location.href = "/login"
+      const errorMessage = await response.json();
+      throw new Error(errorMessage?.message)
+    }
     if (response.status === 403) {
-      const currentPath = window.location.pathname;
-      if (!['/login', '/register', '/'].includes(currentPath)) {
-        console.log("Redirecting to login due to status code:", response.status);
-        window.location.href = "/login";
+      const errorMessage = await response.json();
+      if(errorMessage) {
+        setError(true);
       }
-      throw new Error("Unauthorized access. Please log in.");
+      throw new Error(errorMessage?.message);
+    }
+    if (response.status === 400) {
+      const errorMessage = await response.json();
+      if(errorMessage) {
+        setError(true);
+      }
+      throw new Error(errorMessage?.message);
     }
 
     if (response.status === 404) {
-      throw new Error("Resource not found.");
+      const errorMessage = await response.json();
+      throw new Error(errorMessage?.message)
     }
+    
 
     if (response.status === 500) {
-      throw new Error("An Error occured. Please try again later.");
+      const errorMessage = await response.json();
+      throw new Error(errorMessage?.message)
     }
 
     if (response.status === 502) {
-      throw new Error("Bad gateway. Please try again later.");
+      const errorMessage = await response.json();
+      throw new Error(errorMessage?.message)
     }
 
     if (response.status === 503) {
-      throw new Error("Service unavailable. Please try again later.");
+      const errorMessage = await response.json();
+      throw new Error(errorMessage?.message)
     }
 
     if (response.status === 504) {
-      throw new Error("Gateway timeout. Please try again later.");
+      const errorMessage = await response.json();
+      throw new Error(errorMessage?.message)
     }
-
     if (response.status === 200 || response.status === 201) {
       return await response.json();
     }

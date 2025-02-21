@@ -49,7 +49,7 @@ const ForgotPasswordPage = () => {
           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           {successMessage && <p className="text-green-500">{successMessage}</p>}
-          <Button className='text-white rounded-[12px]'>Reset</Button>
+          <Button className='text-white rounded-[12px] justify-center'>Reset</Button>
           <div className='flex justify-center items-center text-center'>
             <p>Remembered your password? </p>
             <Link href={'/login'} className='text-primary font-[500] underline'>

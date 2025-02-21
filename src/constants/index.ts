@@ -1,62 +1,82 @@
 import { BiSolidPurchaseTag } from "react-icons/bi";
-import { GrAnalytics } from "react-icons/gr";
 import { IoIosHome, IoIosNotifications, IoMdHelp } from "react-icons/io";
 import { MdInventory, MdOutlineDeliveryDining, MdOutlineMultilineChart } from "react-icons/md";
-import { RiAdminLine } from "react-icons/ri";
+import { RiAdminLine, RiFileList3Line } from "react-icons/ri";
+import { AiOutlineAudit } from "react-icons/ai";
 
 export const navbarLinks = [
-    {
-        links: [
-            {
-                label: "Dashboard",
-                icon:IoIosHome,
-                path: "dashboard",
-            },
-            {
-                label: "Supplier Management",
-                icon: MdOutlineDeliveryDining,
-                path: "analytics",
-            },
-            {
-                label: "Purchase Requisition",
-                icon: BiSolidPurchaseTag,
-                path: "reports",
-            },
-            {
-                label: "Purchase Order Management",
-                icon: BiSolidPurchaseTag,
-                path: "reports",
-            }, {
-                label: "Inventory Management",
-                icon: MdInventory,
-                path: "reports",
-            }, {
-                label: "Budget Tracking",
-                icon: MdOutlineMultilineChart,
-                path: "reports",
-            }, {
-                label: "Reporting Analytics",
-                icon: GrAnalytics,
-                path: "reports",
-            },{
-                label: "Admin Settings",
-                icon: RiAdminLine,
-                path: "reports",
-            },
+  {
+    links: [
+      {
+        label: "Dashboard",
+        icon: IoIosHome,
+        path: "/dashboard",
+      },
+      {
+        label: "Requisitions",
+        icon: BiSolidPurchaseTag,
+        path: "/purchase-requisitions",
+      },
+      {
+        label: "Approvals",
+        icon: RiFileList3Line,
+        subLinks: [
+          { label: "Requisition", path: "/approval/requisition-approval" },
+          { label: "Order", path: "/approval/order-approval" },
         ],
-    },
-    {
-        footer: [
-            {
-                label: "Notifications",
-                icon: IoIosNotifications,
-                path: "about",
-            },
-            {
-                label: "Help and Support",
-                icon: IoMdHelp,
-                path: "help",
-            },
+      },
+      {
+        label: "Budgets",
+        icon: MdOutlineMultilineChart,
+        subLinks: [
+          { label: "Budget centrals", path: "/budgets-central" },
         ],
-    }
+      },
+      {
+        label: "Inventory ",
+        icon: MdInventory,
+        subLinks: [
+          { label: "Manage Inventory", path: "/inventory/inventory-management" },
+        ],
+      },
+      {
+        label: "Suppliers",
+        icon: MdOutlineDeliveryDining,
+        subLinks: [
+          { label: "Suppliers Management", path: "/suppliers/suppliers-management" },
+        ],
+      },
+      {
+        label: "Purchase Orders",
+        icon: BiSolidPurchaseTag,
+        subLinks: [
+          { label: "Manage Order", path: "/purchase-order-management" },
+        ],
+      },
+      {
+        label: "Audit Logs",
+        icon: AiOutlineAudit,
+         path: '/audit-logs'
+      },
+      {
+        label: "Settings",
+        icon: RiAdminLine,
+        path: "/settings",
+      },
+    ],
+  },
+  {
+    footer: [
+      {
+        label: "Notifications",
+        icon: IoIosNotifications,
+        path: "/notifications",
+      },
+      {
+        label: "Help and Support",
+        icon: IoMdHelp,
+        path: "/help",
+      },
+    ],
+  },
 ];

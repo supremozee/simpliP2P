@@ -3,7 +3,7 @@ import Logo from '../atoms/Logo'
 
 const Loader = () => {
   return (
-    <div className='bg-black bg-opacity-20 w-full h-screen flex flex-col justify-center items-center fixed z-50'>
+    <div className='bg-black bg-opacity-20 w-full h-screen flex flex-col justify-center items-center fixed z-50 top-0 right-0'>
     <Logo animate={true}/>
     </div>
   )
