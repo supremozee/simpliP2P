@@ -72,9 +72,9 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
   return (
     <Modal onClose={toggleModal} isOpen={showModal}>
       <form onSubmit={handleSubmit(onSubmit)} className="">
-        <div className="px-4 py-6 sm:px-10">
+        <div className="py-6 sm:px-10">
           <div className="flex justify-between w-full">
-            <h2 className="text-xl font-bold mb-1">Create Supplier</h2>
+            <h2 className="sm:text-xl text-sm font-bold sm:mb-1">Create Supplier</h2>
             <div className="flex items-center space-x-2">
                   <div className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
                     1
@@ -90,7 +90,7 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
               {step === 1 ? "Basic details" : "Bank details"}
             </p>
             {step === 1 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:grid sm:grid-cols-2 gap-4">
                 <div>
                   <Input
                     type="text"

@@ -81,12 +81,11 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ isOpen, toggleSi
         className={cn(
           "drop-shadow-lg shadow-inner sm:flex hidden flex-col bg-white overflow-x-hidden custom-scrollbar",
           "fixed left-0 top-0 h-screen z-40",
-          !isDesktop && (isOpen ? "translate-x-0 flex max-w-[270px] h-screen pt-10 pl-5" : "-translate-x-full"),
+          !isDesktop && (isOpen ? "translate-x-0 flex max-w-[270px] h-screen" : "-translate-x-full"),
           "transition-all duration-300 ease-in-out"
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Header Section */}
           <div className="px-4 py-2 border-b border-gray-100">
             {isDesktop ? (
               <div className="flex items-center justify-between">

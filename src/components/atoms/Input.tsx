@@ -24,7 +24,7 @@ const Input = ({
     onChange={onChange}
     value={value}
     {...props}
-    className={`w-full p-2 border border-[#dddada] font-[400] rounded-[12px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] placeholder:text-[10px] placeholder:pl-2 ${
+    className={`w-full   p-2 border border-[#dddada] font-[400] rounded-[12px] text-[17px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] placeholder:text-[10px] placeholder:pl-2 ${
       isDropdown ? 'pr-10' : ''
     } ${className || ''}`}
   />

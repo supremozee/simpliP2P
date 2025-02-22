@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-// import classNames from 'classnames';
 import { cn } from '@/utils/cn';
 
 interface ButtonProps {
@@ -71,10 +70,10 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-    type={type}
-    onClick={onClick}
+      type={type}
+      onClick={onClick}
       className={cn(
-        'focus:outline-none flex font-bold font-roboto z-10',
+        'focus:outline-none flex font-bold font-roboto z-10 ',
         radiusClasses[radius],
         paddingClasses[padding],
         widthClasses[width],

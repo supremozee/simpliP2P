@@ -77,7 +77,7 @@ const OpenInventory = () => {
     <>
       <Button
         type="button"
-        className="px-4 py-2 text-sm bg-[#181819] text-white rounded-lg hover:bg-[#181819]/90 transition-colors"
+        className="sm:px-4 sm:py-2 px-2 py-0 sm:text-sm text-[10px] bg-[#181819] text-white rounded-lg hover:bg-[#181819]/90 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         Add from Inventory

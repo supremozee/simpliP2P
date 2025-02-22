@@ -61,11 +61,11 @@ const AddNewItem = () => {
     <>
       <Button
         type="button"
-        className="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+        className="sm:px-4 sm:py-2 px-10   py-1 text-sm  bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
         onClick={() => setIsOpen(true)}
       >
         <FaPlus className="w-3 h-3" />
-        <span>Add New Item</span>
+        <span className="sm:text-sm text-[9px ]">Add New Item</span>
       </Button>
 
       <Modal 

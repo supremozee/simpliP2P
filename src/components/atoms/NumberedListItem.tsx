@@ -15,18 +15,18 @@ const NumberedListItem: React.FC<NumberedListItemProps> = ({
 }) => {
   return (
     <li className="w-full list-none">
-      <div className="flex items-start gap-4 mb-4">
+      <div className="flex items-start sm:gap-4 gap-2 mb-4">
         <div className="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center">
           {number}
         </div>
         {(title || description) && (
           <div>
-            {title && <h3 className="text-lg font-medium text-gray-800">{title}</h3>}
-            {description && <p className="text-sm text-gray-600">{description}</p>}
+            {title && <h3 className="sm:text-lg text-sm font-medium text-gray-800">{title}</h3>}
+            {description && <p className="sm:text-sm text-[12px] text-gray-600">{description}</p>}
           </div>
         )}
       </div>
-      <div className="pl-12">
+      <div className="sm:pl-12">
         {children}
       </div>
     </li>

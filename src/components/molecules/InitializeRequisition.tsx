@@ -18,7 +18,7 @@ const InitializeRequisition = () => {
   };
 
   return (
-    <div className="flex justify-end mb-4">
+    <div className="flex sm:justify-end sm:mb-4 mb-7 sm:mt-0 mt-6">
       <Button
         onClick={handleInitialisePurchaseRequisition}
         className="bg-primary text-white px-5 py-2 rounded-lg font-semibold z-10"

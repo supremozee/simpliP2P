@@ -15,6 +15,7 @@ import useSaveForLater from '@/hooks/useSaveForLater';
 import { FaPlus } from 'react-icons/fa';
 import useFetchRequsitionsSavedForLater from '@/hooks/useFetchRequistionsSavedForLater';
 import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
+import LoaderSpinner from '../atoms/LoaderSpinner';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
@@ -118,16 +119,16 @@ const CreateRequisitions = () => {
   return (
     <>
       {isOpen && (
-        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="overflow-y-scroll max-w-[90%] max-h-[600px] px-10 pb-10">
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <div className="bg-primary/5 p-4 rounded-lg mb-4">
-              <h1 className="text-xl font-semibold text-gray-800">Create Purchase Requisition</h1>
-              <p className="text-sm text-gray-600">PR Number: {pr?.pr_number}</p>
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="overflow-y-scroll w-full max-h-[600px] sm:px-10 sm:pb-10">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:gap-4 gap-2">
+            <div className="bg-primary/5 sm:p-4 rounded-lg sm:mb-4">
+              <h1 className="sm:text-xl text-sm font-semibold text-gray-800">Create Purchase Requisition</h1>
+              <p className="sm:text-sm text-[12px] text-gray-600">PR Number: {pr?.pr_number}</p>
             </div>
 
             <ol className="list-decimal list-inside bg-white h-auto py-4 flex flex-col justify-center gap-5 items-center rounded-sm">
               {isLoadingSavedRequisitions ? (
-                <p>Loading...</p>
+                <LoaderSpinner/>
               ) : (
                 <>
                   <NumberedListItem 
