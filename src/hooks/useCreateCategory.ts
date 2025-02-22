@@ -15,9 +15,12 @@ const useCreateCategory = () => {
         mutationFn:async({data, orgId}: {data:CreateCategory, orgId:string})=> {
             return auth.createCategory(data, orgId)
         } ,
-        onSuccess:(response) => {
-            setLoading(false)
-            success(response?.success)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSuccess:(response:any) => {
+            if(response?.status === "success") {
+                setLoading(false)
+                success(response?.success)
+            }
          queryClient.invalidateQueries({queryKey: ['fetchCategory']})
         },
         onError: (error) => {

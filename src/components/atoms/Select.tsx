@@ -93,18 +93,18 @@ const Select = ({
     }
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.select-container')) {
-        setIsOpen(false);
-      }
-    };
+  // // Close dropdown when clicking outside
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     const target = event.target as HTMLElement;
+  //     if (!target.closest('.select-container')) {
+  //       setIsOpen(false);
+  //     }
+  //   };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => document.removeEventListener('mousedown', handleClickOutside);
+  // }, []);
 
   if (isError) {
     return <p className="text-red-500 text-sm">Error occurred fetching {label}</p>;
@@ -136,17 +136,17 @@ const Select = ({
 
       {isOpen && !disabled && (
         <div className="absolute w-full mt-1 max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-          <div className="sticky top-0 bg-white border-b border-gray-100 p-2 flex gap-2 items-center">
-            <input
-              type="text"
-              placeholder={`Search ${label.toLowerCase()}`}
-              className="w-full p-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary"
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              value={searchTerm}
-            />
+        <div className="sticky top-0 bg-white border-b border-gray-100 p-2 flex gap-2 items-center">
+          <input
+            type="text"
+            placeholder={`Search ${label.toLowerCase()}`}
+            className="w-full p-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            value={searchTerm}
+          />
             {component}
-          </div>
+        </div>
           
           {loading ? (
             <div className="p-4 flex justify-center">

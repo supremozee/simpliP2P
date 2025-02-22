@@ -70,7 +70,7 @@ export interface Organization {
   tenant_code?: string;
   address: string;
   logo?: string;
-  creator_role: string;
+  creator_role?: string;
 }
 
 export interface OrganizationResponse {

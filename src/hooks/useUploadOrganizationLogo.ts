@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMutation } from '@tanstack/react-query';
+import { QueryClient, useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import useNotify from './useNotify';
 import { auth } from '@/api/auths';
 
 const useUploadOrganizationLogo = () => {
+  const queryClient = new QueryClient()
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { success: notifySuccess, error: notifyError } = useNotify();
@@ -18,6 +19,8 @@ const useUploadOrganizationLogo = () => {
       setErrorMessage(null);
     },
     onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['organizationById'] })
+      queryClient.invalidateQueries({ queryKey: ['customer'] })
       setLoading(false);
       if (response?.status === 'success') {
         notifySuccess(response?.message);

@@ -18,8 +18,8 @@ const Modal: React.FC<ModalProps> = ({
   isOpen, 
   onClose, 
   children, 
-  width, 
-  height, 
+  width = 'auto', 
+  height = 'auto', 
   contentClassName,
   title,
   showCloseIcon = true
@@ -36,40 +36,30 @@ const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen]);
 
-  const handleEscapeKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscapeKey);
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" 
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center  backdrop-blur-sm" 
+      onClick={(e)=>e.stopPropagation()}
     >
       <div
         className={cn(
           "relative bg-white overflow-y-auto animate-slide-in shadow-xl rounded-xl",
           "max-h-[90vh] max-w-[90vw]",
-          `w-[${width}] h-[${height}]`,
           contentClassName
         )}
+        style={{ width, height }}
         onClick={(e) => e.stopPropagation()}
       >
         {showCloseIcon && (
           <button
-            onClick={onClose}
+            type='button'
+            onClick={(e)=> {
+              e.preventDefault();
+              e.stopPropagation()
+              onClose()
+            }}
             className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 z-10"
             aria-label="Close modal"
           >
@@ -86,7 +76,9 @@ const Modal: React.FC<ModalProps> = ({
         <div className={cn(
           "p-6",
           title ? "pt-4" : "pt-6"
-        )}>
+        )}
+        onClick={(e) => e.stopPropagation()}  
+        >
           {children}
         </div>
       </div>

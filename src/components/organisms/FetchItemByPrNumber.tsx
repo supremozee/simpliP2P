@@ -36,7 +36,7 @@ const FetchItemByPrNumber = () => {
             <tr key={item.id} className="border-b text-center">
               <TableCell className="flex justify-center items-center">
                 {item.image_url ? (
-                  <Image src={item.image_url} alt={item.item_name} width={25} height={25} className="object-cover rounded-md" />
+                  <Image src={item.image_url} alt={item.item_name} width={25} height={25} className="object-cover rounded-full w-[30px] h-[30px] bg-cover" />
                 ) : (
                   <span className="text-gray-500">No Image</span>
                 )}

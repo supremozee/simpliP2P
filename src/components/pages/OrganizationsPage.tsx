@@ -1,3 +1,4 @@
+"use client"
 import { usePathname, useRouter } from "next/navigation";
 import useStore from "@/store";
 import Card from "../atoms/Card";

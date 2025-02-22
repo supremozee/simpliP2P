@@ -20,12 +20,14 @@ const CreateCategory = ({add}: {add?:boolean}) => {
   const [isOpen, setIsOpen] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateCategoryFormData>({
     resolver: zodResolver(CreateCategorySchema),
+    mode: "onChange",
   });
-  const { currentOrg } = useStore();
+  const { currentOrg, loading } = useStore();
   const { createCategory } = useCreateCategory();
     const onSubmit = async(data:CreateCategoryFormData)=> {
         await createCategory(data,currentOrg);
         reset()
+        setIsOpen(false)
     };
   return (
     <>
@@ -46,10 +48,10 @@ const CreateCategory = ({add}: {add?:boolean}) => {
           <span className="text-[10px]">Add New</span>
     </Button>)}
       {isOpen && (
-        <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
-          <div className="mx-auto w-full bg-white p-6 rounded-2xl shadow-xl">
+       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
+          <div className="mx-auto w-[400px] h-[200px] bg-white p-6 rounded-2xl shadow-xl">
             <h1 className="text-[15px] font-bold mb-4">Add a Category</h1>
-              <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-1 ">
+              <form action="post"  onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-1 absolute">
                 <div>
                     <InputField
                     required
@@ -62,7 +64,7 @@ const CreateCategory = ({add}: {add?:boolean}) => {
                 </div>
                 <div className="flex justify-end">
                     <Button className="px-5 py-2 ">
-                       <span className="text-white text-[10px]"> Add Category</span>
+                       <span className="text-white text-[10px]">{loading ? "Adding" : "Add A Category"}</span>
                      </Button>
                 </div>
               </form>

@@ -8,10 +8,11 @@ import Modal from "../atoms/Modal";
 import useStore from "@/store";
 import { FaImage, FaPlus } from "react-icons/fa";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 import useAddItemsToRequistion from "@/hooks/useAddItemsToRequisition";
 import LoaderSpinner from "../atoms/LoaderSpinner";
+import useFileManager from "@/hooks/useFileManager";
 
 const AddItemSchema = z.object({
   pr_id: z.string().min(1, "PR ID is required"),
@@ -27,15 +28,25 @@ const AddNewItem = () => {
   const { currentOrg, pr, loading } = useStore();
   const { addItemsToRequisition } = useAddItemsToRequistion();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<AddItemFormData>({
+  const { register, handleSubmit, formState: { errors }, reset} = useForm<AddItemFormData>({
     resolver: zodResolver(AddItemSchema),
   });
   const [isOpen, setIsOpen] = useState(false);
-
+  const {uploadFile, loading:imageLoading} = useFileManager()
+  const productRef = useRef<HTMLInputElement>(null)
+  const handleFileChange = async () => {
+    const file = productRef.current?.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size must be less than 5MB");
+        return;
+      }
+      const response= await uploadFile(file);
+      setImagePreview(response?.url);
+    }
+  }
   const onSubmit = async (data: AddItemFormData) => {
     try {
-      setIsUploading(true);
       const imageUrl = imagePreview ?? "";
       await addItemsToRequisition({ ...data, image_url: imageUrl }, currentOrg);
       reset();
@@ -43,9 +54,7 @@ const AddNewItem = () => {
       setIsOpen(false);
     } catch (error) {
       console.error("Error adding item:", error);
-    } finally {
-      setIsUploading(false);
-    }
+    } 
   };
 
   return (
@@ -118,7 +127,7 @@ const AddNewItem = () => {
               <label className="block text-sm font-medium text-gray-700">
                 Item Image
               </label>
-              <div 
+              {imageLoading ? <LoaderSpinner/> :<div 
                 className={cn(
                   "relative border-2 border-dashed rounded-lg cursor-pointer transition-colors",
                   "hover:bg-gray-50 group",
@@ -152,23 +161,10 @@ const AddNewItem = () => {
                   accept="image/*"
                   className="hidden"
                   {...register("image_url")}
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) {
-                      if (file.size > 5 * 1024 * 1024) {
-                        alert("File size must be less than 5MB");
-                        return;
-                      }
-                      setValue("image_url", file);
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setImagePreview(reader.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
+                  onChange={handleFileChange}
+                  ref={productRef}
                 />
-              </div>
+              </div>}
               {errors.image_url && (
                 <p className="text-sm text-red-500">{errors.image_url.message}</p>
               )}
@@ -189,9 +185,9 @@ const AddNewItem = () => {
               <Button
                 type="submit"
                 className="px-6 py-2 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg flex items-center gap-2"
-                disabled={loading || isUploading}
+                disabled={loading}
               >
-                {(loading || isUploading) ? (
+                {(loading) ? (
                   <>
                     <LoaderSpinner size="sm" color="white" />
                     <span>Adding Item...</span>

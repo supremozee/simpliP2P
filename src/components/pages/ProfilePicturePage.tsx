@@ -1,18 +1,35 @@
 "use client"
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import useUploadProfilePicture from '@/hooks/useUploadProfile';
 import Loader from '../molecules/Loader';
 import { FiUploadCloud } from 'react-icons/fi';
-
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const ProfilePicturePage = () => {
   const { uploadProfilePicture, loading, errorMessage } = useUploadProfilePicture();
-  const handleFileChange = async(event:React.ChangeEvent<HTMLInputElement>)=> {
-if(event.target.files && event.target.files[0]) {
-  await uploadProfilePicture(event.target.files[0])
-}
+  const [preview, setPreview] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleFileChange = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    if(event.target.files && event.target.files[0]) {
+      const selectedFile = event.target.files[0];
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+
+      try {
+        await uploadProfilePicture(selectedFile);
+      } catch (error) {
+        console.error('Upload failed:', error);
+      }
+    }
   }
+
   return (
     <div className='flex h-screen w-full font-roboto'>
       {loading && <Loader />}
@@ -27,17 +44,33 @@ if(event.target.files && event.target.files[0]) {
         </div>
         <div className='relative flex justify-center items-center'>
           <input
-            className='w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-[#E5E5E5] flex items-center justify-center rounded-[15px] opacity-0 absolute cursor-pointer'
+            className='w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-[#E5E5E5] flex items-center justify-center rounded-[15px] opacity-0 absolute cursor-pointer z-10'
             type='file'
             onChange={handleFileChange}
+            accept="image/*"
           />
-          <div className='w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-[#E5E5E5] flex items-center justify-center rounded-[15px]'>
-            <FiUploadCloud className='text-gray-500 text-4xl' />
+          <div className='w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-[#E5E5E5] flex items-center justify-center rounded-[15px] overflow-hidden'>
+            {preview ? (
+              <Image 
+                src={preview} 
+                alt="Profile Preview" 
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <FiUploadCloud className='text-gray-500 text-4xl' />
+            )}
           </div>
         </div>
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         <div className='flex flex-col gap-4 mt-4'>
-          <Button kind='white' className='text-[#888888] justify-center items-center'>Skip</Button>
+          <Button 
+            kind='white' 
+            className='text-[#888888] justify-center items-center'
+            onClick={() => router.back()}
+          >
+            Back
+          </Button>
         </div>
       </div>
     </div>

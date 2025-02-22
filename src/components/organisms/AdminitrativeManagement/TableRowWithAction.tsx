@@ -27,7 +27,7 @@ const TableRowWithActions = <T extends Item>({
   const renderData = () => {
     switch (activeTab) {
       case "Branches":
-        if ("name" in item) return [item.name, item.status];
+        if ("name" in item) return [item.name];
         break;
       case "Departments":
         if ("organisation" in item) {
@@ -39,37 +39,39 @@ const TableRowWithActions = <T extends Item>({
             department.name,
             department.organisation?.tenant_code,
             headOfDepartment,
-            department.status,
           ];
         }
         break;
       case "Categories":
-        if ("name" in item) return [item.name, item.status];
+        if ("name" in item) return [item.name];
         break;
-        default:
-          if ("full_name" in item) return [
-            item.full_name,
-            item.created_at.split('T')[0],
+      default:
+        if ("full_name" in item) return [
+          item.full_name,
+          item.created_at.split('T')[0],
           item?.category.name,
-            <div key={item.id}>
-              <StarRating
-                isTable={true}
-                rating={Number(item.rating)}
-                setRating={() => {}}
-                showLabel={false}
-              />
-            </div>
-          ];
+          <div key={item.id}>
+            <StarRating
+              isTable={true}
+              rating={Number(item.rating)}
+              setRating={() => {}}
+              showLabel={false}
+            />
+          </div>
+        ];
     }
     return [];
   };
-  return (
-    <TableRow data={renderData()} index={index} className="">
-      {activeTab === "Categories" && <DropdownActions itemId={item.id || ""} />}
-      {!activeTab && "full_name" in item && (
+
+  const renderActions = () => {
+    if (activeTab === "Categories" && "deactivated_at" in item) {
+      return <DropdownActions itemId={item.id || ""} />;
+    }
+    if (!activeTab && "full_name" in item) {
+      return (
         <div className="flex gap-3 justify-center">
-            <Button
-            onClick={()=> onEdit?.(item.id)}
+          <Button
+            onClick={() => onEdit?.(item.id)}
             className="flex justify-center items-center w-6 h-6 text-white px-0 py-0 rounded-full bg-primary"
           >
             <VscEdit size={12} />
@@ -81,7 +83,14 @@ const TableRowWithActions = <T extends Item>({
             <FaTimes size={12} />
           </Button>
         </div>
-      )}
+      );
+    }
+    return null;
+  };
+
+  return (
+    <TableRow data={renderData()} index={index} className="">
+      {renderActions()}
     </TableRow>
   );
 };

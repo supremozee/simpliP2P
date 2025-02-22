@@ -13,6 +13,7 @@ import useFetchMembers from "@/hooks/useFetchMembers";
 import { cn } from "@/utils/cn";
 import { FaPlus } from "react-icons/fa";
 
+
 const CreateDepartmentSchema = z.object({
     name: z.string().nonempty("Branch name is required"),
     department_code: z.string().optional(),
@@ -52,7 +53,7 @@ const CreateDepartment = ({add}:{add?:boolean}) => {
       {isOpen && (
         <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
           <div className="mx-auto w-full bg-white p-6 rounded-2xl shadow-xl">
-            <h1 className="text-[15px] font-bold mb-4">Add a New Branch</h1>
+            <h1 className="text-[15px] font-bold mb-4">Add a New Department</h1>
               <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-1 ">
                 <div>
                     <InputField

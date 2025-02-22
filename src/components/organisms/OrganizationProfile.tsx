@@ -13,17 +13,15 @@ import useUploadOrganizationLogo from '@/hooks/useUploadOrganizationLogo';
 import useUserPermissions from '@/hooks/useUserPermissions';
 import useNotify from '@/hooks/useNotify';
 import LoaderSpinner from '../atoms/LoaderSpinner';
+import useGetUser from '@/hooks/useGetUser';
+import { cn } from '@/utils/cn';
 
 const OrganizationSchema = z.object({
   name: z.string().min(1, "Organization name is required"),
   address: z.string().min(1, "Organization address is required"),
-  creator_role: z.string().min(1, "Creator role is required"),
-  tenant_code: z.string().optional(),
 });
 
 type OrganizationFormType = z.infer<typeof OrganizationSchema>;
-
-const DEFAULT_LOGO = "/placeholder-org.png";
 
 const OrganizationProfile = () => {
   const { currentOrg } = useStore();
@@ -34,33 +32,48 @@ const OrganizationProfile = () => {
   const { getUserPermissions } = useUserPermissions();
   const { error: showError, success: showSuccess } = useNotify();
   const { isCreator } = getUserPermissions();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<OrganizationFormType>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<OrganizationFormType>({
     resolver: zodResolver(OrganizationSchema),
     defaultValues: {
       name: '',
       address: '',
-      creator_role: '',
-      tenant_code: '',
     }
   });
 
+  const handleUploadLogo = async() => {
+    const file = fileInputRef.current?.files?.[0];
+    if(file) {
+      try {
+        setIsImageLoading(true);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+
+        await uploadOrganizationLogo(file, currentOrg);
+      } catch {
+        setPreviewImage(null);
+      } finally {
+        setIsImageLoading(false);
+      }
+    }
+  }
+
   const organisation = data?.data;
+  const {user} = useGetUser();
+  const getUserRole = user?.data?.user_organisations?.find((org) => org.org_id === currentOrg);
 
   useEffect(() => {
     if (organisation) {
-      reset({
-        name: organisation.name || '',
-        address: organisation.address || '',
-        creator_role: organisation.creator_role || '',
-        tenant_code: organisation.tenant_code || '',
-      });
-      setImagePreview(organisation.logo || null);
+      setValue('name', organisation.name || '');
+      setValue('address', organisation.address || '');
     }
-  }, [organisation, reset]);
+  }, [organisation, setValue]);
 
   if (isLoading) {
     return (
@@ -78,38 +91,6 @@ const OrganizationProfile = () => {
       </div>
     );
   }
-
-  const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isCreator) {
-      showError("You don't have permission to change the logo");
-      return;
-    }
-
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Show preview immediately
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUploadPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    
-    try {
-      const response = await uploadOrganizationLogo(file, currentOrg);
-      
-      if (response?.status === 'success' && response.data?.url) {
-        setImagePreview(response.data.url);
-        setUploadPreview(null);
-        showSuccess('Logo updated successfully');
-      } else {
-        throw new Error('Failed to upload logo');
-      }
-    } catch {
-      showError('Failed to upload logo. Please try again.');
-      setUploadPreview(null);
-    }
-  };
 
   const onSubmit = async (formData: OrganizationFormType) => {
     if (!isCreator) {
@@ -149,11 +130,11 @@ const OrganizationProfile = () => {
           <Input
             type="text"
             label="Role"
+            value={getUserRole?.role}
+            name="role"
             placeholder="Enter your role"
-            {...register("creator_role")}
-            disabled={!isCreator}
+            disabled={true}
           />
-          {errors.creator_role && <p className="text-red-500 text-sm mt-1">{errors.creator_role.message}</p>}
 
           <Input
             type="text"
@@ -168,38 +149,50 @@ const OrganizationProfile = () => {
             type="text"
             label="Tenant Code"
             placeholder="Enter tenant code"
-            {...register("tenant_code")}
-            disabled={!isCreator}
+            value={organisation?.tenant_code}
+            name='tenant_code'
+            disabled={true}
           />
-          {errors.tenant_code && <p className="text-red-500 text-sm mt-1">{errors.tenant_code.message}</p>}
         </div>
 
         <div className="flex flex-col items-center space-y-4">
-          <div className="relative">
-            <div className="relative w-[200px] h-[200px] rounded-full overflow-hidden bg-gray-100">
-              <Image
-                src={uploadPreview || imagePreview || DEFAULT_LOGO}
-                alt="Organization Logo"
-                fill
-                className="object-cover"
-              />
-              {isCreator && (
-                <Button
-                  type="button"
-                  className="absolute bottom-2 right-2 rounded-full w-10 h-10 p-0 flex justify-center items-center bg-primary hover:bg-primary/90"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                >
-                  <MdModeEdit size={20} className="text-white" />
-                </Button>
+          <div className="relative w-[300px] h-[300px]">
+            <div className={cn(
+              "w-full h-full rounded-full overflow-hidden",
+              "border-4 border-gray-100 shadow-lg"
+            )}>
+              {isImageLoading ? (
+                <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                  <LoaderSpinner size="lg" />
+                </div>
+              ) : (
+                <Image
+                  src={previewImage || getUserRole?.logo || "/placeholder.png"}
+                  alt="Organization Logo"
+                  fill
+                  className="object-cover"
+                  priority
+                  onLoadingComplete={() => setIsImageLoading(false)}
+                  onError={() => setIsImageLoading(false)}
+                />
               )}
             </div>
+            {isCreator && (
+              <Button
+                type="button"
+                className="absolute right-2 bottom-2 w-[40px] h-[40px] rounded-full p-0 flex justify-center items-center bg-primary hover:bg-primary/90 shadow-lg"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                <MdModeEdit size={24} className="text-white" />
+              </Button>
+            )}
             <input
               type="file"
               accept="image/*"
               ref={fileInputRef}
               className="hidden"
-              onChange={handleLogoChange}
+              onChange={handleUploadLogo}
               disabled={!isCreator || isUploading}
             />
           </div>
@@ -209,7 +202,7 @@ const OrganizationProfile = () => {
           {isUploading && (
             <div className="flex items-center gap-2">
               <LoaderSpinner size="sm" />
-              <p className="text-sm text-gray-500">Uploading logo...</p>
+              <span className="text-sm text-gray-600">Uploading logo...</span>
             </div>
           )}
         </div>
@@ -219,7 +212,7 @@ const OrganizationProfile = () => {
         <div className="flex justify-end">
           <Button
             type="submit"
-            className="px-4 py-2 text-white bg-primary hover:bg-primary/90"
+            className="px-6 py-2 text-white bg-primary hover:bg-primary/90 rounded-lg"
             disabled={isUpdating || isUploading}
           >
             {isUpdating ? 'Saving Changes...' : 'Save Changes'}

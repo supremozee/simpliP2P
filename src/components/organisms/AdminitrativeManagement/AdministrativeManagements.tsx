@@ -36,10 +36,27 @@ const AdministrativeManagements = () => {
         return [];
     }
   };
+  const getTabCount = (tabName:string)=> {
+    switch (tabName) {
+      case "Branches":
+        return branch.filter(req => req.name).length;
+      case "Departments":
+           return department.filter(req => req.name).length;
+      case "Categories":
+               return category.filter(req => req.name).length;
+      default:
+        return 0;
+    }
+  }
+  const tabCounts = TabName.map(getTabCount);
 
   return (
     <div className="p-6">
-      <Tabs tabNames={TabName} active={activeTab} setActive={setActiveTab} counts={[9]} />
+      <Tabs
+       tabNames={TabName}
+        active={activeTab}
+         setActive={setActiveTab}
+        counts={tabCounts} />
       <div className="flex justify-between items-center mt-4">
         <h2 className="text-xl font-bold">Manage {activeTab}</h2>
         <CreateComponent activeTab={activeTab} />

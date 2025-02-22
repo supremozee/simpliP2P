@@ -62,7 +62,7 @@ const CreateRequisitions = () => {
     watch,
   } = useForm<PurchaseRequsitionData>({
     resolver: zodResolver(PurchaseRequisitionSchema),
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues,
   });
   const saved = savedRequisitions && savedRequisitions.data.requisitions.find((req)=> req?.pr_number === pr?.pr_number);

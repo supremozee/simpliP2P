@@ -10,11 +10,13 @@ import useStore from "@/store";
 import TextAreaField from "../atoms/TextArea";
 import { FaImage, FaPlus } from "react-icons/fa";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 import Select from "../atoms/Select";
 import CreateCategory from "./CreateCategory";
 import useFetchCategories from "@/hooks/useFetchCategories";
+import useFileManager from "@/hooks/useFileManager";
+import LoaderSpinner from "../atoms/LoaderSpinner";
 
 const CreateProductSchema = z.object({
   name: z.string().min(1, "Product Name is required"),
@@ -35,14 +37,30 @@ const CreateProduct = ({add, custom }: {add?:boolean, custom?:boolean}) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<ProductFormData>({
     resolver: zodResolver(CreateProductSchema),
+    mode: "onSubmit",
   });
+  const imageRef = useRef<HTMLInputElement>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const {uploadFile, loading:imageLoading} = useFileManager()
+  const handleFileUpload = async()=> {
+    try {
+      const file = imageRef.current?.files?.[0];
+      if (!file) {
+        throw new Error("No file selected");
+      }
+      const response = await uploadFile(file)
+      setImagePreview(response.url)
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  }
 const categories = categoryData?.data?.categories || []
   const onSubmit = async (data: ProductFormData) => {
     try {
       const imageUrl = imagePreview ?? ""
       await createProduct({ ...data, image_url: imageUrl }, currentOrg);
       reset();
+      setIsOpen(false);
     } catch (error) {
       console.error("Error creating product:", error);
     }
@@ -53,6 +71,7 @@ const categories = categoryData?.data?.categories || []
         {
       add ? (<button
       title="Add New"
+      type="button"
         onClick={() => setIsOpen(true)}
       className="w-[18px] h-[18px] text-white rounded-full flex justify-center text-center items-center bg-primary">
       <FaPlus size={10} />
@@ -122,8 +141,6 @@ const categories = categoryData?.data?.categories || []
               {...register("stockQtyAlert", { valueAsNumber: true })}
             />
           </div>
-
-          <div>
           <Select
               label="Category"
               options={categories}
@@ -137,11 +154,10 @@ const categories = categoryData?.data?.categories || []
                 <CreateCategory add={true} />
                    }
                   />
-          </div>
 
           <div className="flex flex-col w-full col-span-2 mt-10">
               <label htmlFor="image_url" className="mb-4">Upload Item Image</label>
-                  <label htmlFor="image_url" className={cn("flex flex-col items-center justify-center w-full border-2 cursor-pointer border-dashed border-gray-300 rounded-lg",
+                 {imageLoading ? <LoaderSpinner/> : <label htmlFor="image_url" className={cn("flex flex-col items-center justify-center w-full border-2 cursor-pointer border-dashed border-gray-300 rounded-lg",
                     imagePreview ? "border-transparent h-48" : "border-gray-300 h-48"
                   )}>
                     {imagePreview ? (
@@ -160,19 +176,10 @@ const categories = categoryData?.data?.categories || []
                       type="file"
                       className="hidden"
                       {...register("image_url")}
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (file) {
-                          setValue("image_url", file);
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            setImagePreview(reader.result as string);
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
+                      onChange={handleFileUpload}
+                      ref={imageRef}
                     />
-                  </label>
+                  </label>}
               {errors?.image_url && <p className="text-red-500 text-sm">{errors.image_url.message}</p>}
           </div>
           <div className="flex justify-end my-6 space-x-4 col-span-1 sm:col-span-2">
