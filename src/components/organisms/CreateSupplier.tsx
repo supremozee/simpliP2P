@@ -11,17 +11,24 @@ import StarRating from "../atoms/StarRating";
 import Select from "../atoms/Select";
 import useFetchCategories from "@/hooks/useFetchCategories";
 import CreateCategory from "./CreateCategory";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { City, Country, State } from 'country-state-city';
 
 const CreateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
   phone: z.string().min(10, "Phone is required").regex(/^[0-9]+$/, "Phone number must contain only numbers"),
-  address: z.string().min(1, "Address is required"),
   email: z.string().email("Invalid email address"),
   category: z.string().min(1, "Category is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
+  address: z.object({
+    street: z.string().min(1, "Street address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    country: z.string().min(1, "Country is required"),
+    zip_code: z.string().optional()
+  }),
   bank_details: z.object({
-    account_number: z.string().min(10, "Account number is required"),
+    account_number: z.string().min(1, "Account number is required"),
     bank_name: z.string().min(1, "Bank name is required"),
     account_name: z.string().min(1, "Account name is required"),
   })
@@ -33,12 +40,26 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
   const { currentOrg } = useStore();
   const { createSupplier, loading, errorMessage, successCreate } = useCreateSupplier();
   const { data: categoryData, isLoading: categoryLoading, isError: errorCategory } = useFetchCategories(currentOrg);
+  
+  const [step, setStep] = useState(1);
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+
   const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<SupplierFormData>({
     resolver: zodResolver(CreateSupplierSchema),
-    mode:"onChange"
+    mode: "onChange"
   });
 
-  const [step, setStep] = useState(1);
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const states = useMemo(() => {
+    if (!selectedCountry) return [];
+    return State.getStatesOfCountry(selectedCountry);
+  }, [selectedCountry]);
+
+  const cities = useMemo(() => {
+    if (!selectedCountry || !selectedState) return [];
+    return City.getCitiesOfState(selectedCountry, selectedState);
+  }, [selectedCountry, selectedState]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -58,37 +79,68 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
   const rating = watch("rating", 0);
   const category = watch("category");
 
-  const handleNextStep = async() => {
-    const isStepValid = await trigger(["full_name", "phone", "address", "email", "category", "rating"]);
-    if(isStepValid) {
-    setStep(step + 1);
+  const handleNextStep = async () => {
+    let isStepValid = false;
+    
+    switch (step) {
+      case 1:
+        isStepValid = await trigger(["full_name", "phone", "email", "category", "rating"]);
+        break;
+      case 2:
+        isStepValid = await trigger(["address"]);
+        break;
+    }
+
+    if (isStepValid) {
+      setStep(step + 1);
+    }
   };
-}
 
   const handlePreviousStep = () => {
     setStep(step - 1);
   };
 
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const countryCode = e.target.value;
+    setSelectedCountry(countryCode);
+    const countryName = Country.getCountryByCode(countryCode)?.name || '';
+    setValue("address.country", countryName);
+    setSelectedState('');
+    setValue("address.state", '');
+    setValue("address.city", '');
+  };
+
+  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const stateCode = e.target.value;
+    setSelectedState(stateCode);
+    const stateName = State.getStateByCodeAndCountry(stateCode, selectedCountry)?.name || '';
+    setValue("address.state", stateName);
+    setValue("address.city", '');
+  };
+
   return (
     <Modal onClose={toggleModal} isOpen={showModal}>
-      <form onSubmit={handleSubmit(onSubmit)} className="">
-        <div className="py-6 sm:px-10">
-          <div className="flex justify-between w-full">
-            <h2 className="sm:text-xl text-sm font-bold sm:mb-1">Create Supplier</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+        <div className="py-6 px-6 sm:px-10">
+          <div className="flex justify-between w-full mb-6">
+            <h2 className="sm:text-xl text-sm font-bold">Create Supplier</h2>
             <div className="flex items-center space-x-2">
-                  <div className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
-                    1
+              {[1, 2, 3].map((num) => (
+                <>
+                  <div className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === num ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
+                    {num}
                   </div>
-                  <div className="border-t border-gray-300 w-8"></div>
-                  <div className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === 2 ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
-                    2
-                  </div>
-              </div>
+                  {num < 3 && <div className="border-t border-gray-300 w-8"></div>}
+                </>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-col ">
-            <p className="text-gray-500">
-              {step === 1 ? "Basic details" : "Bank details"}
+
+          <div className="flex flex-col">
+            <p className="text-gray-500 mb-6">
+              {step === 1 ? "Basic details" : step === 2 ? "Address details" : "Bank details"}
             </p>
+
             {step === 1 && (
               <div className="sm:grid sm:grid-cols-2 gap-4">
                 <div>
@@ -124,17 +176,6 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
                   {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
                 </div>
 
-                <div>
-                  <Input
-                    type="text"
-                    label="Address"
-                    className="mt-1 w-full"
-                    placeholder="Input address"
-                    {...register("address")}
-                  />
-                  {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
-                </div>
-
                 <div className='relative'>
                   <Select
                     label="Categories"
@@ -147,13 +188,11 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
                     error={errors.category?.message}
                     loading={categoryLoading}
                     isError={errorCategory}
-                    component={
-                      <CreateCategory add={true} />
-                    }
+                    component={<CreateCategory add={true} />}
                   />
                 </div>
 
-                <div className="mt-5 sm:mt-0">
+                <div className="mt-5 sm:mt-0 col-span-2">
                   <StarRating
                     showLabel={true}
                     maxRating={5}
@@ -166,6 +205,84 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
             )}
 
             {step === 2 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Input
+                    type="text"
+                    label="Street Address"
+                    className="mt-1 w-full"
+                    placeholder="Enter street address"
+                    {...register("address.street")}
+                  />
+                  {errors.address?.street && <p className="text-red-500 text-sm">{errors.address.street.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Country</label>
+                  <select
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                    onChange={handleCountryChange}
+                    value={selectedCountry}
+                  >
+                    <option value="">Select Country</option>
+                    {countries.map((country) => (
+                      <option key={country.isoCode} value={country.isoCode}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.address?.country && <p className="text-red-500 text-sm">{errors.address.country.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">State/Province</label>
+                  <select
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                    onChange={handleStateChange}
+                    value={selectedState}
+                    disabled={!selectedCountry}
+                  >
+                    <option value="">Select State</option>
+                    {states.map((state) => (
+                      <option key={state.isoCode} value={state.isoCode}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.address?.state && <p className="text-red-500 text-sm">{errors.address.state.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">City</label>
+                  <select
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                    {...register("address.city")}
+                    disabled={!selectedState}
+                  >
+                    <option value="">Select City</option>
+                    {cities.map((city) => (
+                      <option key={city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.address?.city && <p className="text-red-500 text-sm">{errors.address.city.message}</p>}
+                </div>
+
+                <div>
+                  <Input
+                    type="text"
+                    label="ZIP/Postal Code"
+                    className="mt-1 w-full"
+                    placeholder="Enter postal code"
+                    {...register("address.zip_code")}
+                  />
+                  {errors.address?.zip_code && <p className="text-red-500 text-sm">{errors.address.zip_code.message}</p>}
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Input
@@ -202,35 +319,34 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
               </div>
             )}
 
-            <div className="flex justify-between items-center mt-6 space-x-4 col-span-1 sm:col-span-2">
-              <div className="flex w-full justify-end items-end">
-                {step > 1 && (
-                  <Button
-                    className="px-4 py-2 bg-white text-gray-700 rounded-lg"
-                    onClick={handlePreviousStep}
-                  >
-                    Previous
-                  </Button>
-                )}
-                {step < 2 && (
-                  <Button
-                    className="px-4 py-2 bg-primary text-white rounded-lg"
-                    onClick={handleNextStep}
-                    
-                  >
-                    Next
-                  </Button>
-                )}
-                {step === 2 && (
-                  <Button
-                    type="submit"
-                    disabled={!isValid}
-                    className="px-5 py-2 text-white rounded-lg"
-                  >
-                    {loading ? "Creating..." : "Create Supplier"}
-                  </Button>
-                )}
-              </div>
+            <div className="flex justify-end items-center mt-6 space-x-4">
+              {step > 1 && (
+                <Button
+                  type="button"
+                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300"
+                  onClick={handlePreviousStep}
+                >
+                  Previous
+                </Button>
+              )}
+              {step < 3 && (
+                <Button
+                  type="button"
+                  className="px-4 py-2 bg-primary text-white rounded-lg"
+                  onClick={handleNextStep}
+                >
+                  Next
+                </Button>
+              )}
+              {step === 3 && (
+                <Button
+                  type="submit"
+                  disabled={!isValid || loading}
+                  className="px-5 py-2 text-white rounded-lg"
+                >
+                  {loading ? "Creating..." : "Create Supplier"}
+                </Button>
+              )}
             </div>
           </div>
           {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}

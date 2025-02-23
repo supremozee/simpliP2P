@@ -244,18 +244,26 @@ export interface Owner {
     message: string;
     data:InviteUserData;
   }
+  export interface Address {
+    street: string 
+    city: string 
+    state: string
+    country: string
+    zip_code?: string 
+  }
+  interface BankDetails {
+      bank_name: string,
+      account_number: string,
+      account_name: string
+  }
   export interface CreateSupplierData {
     full_name: string;
     email: string;
     phone: string;
-    address: string;
+    address: Address;
     category: string;
     rating: number;
-    bank_details: {
-        bank_name: string,
-        account_number: string,
-        account_name: string
-    }
+    bank_details: BankDetails
   }
   export interface Supplier {
     id: string;
@@ -263,9 +271,10 @@ export interface Owner {
     created_at:string;
     email: string;
     phone: string;
-    address: string;
+    address:Address;
     category: Category;
     rating: string;
+    bank_details: BankDetails
   }
   
   export interface FetchSuppliersResponse {
@@ -284,9 +293,10 @@ export interface Owner {
     full_name?: string;
     email?: string;
     phone?: string;
-    address?: string;
+    address?:Address ;
     category?: string;
     rating?: number;
+    bank_details:BankDetails
   }
   export interface UpdateSupplierResponse {
     status: string;
@@ -515,7 +525,7 @@ interface Role {
     name: string;
     department_code?: string;
     description?: string;
-    hod_id?: string;
+    hod_id?: string | undefined;
   }
   export interface Department {
     id?: string;

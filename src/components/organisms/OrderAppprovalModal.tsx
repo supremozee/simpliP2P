@@ -145,7 +145,17 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
-                    <p className="text-sm font-medium">{order?.supplier?.address}</p>
+                    <p className="text-sm font-medium">
+                      {order?.supplier?.address ? (
+                        <>
+                          {order.supplier.address.street}
+                          {order.supplier.address.city && `, ${order.supplier.address.city}`}
+                          {order.supplier.address.state && `, ${order.supplier.address.state}`}
+                          {order.supplier.address.country && `, ${order.supplier.address.country}`}
+                          {order.supplier.address.zip_code && ` ${order.supplier.address.zip_code}`}
+                        </>
+                      ) : 'No address provided'}
+                    </p>
                   </div>
                 </div>
               </div>

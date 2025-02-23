@@ -28,10 +28,15 @@ const CreateDepartment = ({add}:{add?:boolean}) => {
   });
   const { currentOrg, loading } = useStore();
   const members = useFetchMembers(currentOrg)
-  const hodId = members.data?.data
+  const hodId = members.data?.data 
   const { createDepartment } = useCreateDepartment();
     const onSubmit = async(data:CreateDepartmentFormData)=> {
-        await createDepartment(data,currentOrg);
+        // Convert empty string to undefined for hod_id
+        const formattedData = {
+            ...data,
+            hod_id: data.hod_id === "" ? undefined : data.hod_id
+        };
+        await createDepartment(formattedData,currentOrg);
         reset()
     };
   return (
@@ -67,10 +72,11 @@ const CreateDepartment = ({add}:{add?:boolean}) => {
                 </div>
                 <div className="cursor-pointer">
                     <label htmlFor="hod_id"
-                    className="block text-sm font-medium text-gray-700"  >Hod Id</label>
+                    className="block text-sm font-medium text-gray-700">Head of Department</label>
                     <select id="hod_id" {...register("hod_id")}
                       className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer"
                     >
+                      <option value="">Select Head of Department</option>
                       {hodId?.users.map((hod) => (
                         <option key={hod.id}
                         className="cursor-pointer"
@@ -84,17 +90,17 @@ const CreateDepartment = ({add}:{add?:boolean}) => {
                     type="text"
                     label="Department Code"
                     {...register("department_code")}
-                    placeholder="Input branch address"
+                    placeholder="Input department code"
                     />
                     {errors.department_code && <p className="text-red-500 text-sm">{errors.department_code.message}</p>}
                 </div>
               
-                    <div>
+                <div>
                     <InputField
                     type="text"
                     label="description"
                     {...register("description")}
-                    placeholder="Input branch address"
+                    placeholder="Input department description"
                     />
                     {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                 </div>
