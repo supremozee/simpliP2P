@@ -321,6 +321,7 @@ const CreatePurchaseOrder = () => {
                           label="Select Supplier"
                           options={suppliers}
                           {...register("supplier_id")}
+                          onChange={(e) => setValue("supplier_id", e.target.value)}
                           value={supplierId}
                           required
                           error={errors.supplier_id?.message}
@@ -438,22 +439,20 @@ const CreatePurchaseOrder = () => {
                       ) : (
                         <div className="relative p-4 bg-gray-50 rounded-lg">
                           <div className="flex items-start gap-4">
-                            <div className="relative w-20 h-20">
+                            <div className="relative">
                               <Image
                                 src={upload.endsWith('.pdf') ? "/pdf-icon.png" : upload}
                                 alt="File Preview"
-                                fill
-                                className="rounded-lg object-cover"
+                                width={80}
+                                height={80}
+                                className="rounded-lg object-cover w-full h-full"
                               />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-gray-700">
-                                  {upload.split('/').pop()}
-                                </p>
                                 <button
                                   type="button"
-                                  className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                  className="p-1 absolute top-0 right-0 hover:bg-gray-200 rounded-full transition-colors"
                                   onClick={handleRemoveFile}
                                 >
                                   <IoClose className="w-5 h-5 text-gray-500" />

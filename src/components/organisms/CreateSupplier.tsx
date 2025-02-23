@@ -146,9 +146,9 @@ const CreateSupplier: React.FC<ModalProps> = ({ showModal = false, setShowModal 
                 <div>
                   <Input
                     type="text"
-                    label="Full Name"
+                    label="Supplier Name"
                     className="mt-1 w-full"
-                    placeholder="Input full name"
+                    placeholder="Input Supplier name"
                     {...register("full_name")}
                   />
                   {errors.full_name && <p className="text-red-500 text-sm">{errors.full_name.message}</p>}

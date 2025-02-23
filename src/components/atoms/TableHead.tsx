@@ -9,7 +9,7 @@ const TableHead: React.FC<TableHeadProps> = ({ headers }) => {
     <thead>
       <tr className="bg-gray-100">
         {headers.map((header) => (
-          <th key={header} className="border border-gray-300 px-4 py-2 text-left text-[10px] ">
+          <th key={header} className="border border-gray-300 px-4 py-2 text-center text-[10px] ">
             {header}
           </th>
         ))}
