@@ -46,7 +46,7 @@ const OrganizationsPage: React.FC = () => {
     );
   }
 
-  if (!organizationByAdmin && (!organizationByUser || organizationByUser.length === 0)) {
+  if (organizationByAdmin.length === 0 && organizationByUser.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
         <motion.div 
@@ -120,61 +120,29 @@ const OrganizationsPage: React.FC = () => {
         <motion.div variants={item}>
           <Card
             onClick={() => router.push('/create-organization')}
-            className="group relative p-8 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border-2 border-dashed border-primary/20 hover:border-primary/30 flex flex-col items-center justify-center min-h-[200px]"
+            className="group relative p-8 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border-2 border-dashed border-primary/20 hover:border-primary/30 flex flex-col items-center justify-center h-[320px]"
           >
-            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
               <IoAddCircle className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900">Create New</h3>
-            <p className="text-gray-500 text-center mt-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Create New</h3>
+            <p className="text-gray-500 text-center">
               Set up a new organization
             </p>
           </Card>
         </motion.div>
 
-        {organizationByAdmin && (
-          <motion.div variants={item}>
+        {organizationByAdmin?.map((org) => (
+          <motion.div key={org.org_id} variants={item}>
             <Card
-              key={organizationByAdmin?.org_id}
-              onClick={() => handleCardClick(organizationByAdmin.org_id, organizationByAdmin.name)}
-              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100"
+              onClick={() => handleCardClick(org.org_id, org.name)}
+              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100 h-[320px] flex flex-col"
             >
               <div className="absolute top-4 right-4 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                 Admin
               </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-primary/10 mb-4 group-hover:ring-primary/20 transition-all duration-300">
-                  <Image
-                    src={organizationByAdmin?.logo || "/placeholder-org.png"}
-                    alt={organizationByAdmin?.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2">
-                  {organizationByAdmin?.name}
-                </h2>
-                <p className="text-sm text-gray-500">Administrator Access</p>
-                <div className="mt-6 flex items-center gap-2 text-primary">
-                  <span className="text-sm font-medium">Open Dashboard</span>
-                  <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        )}
-
-        {organizationByUser?.map((org) => (
-          <motion.div key={org.org_id} variants={item}>
-            <Card
-              onClick={() => handleCardClick(org.org_id, org.name)}
-              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100"
-            >
-              <div className="absolute top-4 right-4 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
-                Member
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-gray-100 mb-4 group-hover:ring-gray-200 transition-all duration-300">
+              <div className="flex flex-col items-center text-center flex-1">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-primary/10 mb-4 group-hover:ring-primary/20 transition-all duration-300 flex-shrink-0">
                   <Image
                     src={org?.logo || "/placeholder-org.png"}
                     alt={org?.name}
@@ -182,11 +150,42 @@ const OrganizationsPage: React.FC = () => {
                     className="object-cover"
                   />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2">
+                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2 line-clamp-2">
                   {org?.name}
                 </h2>
-                <p className="text-sm text-gray-500">Member Access</p>
-                <div className="mt-6 flex items-center gap-2 text-primary">
+                <p className="text-sm text-gray-500 mb-auto">Administrator Access</p>
+                <div className="mt-4 flex items-center gap-2 text-primary pt-4 border-t border-gray-100 w-full justify-center">
+                  <span className="text-sm font-medium">Open Dashboard</span>
+                  <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        ))}
+
+        {organizationByUser?.map((org) => (
+          <motion.div key={org.org_id} variants={item}>
+            <Card
+              onClick={() => handleCardClick(org.org_id, org.name)}
+              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100 h-[320px] flex flex-col"
+            >
+              <div className="absolute top-4 right-4 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+                Member
+              </div>
+              <div className="flex flex-col items-center text-center flex-1">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-gray-100 mb-4 group-hover:ring-gray-200 transition-all duration-300 flex-shrink-0">
+                  <Image
+                    src={org?.logo || "/placeholder-org.png"}
+                    alt={org?.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2 line-clamp-2">
+                  {org?.name}
+                </h2>
+                <p className="text-sm text-gray-500 mb-auto">Member Access</p>
+                <div className="mt-4 flex items-center gap-2 text-primary pt-4 border-t border-gray-100 w-full justify-center">
                   <span className="text-sm font-medium">Open Dashboard</span>
                   <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>

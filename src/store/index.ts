@@ -29,10 +29,10 @@ interface SimpliP2PStore {
    setSelectedMemberId: (memberId: string)=>void
   supplierId: string;
   setSupplierId:(orgId: string)=>void;
- organizationByAdmin: UserOrganisation | null;
- setOrganizationByAdmin: (organizationData:UserOrganisation)=>void;
- organizationByUser: UserOrganisation[] | null;
- setOrganizationByUser: (organizationData:UserOrganisation[])=>void;
+ organizationByAdmin: UserOrganisation[];
+ setOrganizationByAdmin: (organizationData: UserOrganisation[]) => void;
+ organizationByUser: UserOrganisation[];
+ setOrganizationByUser: (organizationData: UserOrganisation[]) => void;
  members: FetchMembersResponse | null;
  setMembers: (members: FetchMembersResponse) => void;
  onToggle: boolean;
@@ -101,12 +101,12 @@ const useStore = create<SimpliP2PStore>()(
       setSupplierId: (supplierId: string) => {
         set({ supplierId: supplierId });
       },
-     organizationByUser: null,
-     setOrganizationByUser: (organizationData:UserOrganisation[]) => {
+     organizationByUser: [],
+     setOrganizationByUser: (organizationData: UserOrganisation[]) => {
         set({ organizationByUser: organizationData });
       },
-      organizationByAdmin: null,
-      setOrganizationByAdmin: (organizationData:UserOrganisation) => {
+      organizationByAdmin: [],
+      setOrganizationByAdmin: (organizationData: UserOrganisation[]) => {
          set({ organizationByAdmin: organizationData });
        },
        members: null,
@@ -131,6 +131,8 @@ const useStore = create<SimpliP2PStore>()(
         onToggle: state.onToggle,
         currentOrg: state.currentOrg,
         orgName: state.orgName,
+        organizationByAdmin: state.organizationByAdmin,
+        organizationByUser: state.organizationByUser,
       }),
     }
   )

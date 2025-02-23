@@ -1,15 +1,8 @@
+import { Permission } from '@/types';
 import useGetUser from './useGetUser';
 import useStore from '@/store';
 
-export type Permission = 
-  | 'manage_users' 
-  | 'manage_suppliers' 
-  | 'manage_purchase'
-  | 'manage_inventory'
-  | 'manage_budget'
-  | 'all_permissions';
 
-// Define public routes that don't require specific permissions
 const PUBLIC_ROUTES = [
   '/dashboard',
   '/help',
@@ -39,55 +32,44 @@ const useUserPermissions = () => {
   };
 
   const hasAccess = (path: string) => {
-    // Check for public routes first
     if (PUBLIC_ROUTES.some(route => path.startsWith(route))) {
       return true;
     }
-
     const { isCreator, permissions } = getUserPermissions();
-
-    // Settings is only accessible to creators
     if (path.startsWith('/settings')) {
       return isCreator;
     }
     
-    // Define permission requirements for each route
     const routePermissions: Record<string, Permission[]> = {
-      // User/Admin Management
-      '/audit-logs': ['manage_users'],
-
+      '/audit-logs': ['all_permissions'],
       // Supplier Management
-      '/suppliers': ['manage_suppliers'],
-      '/suppliers/suppliers-management': ['manage_suppliers'],
+      '/suppliers': ['manage_suppliers', 'get_suppliers'],
+      '/suppliers/suppliers-management': ['manage_suppliers', 'create_suppliers', 'update_suppliers'],
       '/approvals/vendor-onboarding': ['manage_suppliers'],
 
       // Purchase Management
-      '/purchase-requisitions': ['manage_users'],
-      '/purchase-order-management': ['manage_users'],
-      '/approval/requisition-approval': ['manage_purchase'],
-      '/approval/order-approval': ['manage_users'],
+      '/purchase-requisitions': ['manage_purchase_requisitions', 'get_purchase_requisitions'],
+      '/purchase-order-management': ['manage_purchase_orders'],
+      '/approval/requisition-approval': ['manage_purchase_requisitions'],
+      '/approval/order-approval': ['manage_purchase_orders'],
 
       // Inventory Management
-      '/inventory/inventory-management': ['manage_users'],
-      '/inventory/request': ['manage_users'],
-      '/approvals/inventory': ['manage_users'],
+      '/inventory/inventory-management': ['manage_products'],
+      '/inventory/request': ['manage_products'],
+      '/approvals/inventory': ['manage_products'],
 
       // Budget Management
-      '/budgets-central': ['manage_budget'],
-      '/approvals/budget': ['manage_budget']
+      '/budgets-central': ['manage_budgets'],
+      '/approvals/budget': ['manage_budgets']
     };
 
     // Find matching route
     const matchingRoute = Object.entries(routePermissions)
       .find(([route]) => path.startsWith(route));
-
     if (!matchingRoute) return true; 
-
     const [, requiredPermissions] = matchingRoute;
 
-    // Check permissions
     return isCreator || 
-           permissions.includes('all_permissions') ||
            requiredPermissions.some(perm => permissions.includes(perm));
   };
 

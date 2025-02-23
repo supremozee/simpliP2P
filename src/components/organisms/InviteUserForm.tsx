@@ -9,6 +9,11 @@ import useInviteMember from '@/hooks/useInviteMember';
 import useStore from '@/store';
 import { IoShieldCheckmark } from 'react-icons/io5';
 import { Permission } from '@/types';
+import Select from '../atoms/Select';
+import CreateBranch from './CreateBranch';
+import CreateDepartment from './CreateDepartment';
+import useFetchDepartment from '@/hooks/useFetchDepartments';
+import useFetchBranch from '@/hooks/useFetchBranch';
 
 const PERMISSIONS: { value: Permission; label: string; description: string }[] = [
   {
@@ -21,11 +26,6 @@ const PERMISSIONS: { value: Permission; label: string; description: string }[] =
     label: "Manage Suppliers",
     description: "Can manage suppliers and their information"
   },
-  {
-    value: "all_permissions",
-    label: "All Permissions",
-    description: "Full access to all features and settings"
-  }
 ];
 
 const InviteFormSchema = z.object({
@@ -33,6 +33,8 @@ const InviteFormSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   role: z.string().min(1, "Role is required"),
+  branch_id: z.string().min(1, "Branch is required"),
+  department_id: z.string().min(1, "Department is required"),
   permission: z.enum(["manage_users", "manage_suppliers", "all_permissions"], {
     required_error: "Please select a permission"
   })
@@ -48,10 +50,15 @@ interface InviteProps {
 const InviteUserForm: React.FC<InviteProps> = ({ showModal = false, setShowModal }) => {
   const { inviteUser, loading } = useInviteMember();
   const { currentOrg } = useStore();
-
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<InviteFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue,watch } = useForm<InviteFormData>({
     resolver: zodResolver(InviteFormSchema)
   });
+const { data: departmentData, isLoading: loadingData, isError: errorData } = useFetchDepartment(currentOrg);
+  const { data: branchData, isLoading: branchLoading, isError: errorBranch } = useFetchBranch(currentOrg);
+  const departments = departmentData?.data?.departments || [];
+  const branches = branchData?.data?.branches || [];
+  const departmentId = watch("department_id");
+  const branchId = watch("branch_id");
 
   const onSubmit = async (data: InviteFormData) => {
     await inviteUser({
@@ -59,6 +66,8 @@ const InviteUserForm: React.FC<InviteProps> = ({ showModal = false, setShowModal
       last_name: data.last_name,
       email: data.email,
       role: data.role,
+      branch_id: data.branch_id,
+      department_id: data.department_id,
       permissions: [data.permission]
     }, currentOrg);
     
@@ -135,7 +144,39 @@ const InviteUserForm: React.FC<InviteProps> = ({ showModal = false, setShowModal
               <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
             )}
           </div>
+          <div className="relative">
+                <Select
+                  label="Department"
+                  options={departments}
+                  {...register("department_id")}
+                  required
+                  value={departmentId}
+                  display="name"
+                  error={errors.department_id?.message}
+                  loading={loadingData}
+                  isError={errorData}
+                  onChange={(e) => setValue("department_id", e.target.value)}
+                  component={
+                    <CreateDepartment add={true} />
+                  }
+                />
+              </div>
 
+              <div className="relative">
+                <Select
+                  label="Branch"
+                  options={branches}
+                  {...register("branch_id")}
+                  display="name"
+                  value={branchId}
+                  required
+                  error={errors.branch_id?.message}
+                  loading={branchLoading}
+                  isError={errorBranch}
+                  onChange={(e) => setValue("branch_id", e.target.value)}
+                  component={<CreateBranch add={true} />}
+                />
+              </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Permission Level

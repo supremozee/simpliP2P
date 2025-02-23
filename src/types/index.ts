@@ -161,14 +161,23 @@ export interface UserProfileResponse {
     message: string;
     data: OrganizationDashboardByIdData;
   }
+  
 
-export type Permission = "manage_users" | "manage_suppliers" | "all_permissions";
+export type Permission = "manage_users" | "manage_suppliers" 
+ | "manage_departments" |"manage_budgets" | "org_member"|
+ "manage_products" |"manage_purchase_orders"| "manage_purchase_requisitions"| "create_suppliers"
+| "get_suppliers" | "update_suppliers" | "delete_suppliers" | "manage_purchase_requisitions"| "create_purchase_requisitions"|
+"get_purchase_requisitions"|
+"all_permissions"
+ ;
 
 export interface InviteUserData {
   first_name: string;
   last_name: string;
   email: string;
   role: string;
+  department_id:string;
+  branch_id:string;
   permissions: [Permission];
 }
 

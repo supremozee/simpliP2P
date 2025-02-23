@@ -6,9 +6,15 @@ interface GlobalModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const AuthModal: React.FC<GlobalModalProps> = ({ isOpen, onClose, children }) => {
+const AuthModal: React.FC<GlobalModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  children,
+  size = 'md' 
+}) => {
   const handleEscapeKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -21,9 +27,11 @@ const AuthModal: React.FC<GlobalModalProps> = ({ isOpen, onClose, children }) =>
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleEscapeKeyPress);
+      document.body.style.overflow = 'hidden';
     }
     return () => {
       document.removeEventListener('keydown', handleEscapeKeyPress);
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen, handleEscapeKeyPress]);
 
@@ -35,28 +43,63 @@ const AuthModal: React.FC<GlobalModalProps> = ({ isOpen, onClose, children }) =>
     }
   };
 
+  const sizeClasses = {
+    sm: 'max-w-md',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl'
+  };
+
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-50 flex bg-black bg-opacity-50 auth-modal w-full justify-center h-full items-center"
+      className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm auth-modal w-full justify-center items-center p-4 overflow-y-auto"
       onClick={handleBackgroundClick}
       aria-modal="true"
       role="dialog"
     >
-      <div className="modal-content bg-white h-full rounded-md shadow-lg max-w-lg w-full">
+      <div 
+        className={`modal-content bg-white rounded-xl shadow-2xl ${sizeClasses[size]} w-full relative overflow-hidden`}
+      >
         {children}
       </div>
       <style jsx>{`
-        @keyframes slide-up {
+        @keyframes modal-fade-in {
           from {
-            transform: translateY(0%);
+            opacity: 0;
+            transform: scale(0.95);
           }
           to {
-            transform: translateY(40%);
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes modal-fade-out {
+          from {
+            opacity: 1;
+            transform: scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: scale(0.95);
           }
         }
 
         .modal-content {
-          animation: slide-up 0.3s ease-out forwards;
+          animation: modal-fade-in 0.2s ease-out forwards;
+          box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .auth-modal {
+          animation: fade-in 0.15s ease-out forwards;
+        }
+
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
       `}</style>
     </div>,

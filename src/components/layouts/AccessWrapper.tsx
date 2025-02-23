@@ -6,7 +6,6 @@ import useGetUser from "@/hooks/useGetUser";
 import Loader from "../molecules/Loader";
 import useStore from "@/store";
 import ErrorComponent from "../molecules/ErrorComponent";
-import useisOrgCreator from "@/hooks/useIsOrgCreator";
 
 const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -15,24 +14,29 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const { setOrganizationByAdmin, setOrganizationByUser } = useStore();
   const [hasCheckedAccess, setHasCheckedAccess] = useState(false);
-  const {isOrgCreator} = useisOrgCreator()
+
   useEffect(() => {
     const checkAccess = async () => {
       const accessStatus = isAuthenticated();
       if (!accessStatus || error) {
-        setErrorMessage(error?.message || "Session expired... redirecting to login .");
+        setErrorMessage(error?.message || "Session expired... redirecting to login.");
         setShowError(true);
-          router.push("/login");
+        router.push("/login");
         return;
       }
 
-      const isCreactor = user?.data?.user_organisations?.find(o => o.is_creator);
-      const isUser = user?.data?.user_organisations?.filter(o => !o.is_creator);
+      if (user?.data?.user_organisations) {
+        // Filter organizations based on creator status
+        const adminOrgs = user.data.user_organisations.filter(org => org.is_creator === true);
+        const memberOrgs = user.data.user_organisations.filter(org => org.is_creator === false);
 
-      if (isOrgCreator() && isCreactor?.is_creator === true) {
-        setOrganizationByAdmin(isCreactor);
-      } else if (isUser && isUser.length > 0) {
-        setOrganizationByUser(isUser);
+        // Set organizations in store
+        setOrganizationByAdmin(adminOrgs);
+        setOrganizationByUser(memberOrgs);
+      } else {
+        // Set empty arrays if no organizations exist
+        setOrganizationByAdmin([]);
+        setOrganizationByUser([]);
       }
 
       setHasCheckedAccess(true);
@@ -41,7 +45,7 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
     if (user && !hasCheckedAccess) {
       checkAccess();
     }
-  }, [isOrgCreator, error, router, setOrganizationByAdmin, setOrganizationByUser, user, hasCheckedAccess]);
+  }, [error, router, setOrganizationByAdmin, setOrganizationByUser, user, hasCheckedAccess]);
 
   if (isLoading || !user || !hasCheckedAccess) {
     return <Loader />;
