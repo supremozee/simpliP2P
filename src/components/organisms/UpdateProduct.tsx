@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,14 +10,29 @@ import useStore from '@/store';
 import { useEffect } from "react";
 import useUpdateProduct from "@/hooks/useUpdateProduct";
 import useFetchProductById from "@/hooks/useFetchProductById";
+import Select from "../atoms/Select";
+import useFetchCategories from "@/hooks/useFetchCategories";
+import CreateCategory from "./CreateCategory";
+
+const currencies:any = [
+  { id: "NGN", name: "NGN - Nigerian Naira" },
+  { id: "USD", name: "USD - US Dollar" },
+  { id: "EUR", name: "EUR - Euro" },
+  { id: "GBP", name: "GBP - British Pound" },
+  { id: "JPY", name: "JPY - Japanese Yen" },
+  { id: "GHS", name: "GHS - Ghanaian Cedi" },
+  { id: "KES", name: "KES - Kenyan Shilling" },
+  { id: "ZAR", name: "ZAR - South African Rand" }
+] as const;
 
 const UpdateProductSchema = z.object({
   name: z.string().min(1, "Name of the product is required"),
   description: z.string().min(1, "Description of the product is required"),
-  unitPrice: z.preprocess((val) => parseFloat(val as string), z.number().positive().finite()),
-  stockQtyAlert: z.preprocess((val) => parseInt(val as string, 10), z.number().optional()),
+  unitPrice: z.number().min(1, "Unit price is required"),
+  currency: z.string().min(1, "Currency is required"),
+  stockQtyAlert: z.number().min(0, "Stock alert must be 0 or greater"),
   category: z.string().min(1, "Category is required"),
-  stockQty: z.preprocess((val) => parseInt(val as string, 10), z.number().optional()),
+  stockQty: z.number().min(0, "Stock quantity must be 0 or greater"),
 });
 
 type UpdateProductFormData = z.infer<typeof UpdateProductSchema>;
@@ -29,18 +45,23 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
   const { currentOrg } = useStore();
   const { updateProduct } = useUpdateProduct();
   const { data, isLoading, isError } = useFetchProductById(currentOrg, productId);
+  const { data: categoryData, isLoading: categoryLoading, isError: errorCategory } = useFetchCategories(currentOrg);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<UpdateProductFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<UpdateProductFormData>({
     resolver: zodResolver(UpdateProductSchema),
     defaultValues: {
       name: "",
       description: "",
-      unitPrice: 0.00,
+      unitPrice: 0,
+      currency: "USD",
       stockQtyAlert: 0,
       category: "",
       stockQty: 0,
     },
   });
+
+  const categories = categoryData?.data?.categories || [];
+  const selectedCategory = watch("category");
 
   useEffect(() => {
     if (data?.data) {
@@ -48,13 +69,18 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
       setValue("description", data.data.description);
       setValue("unitPrice", data.data.unitPrice);
       setValue("stockQtyAlert", data.data.stockQtyAlert);
-      setValue("category", data.data.category);
+      setValue("category", data.data.category?.id || "");
       setValue("stockQty", data.data.stockQty);
     }
   }, [data, setValue]);
 
-  const onSubmit = async (data: ProductData) => {
-    await updateProduct(currentOrg, productId, data);
+  const onSubmit = async (formData: UpdateProductFormData) => {
+    const productData: ProductData = {
+      ...formData,
+      stockQty: Number(formData.stockQty),
+      stockQtyAlert: Number(formData.stockQtyAlert),
+    };
+    await updateProduct(currentOrg, productId, productData);
     setShowModal(false);
   };
 
@@ -83,7 +109,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
 
-            <div>
+            <div className="sm:col-span-2">
               <Input
                 type="text"
                 label="Description"
@@ -106,44 +132,77 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
             </div>
 
             <div>
-              <Input
-                type="number"
-                label="Stock Quantity"
-                className="mt-1 w-full"
-                placeholder="Enter stock quantity"
-                {...register("stockQty")}
+              <Select
+                label="Currency"
+                options={currencies}
+                {...register("currency")}
+                value={watch("currency")}
+                error={errors.currency?.message}
+                required
+                display="name"
+                placeholder="Select currency"
               />
+            </div>
+
+            <div>
+              <div className="flex flex-col">
+                <Input
+                  type="number"
+                  label="Stock Quantity"
+                  className="mt-1 w-full"
+                  min={0}
+                  placeholder="Enter stock quantity"
+                  {...register("stockQty", { valueAsNumber: true })}
+                />
+                <span className="text-xs text-gray-500 mt-1">
+                  Current stock level in inventory
+                </span>
+              </div>
               {errors.stockQty && <p className="text-red-500 text-sm">{errors.stockQty.message}</p>}
             </div>
 
             <div>
-              <Input
-                type="number"
-                label="Stock Quantity Alert"
-                className="mt-1 w-full"
-                placeholder="Enter stock alert quantity"
-                {...register("stockQtyAlert")}
-              />
+              <div className="flex flex-col">
+                <Input
+                  type="number"
+                  label="Stock Alert Level"
+                  className="mt-1 w-full"
+                  min={0}
+                  placeholder="Enter alert threshold"
+                  {...register("stockQtyAlert", { valueAsNumber: true })}
+                />
+                <span className="text-xs text-gray-500 mt-1">
+                  Minimum quantity before restock notification
+                </span>
+              </div>
               {errors.stockQtyAlert && <p className="text-red-500 text-sm">{errors.stockQtyAlert.message}</p>}
-            </div> 
+            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Category</label>
-              <select
-                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            <div className="relative">
+              <Select
+                label="Category"
+                options={categories}
                 {...register("category")}
-              >
-                <option value="" disabled>
-                  Select category
-                </option>
-                <option value="Building">Building</option>
-                <option value="Agriculture">Agriculture</option>
-                <option value="Technology">Technology</option>
-              </select>
-              {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
+                onChange={(e) => setValue("category", e.target.value)}
+                value={selectedCategory}
+                error={errors.category?.message}
+                loading={categoryLoading}
+                isError={errorCategory}
+                required
+                display="name"
+                placeholder="Select a category"
+                component={<CreateCategory add={true} />}
+              />
             </div>
 
             <div className="flex justify-end mt-6 space-x-4 col-span-1 sm:col-span-2">
+              <Button
+                type="button"
+                className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300"
+                onClick={toggleModal}
+              >
+                Cancel
+              </Button>
               <Button
                 type="submit"
                 className="px-5 py-2 text-white rounded-lg"

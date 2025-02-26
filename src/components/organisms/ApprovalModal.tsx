@@ -16,14 +16,25 @@ import { FaUserTie, FaFileInvoiceDollar } from "react-icons/fa";
 import { BsClockHistory } from "react-icons/bs";
 import { cn } from "@/utils/cn";
 import LoaderSpinner from "../atoms/LoaderSpinner";
+import useFetchBudget from '@/hooks/useFetchBudget';
+import Select from '../atoms/Select';
+
+const actionTypes = [
+  { id: "approve", name: "Approve Only" },
+  { id: "reject", name: "Reject" },
+  { id: "approve_and_create_po", name: "Approve & Create PO" }
+];
 
 const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
   const { isOpen, setIsOpen, currentOrg } = useStore();
   const { data, isLoading, isError } = useFetchPurchaseRequisitionById(currentOrg, pr_id);
+  const { data: budgets, isLoading: isBudgetLoading } = useFetchBudget(currentOrg);
   const { updateRequisitionStatus, loading } = useUpdateRequisitionStatus();
   const [isRejectModalOpen, setIsRejectModalOpen] = useState<boolean>(false);
   const [justification, setJustification] = useState<string>("");
   const [showConfirmApproval, setShowConfirmApproval] = useState(false);
+  const [selectedBudget, setSelectedBudget] = useState<string>("");
+  const [selectedActionType, setSelectedActionType] = useState<string>("approve_and_create_po");
 
   if (isLoading) {
     return (
@@ -49,18 +60,24 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
   const requisition = data?.data.requisition;
 
   const handleApprove = async () => {
+    if (!selectedBudget || !selectedActionType) return;
     await updateRequisitionStatus(currentOrg, pr_id, { 
       status: 'APPROVED', 
-      approval_justification: justification 
+      approval_justification: justification,
+      budget_id: selectedBudget,
+      action_type: selectedActionType as "approve" | "approve_and_create_po"
     });
     setShowConfirmApproval(false);
     setIsOpen(false);
   };
 
   const handleReject = async () => {
+    if (!selectedBudget) return;
     await updateRequisitionStatus(currentOrg, pr_id, { 
       status: 'REJECTED', 
-      approval_justification: justification 
+      approval_justification: justification,
+      budget_id: selectedBudget,
+      action_type: "reject"
     });
     setIsRejectModalOpen(false);
     setIsOpen(false);
@@ -228,16 +245,45 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
 
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <h3 className="font-semibold text-gray-800 mb-4">Approval Notes</h3>
-                <TextAreaField
-                  name="approvalJustification"
-                  label="Justification"
-                  placeholder="Enter your justification for approval/rejection"
-                  required={true}
-                  className="w-full"
-                  rows={4}
-                  value={justification}
-                  onChange={(e) => setJustification(e.target.value)}
-                />
+                <div className="space-y-4">
+                  <div>
+                    <Select
+                      label="Select Budget"
+                      options={budgets || []}
+                      value={selectedBudget}
+                      onChange={(e) => setSelectedBudget(e.target.value)}
+                      error={!selectedBudget ? "Please select a budget" : ""}
+                      loading={isBudgetLoading}
+                      required
+                      display="name"
+                      placeholder="Select a budget"
+                    />
+                  </div>
+                  {!isRejectModalOpen && (
+                    <div>
+                      <Select
+                        label="Action Type"
+                        options={actionTypes}
+                        value={selectedActionType}
+                        onChange={(e) => setSelectedActionType(e.target.value)}
+                        error={!selectedActionType ? "Please select an action type" : ""}
+                        required
+                        display="name"
+                        placeholder="Select action type"
+                      />
+                    </div>
+                  )}
+                  <TextAreaField
+                    name="approvalJustification"
+                    label="Justification"
+                    placeholder="Enter your justification for approval/rejection"
+                    required={true}
+                    className="w-full"
+                    rows={4}
+                    value={justification}
+                    onChange={(e) => setJustification(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -246,7 +292,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                   <Button
                     className="w-full bg-primary text-white py-2 rounded-lg flex justify-center items-center"
                     onClick={() => setShowConfirmApproval(true)}
-                    disabled={loading || !justification.trim()}
+                    disabled={loading || !justification.trim() || !selectedBudget || !selectedActionType}
                   >
                     {loading ? (
                       <div className="flex items-center gap-2">
@@ -254,13 +300,13 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                         <span>Processing...</span>
                       </div>
                     ) : (
-                      "Approve Requisition"
+                      selectedActionType === "approve_and_create_po" ? "Approve & Create PO" : "Approve Requisition"
                     )}
                   </Button>
                   <Button
                     className="w-full bg-white border border-red-500 text-red-500 py-2 rounded-lg flex justify-center items-center"
                     onClick={() => setIsRejectModalOpen(true)}
-                    disabled={loading || !justification.trim()}
+                    disabled={loading || !justification.trim() || !selectedBudget}
                   >
                     Reject Requisition
                   </Button>

@@ -9,6 +9,7 @@ import CreateDepartment from './CreateDepartment';
 import Select from '../atoms/Select';
 import useFetchBranch from '@/hooks/useFetchBranch';
 import CreateBranch from './CreateBranch';
+import { currencies } from "@/constants";
 
 interface RequisitionFormType {
   department_id: string;
@@ -18,12 +19,9 @@ interface RequisitionFormType {
   branch_id: string;
   quantity: number;
   estimated_cost: number;
+  currency: string;
   justification: string;
   needed_by_date: string;
-  priority_level?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-  budget_code?: string;
-  delivery_location?: string;
-  special_instructions?: string;
 }
 
 interface CreateRequisitionFormProps {
@@ -36,6 +34,7 @@ interface CreateRequisitionFormProps {
 
 const today = new Date();
 
+
 const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register, errors, prNumber, watch, setValue }) => {
   const { currentOrg } = useStore();
   const { data: departmentData, isLoading: loadingData, isError: errorData } = useFetchDepartment(currentOrg);
@@ -44,13 +43,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
   const branches = branchData?.data?.branches || [];
   const departmentId = watch("department_id");
   const branchId = watch("branch_id");
-
-  const priorityLevels = [
-    { id: "LOW", name: "Low Priority" },
-    { id: "MEDIUM", name: "Medium Priority" },
-    { id: "HIGH", name: "High Priority" },
-    { id: "URGENT", name: "Urgent" }
-  ];
+  const selectedCurrency = watch("currency");
 
   return (
     <div className="flex flex-col w-full justify-center z-20 relative">
@@ -101,37 +94,6 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 />
               </div>
 
-              <div className="relative opacity-60">
-                <Select
-                  label="Priority Level (Coming Soon)"
-                  options={priorityLevels}
-                  value=""
-                  error={errors.priority_level?.message}
-                  placeholder="This feature will be available soon"
-                  disabled
-                />
-              </div>
-
-              <div className="opacity-60">
-                <InputField
-                  label="Budget Code (Coming Soon)"
-                  name="budget_code"
-                  type="text"
-                  placeholder="This feature will be available soon"
-                  disabled
-                />
-              </div>
-
-              <div className="opacity-60">
-                <InputField
-                  name="delivery_location"
-                  label="Delivery Location (Coming Soon)"
-                  type="text"
-                  placeholder="This feature will be available soon"
-                  disabled
-                />
-              </div>
-
               <InputField
                 label="Contact Information"
                 required
@@ -174,14 +136,6 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
               />
               {errors.request_description && <p className="text-red-500 text-xs">{errors.request_description.message}</p>}
 
-              <TextAreaField
-                label="Special Instructions (Coming Soon)"
-                placeholder="This feature will be available soon"
-                className="h-28 opacity-60"
-                name="special_instructions"
-                disabled
-              />
-
               <InputField
                 label="Quantity"
                 required
@@ -191,14 +145,33 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
               />
               {errors.quantity && <p className="text-red-500 text-xs">{errors.quantity.message}</p>}
 
-              <InputField
-                label="Estimated Cost"
-                required
-                type="number"
-                placeholder="Estimated Cost"
-                {...register("estimated_cost", { valueAsNumber: true })}
-              />
-              {errors.estimated_cost && <p className="text-red-500 text-xs">{errors.estimated_cost.message}</p>}
+              <div className="flex gap-4 flex-col">
+                <div className="flex-1">
+                  <InputField
+                    label="Estimated Cost"
+                    required
+                    type="number"
+                    placeholder="Estimated Cost"
+                    {...register("estimated_cost", { valueAsNumber: true })}
+                  />
+                  {errors.estimated_cost && <p className="text-red-500 text-xs">{errors.estimated_cost.message}</p>}
+                </div>
+
+                <div className="w-full">
+                  <Select
+                    label="Currency"
+                    options={currencies}
+                    {...register("currency")}
+                    value={selectedCurrency}
+                    error={errors.currency?.message}
+                    required
+                    display="name"
+                    placeholder="Select currency"
+                    onChange={(e) => setValue("currency", e.target.value)}
+                  />
+                  {errors.currency && <p className="text-red-500 text-xs">{errors.currency.message}</p>}
+                </div>
+              </div>
 
               <TextAreaField
                 label="Justification"

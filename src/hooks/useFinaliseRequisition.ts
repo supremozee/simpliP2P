@@ -21,7 +21,6 @@ const useFinaliseRequisition = () => {
       return await auth.finaliseRequistion(orgId, data);
     },
     onSuccess: (response) => {
-      console.log(response);
       setLoading(false);
       success(response?.message);
       queryClient.invalidateQueries({ queryKey: ['fetchRequisition'] });

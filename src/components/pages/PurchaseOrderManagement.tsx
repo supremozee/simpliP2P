@@ -70,12 +70,10 @@ const PurchaseOrdersManagement: React.FC = () => {
     if (data?.data?.orders) {
       let orders = data.data.orders;
 
-      // Filter by tab
       if (activeTab !== "ALL") {
         orders = orders.filter(order => order.status === activeTab);
       }
 
-      // Filter by search - include total_amount in the search
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
         orders = orders.filter(order => {
@@ -149,10 +147,7 @@ const PurchaseOrdersManagement: React.FC = () => {
           order.po_number,
           order.supplier.full_name,
           new Date(order.created_at).toLocaleDateString(),
-          Number(order.total_amount).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD'
-          }),
+          order?.currency +Number(order.total_amount),
           order.status,
         ]}
         index={index}

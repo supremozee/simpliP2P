@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import CreateSupplier from '../organisms/CreateSupplier';
 import useFetchSuppliers from '@/hooks/useFetchSuppliers';
 import useStore from '@/store';
 import Loader from '../molecules/Loader';
@@ -24,7 +23,7 @@ interface FilteredSupplier extends Supplier {
 }
 
 const SupplierPage = () => {
-  const { currentOrg, setSupplierId } = useStore();
+  const { currentOrg, setSupplierId, setIsUpdateSupplierOpen } = useStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,24 +31,18 @@ const SupplierPage = () => {
 
   const { data, isLoading, isError, error } = useFetchSuppliers(currentOrg, currentPage, itemsPerPage);
   const { mutateAsync: deleteSupplier } = useDeleteSupplier(currentOrg);
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
   
   const headers = ["Name", "Date created", "Category", "Rating", "Actions"];
 
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
-
   const toggleView = () => {
     setView(prev => prev === 'list' ? 'grid' : 'list');
   };
 
-  const toggleUpdateModal = (supplierId: string) => {
-    setSupplierId(supplierId);
-    setShowUpdateModal(true);
+  const handleEdit = (id: string) => {
+    setSupplierId(id);
+    setIsUpdateSupplierOpen(true);
   };
 
   const handleOpenConfirmDeleteModal = (supplierId: string) => {
@@ -95,8 +88,7 @@ const SupplierPage = () => {
 
   return (
     <>
-      {showModal && <CreateSupplier showModal={showModal} setShowModal={setShowModal} />}
-      {showUpdateModal && <UpdateSupplier showModal={showUpdateModal} setShowModal={setShowUpdateModal} />}
+      <UpdateSupplier />
       {openConfirmDeleteModal && selectedSupplierId && (
         <ConfirmDelete
           isOpen={openConfirmDeleteModal}
@@ -119,11 +111,11 @@ const SupplierPage = () => {
         </div>
 
         <ActionBar
-          buttonName="Create Supplier"
-          onClick={toggleModal}
           onSearch={handleSearch}
           showDate
           type="suppliers"
+          buttonName='Create Supplier'
+          onClick={() => setIsUpdateSupplierOpen(true)}
         />
 
         <div className="bg-white rounded-xl shadow-sm">
@@ -145,7 +137,7 @@ const SupplierPage = () => {
                         key={supplier.id}
                         item={supplier}
                         index={i}
-                        onEdit={toggleUpdateModal}
+                        onEdit={handleEdit}
                         onDelete={handleOpenConfirmDeleteModal}
                       />
                     )}
@@ -188,7 +180,7 @@ const SupplierPage = () => {
 
                     <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-2">
                       <Button
-                        onClick={() => toggleUpdateModal(supplier.id)}
+                        onClick={() => handleEdit(supplier.id)}
                         className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors"
                       >
                         Edit

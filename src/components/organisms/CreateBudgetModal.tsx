@@ -12,6 +12,9 @@ import Select from "../atoms/Select";
 import useFetchDepartments from "@/hooks/useFetchDepartments";
 import useFetchCategories from "@/hooks/useFetchCategories";
 import useFetchBranch from "@/hooks/useFetchBranch";
+import CreateBranch from "./CreateBranch";
+import CreateDepartment from "./CreateDepartment";
+import CreateCategory from "./CreateCategory";
 
 const CreateBudgetSchema = z.object({
   name: z.string().min(1, "Budget name is required"),
@@ -32,7 +35,7 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
   const { data: categoryData, isLoading: categoryLoading, isError: categoryError } = useFetchCategories(currentOrg);
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<CreateBudgetFormData>({
     resolver: zodResolver(CreateBudgetSchema),
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: { currency: 'NGN' },
   });
 
@@ -106,6 +109,7 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               error={errors.branchId?.message}
               loading={branchLoading}
               isError={branchError}
+              component={<CreateBranch add={true}/>}
             />
           </div>
 
@@ -121,6 +125,7 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               error={errors.departmentId?.message}
               loading={departmentLoading}
               isError={departmentError}
+              component={<CreateDepartment add={true}/>}
             />
           </div>
 
@@ -136,6 +141,8 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               error={errors.categoryId?.message}
               loading={categoryLoading}
               isError={categoryError}
+              component={<CreateCategory add={true}/>}
+
             />
           </div>
         </div>

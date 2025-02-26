@@ -17,11 +17,15 @@ import CreateCategory from "./CreateCategory";
 import useFetchCategories from "@/hooks/useFetchCategories";
 import useFileManager from "@/hooks/useFileManager";
 import LoaderSpinner from "../atoms/LoaderSpinner";
+import { currencies } from "@/constants";
+
+// Currency data
 
 const CreateProductSchema = z.object({
   name: z.string().min(1, "Product Name is required"),
   description: z.string().min(1, "Description is required"),
-  unitPrice: z.number().positive("Unit price must be a positive number"),
+  unitPrice: z.string().min(1, "Unit price is required"),
+  currency: z.string().min(1, "Currency is required"),
   stockQty: z.number().nonnegative("Stock quantity must be at least 0"),
   stockQtyAlert: z.number().optional(),
   category: z.string().min(1, "Category is required"),
@@ -35,8 +39,13 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
   const { createProduct, loading, errorMessage, successCreate } = useCreateProduct();
   const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<ProductFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<ProductFormData>({
     resolver: zodResolver(CreateProductSchema),
+    defaultValues: {
+      currency: "USD",
+      stockQtyAlert: 0,
+      stockQty: 0,
+    },
     mode: "onSubmit",
   });
   const imageRef = useRef<HTMLInputElement>(null);
@@ -51,22 +60,25 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
       }
       const response = await uploadFile(file);
       setImagePreview(response.url);
-      setValue("image_url", response.url); // Set the image_url field in the form
+      setValue("image_url", response.url);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
 
   const categories = categoryData?.data?.categories || [];
+  const selectedCurrency = watch("currency");
 
   const onSubmit = async (data: ProductFormData) => {
-    try {
-      await createProduct({ ...data }, currentOrg);
-      reset();
-      setIsOpen(false);
-    } catch (error) {
-      console.error("Error creating product:", error);
-    }
+    const formattedData = {
+      ...data,
+      unitPrice: Number(data.unitPrice),
+      stockQty: Number(data.stockQty),
+      stockQtyAlert: Number(data.stockQtyAlert || 0),
+    };
+    await createProduct(formattedData, currentOrg);
+    reset();
+    setIsOpen(false);
   };
 
   return (
@@ -121,31 +133,58 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
 
             <div>
               <Input
-                type="number"
+                type="text"
                 label="Unit Price"
                 placeholder="Input unit price"
-                {...register("unitPrice", { valueAsNumber: true })}
+                {...register("unitPrice")}
               />
               {errors.unitPrice && <p className="text-red-500 text-sm">{errors.unitPrice.message}</p>}
             </div>
 
             <div>
-              <Input
-                type="number"
-                label="Stock Quantity"
-                placeholder="Input stock quantity"
-                {...register("stockQty", { valueAsNumber: true })}
+              <Select
+                label="Currency"
+                options={currencies}
+                {...register("currency")}
+                value={selectedCurrency}
+                error={errors.currency?.message}
+                required
+                display="name"
+                placeholder="Select currency"
               />
+              {errors.currency && <p className="text-red-500 text-sm">{errors.currency.message}</p>}
+            </div>
+
+            <div>
+              <div className="flex flex-col">
+                <Input
+                  type="number"
+                  label="Stock Quantity"
+                  placeholder="Input stock quantity"
+                  min={0}
+                  {...register("stockQty", { valueAsNumber: true })}
+                />
+                <span className="text-xs text-gray-500 mt-1">
+                  Current stock level in inventory
+                </span>
+              </div>
               {errors.stockQty && <p className="text-red-500 text-sm">{errors.stockQty.message}</p>}
             </div>
 
             <div>
-              <Input
-                type="number"
-                label="Stock Alert (Optional)"
-                placeholder="Stock alert threshold"
-                {...register("stockQtyAlert", { valueAsNumber: true })}
-              />
+              <div className="flex flex-col">
+                <Input
+                  type="number"
+                  label="Stock Alert (Optional)"
+                  placeholder="Stock alert threshold"
+                  min={0}
+                  {...register("stockQtyAlert", { valueAsNumber: true })}
+                />
+                <span className="text-xs text-gray-500 mt-1">
+                  Minimum quantity before restock notification
+                </span>
+              </div>
+              {errors.stockQtyAlert && <p className="text-red-500 text-sm">{errors.stockQtyAlert.message}</p>}
             </div>
 
             <div onClick={(e) => {
@@ -199,7 +238,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
 
             <div className="flex justify-end my-6 space-x-4 col-span-1 sm:col-span-2">
               <Button
-                className="px-4 py-2 bg-white text-gray-700 rounded-lg"
+                className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300"
                 onClick={() => {
                   reset();
                   setIsOpen(false);

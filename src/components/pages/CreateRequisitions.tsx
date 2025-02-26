@@ -25,12 +25,9 @@ const PurchaseRequisitionSchema = z.object({
   branch_id: z.string().min(1, "Branch is required"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   estimated_cost: z.number().min(1, "Estimated cost must be at least 1"),
+  currency: z.string().min(1, "Currency is required"),
   justification: z.string().min(1, "Justification is required"),
   needed_by_date: z.string().min(1, "Needed by date must be in the future"),
-  priority_level: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
-  budget_code: z.string().optional(),
-  delivery_location: z.string().optional(),
-  special_instructions: z.string().optional(),
 });
 
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
@@ -51,6 +48,7 @@ const CreateRequisitions = () => {
     branch_id: "",
     quantity: 0,
     estimated_cost: 0,
+    currency: "USD",
     justification: "",
     needed_by_date: "",
   };
@@ -101,6 +99,7 @@ const CreateRequisitions = () => {
         branch_id: data.branch_id,
         quantity: data.quantity,
         estimated_cost: data.estimated_cost,
+        currency: data.currency,
         justification: data.justification,
         needed_by_date: data.needed_by_date,
       };
@@ -109,6 +108,7 @@ const CreateRequisitions = () => {
         await saveForLater(currentOrg, submissionData);
       } else {
         await finaliseRequisition(submissionData, currentOrg);
+        setIsOpen(false);
       }
       reset();
     } else {

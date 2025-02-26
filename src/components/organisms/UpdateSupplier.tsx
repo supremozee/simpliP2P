@@ -1,21 +1,19 @@
 import { z } from "zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from '../atoms/Input'; 
 import Button from '../atoms/Button';
 import Modal from "../atoms/Modal";
-import { DeleteSupplierResponse, ModalProps } from "@/types";
 import useStore from '@/store';
+import StarRating from "../atoms/StarRating";
+import Select from "../atoms/Select";
+import useFetchCategories from "@/hooks/useFetchCategories";
+import CreateCategory from "./CreateCategory";
+import { useState, useMemo, useEffect } from "react";
+import { City, Country, State } from 'country-state-city';
 import useUpdateSupplier from "@/hooks/useUpdateSupplier";
 import useFetchSupplierById from "@/hooks/useFetchSupplierById";
-import { useEffect, useState, useMemo } from "react";
-import useNotify from "@/hooks/useNotify";
-import useDeleteSupplier from "@/hooks/useDeleteSupplier";
-import Select from "../atoms/Select";
-import CreateCategory from "./CreateCategory";
-import useFetchCategories from "@/hooks/useFetchCategories";
-import LoaderSpinner from "../atoms/LoaderSpinner";
-import { City, Country, State } from 'country-state-city';
+import { cn } from "@/utils/cn";
 
 const UpdateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
@@ -31,72 +29,43 @@ const UpdateSupplierSchema = z.object({
     zip_code: z.string().optional()
   }),
   bank_details: z.object({
-    account_number: z.string().min(10, "Account number must be at least 10 characters"),
+    account_number: z.string().min(1, "Account number is required"),
     bank_name: z.string().min(1, "Bank name is required"),
-    account_name: z.string().min(1, "Account name is required")
+    account_name: z.string().min(1, "Account name is required"),
   })
 });
 
 type UpdateSupplierFormData = z.infer<typeof UpdateSupplierSchema>;
 
-interface UpdateSupplierProps extends ModalProps {
-  supplierId?: string;
-}
-
-const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal }) => {
-  const { currentOrg, supplierId } = useStore();
-  const {success} = useNotify();
-  const [selectedCategory, setSelectedCategory] = useState("");
+const UpdateSupplier = () => {
+  const { currentOrg, supplierId, isUpdateSupplierOpen, setIsUpdateSupplierOpen } = useStore();
   const [step, setStep] = useState(1);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
   
   const updateSupplierMutation = useUpdateSupplier(currentOrg);
-  const deleteSupplierMutation = useDeleteSupplier(currentOrg);
-  const { isPending, isError } = updateSupplierMutation;
   const { data: supplierData, isLoading: isSupplierLoading } = useFetchSupplierById(currentOrg, supplierId);
   const { data: categoryData, isLoading: categoryLoading, isError: errorCategory } = useFetchCategories(currentOrg);
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue, control, watch, trigger } = useForm<UpdateSupplierFormData>({
+  const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<UpdateSupplierFormData>({
     resolver: zodResolver(UpdateSupplierSchema),
-    defaultValues: {
-      full_name: "",
-      email: "",
-      phone: "",
-      address: {
-        street: "",
-        city: "",
-        state: "",
-        country: "",
-        zip_code: ""
-      },
-      category: "",
-      rating: 0,
-      bank_details: {
-        account_number: "",
-        bank_name: "",
-        account_name: ""
-      }
-    }
+    mode: "onChange"
   });
 
-  // Get countries list
   const countries = useMemo(() => Country.getAllCountries(), []);
-  
-  // Get states based on selected country
   const states = useMemo(() => {
     if (!selectedCountry) return [];
     return State.getStatesOfCountry(selectedCountry);
   }, [selectedCountry]);
 
-  // Get cities based on selected state and country
   const cities = useMemo(() => {
     if (!selectedCountry || !selectedState) return [];
     return City.getCitiesOfState(selectedCountry, selectedState);
   }, [selectedCountry, selectedState]);
 
   const categories = categoryData?.data?.categories || [];
-  const ratings = useWatch({ control, name: 'rating' });
+  const rating = watch("rating", 0);
+  const category = watch("category");
 
   useEffect(() => {
     if (supplierData?.data) {
@@ -104,10 +73,9 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
       setValue("full_name", data.full_name ?? "");
       setValue("email", data.email ?? "");
       setValue("phone", data.phone ?? "");
-      setValue("category", data.category?.id ?? "");
-      setSelectedCategory(data.category?.name ?? "");
-      
-      // Parse address string into components
+      if(data?.category?.id) {
+        setValue("category", data.category.id, { shouldValidate: true });
+      }
       if (data.address) {
         setValue("address.street", data.address.street ?? "");
         setValue("address.city", data.address.city ?? "");
@@ -115,11 +83,9 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
         setValue("address.country",  data.address.country ?? "");
         setValue("address.zip_code",  data.address.zip_code ?? "");
 
-        // Find and set country code
         const country = countries.find(c => c.name === data.address.country);
         if (country) {
           setSelectedCountry(country.isoCode);
-          // Find and set state code
           const state = State.getStatesOfCountry(country.isoCode)
             .find(s => s.name === data.address.state);
           if (state) {
@@ -128,7 +94,6 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
         }
       }
 
-      // Set bank details if they exist
       if (data.bank_details) {
         setValue("bank_details.account_number", data.bank_details.account_number ?? "");
         setValue("bank_details.bank_name", data.bank_details.bank_name ?? "");
@@ -140,33 +105,12 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
     }
   }, [supplierData, setValue, countries]);
 
-  const toggleModal = () => {
-    setShowModal(!showModal);
-    setStep(1); 
-  };
-
-  const handleDeleteSupplier = async () => {
-    if (supplierId) {
-      const response: DeleteSupplierResponse = await deleteSupplierMutation.mutateAsync({ supplierId });
-      if (response.status === "success") {
-        success(response?.message);
-      }
-      toggleModal();
-    }
-  };
-
   const onSubmit = async (data: UpdateSupplierFormData) => {
     try {
-      if (supplierId) {
-        const response = await updateSupplierMutation.mutateAsync({ supplierId, data });
-        if (response.status === "success") {
-          success(response?.message);
-        }
-      } else {
-        alert("Supplier ID not defined");
-      }
+      await updateSupplierMutation.mutateAsync({ supplierId, data });
       reset();
-      toggleModal();
+      setIsUpdateSupplierOpen(false);
+      setStep(1);
     } catch (error) {
       console.error("Error updating supplier:", error);
     }
@@ -181,9 +125,6 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
         break;
       case 2:
         isStepValid = await trigger(["address"]);
-        break;
-      case 3:
-        isStepValid = await trigger(["bank_details"]);
         break;
     }
 
@@ -215,38 +156,42 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
   };
 
   return (
-    <Modal onClose={toggleModal} isOpen={showModal}>
+    <Modal onClose={() => {
+      setIsUpdateSupplierOpen(false);
+      setStep(1);
+    }} isOpen={isUpdateSupplierOpen}>
       <div className="px-4 py-6 sm:px-10">
-        <div className="flex justify-between w-full mb-6">
-          <div>
-            <h2 className="text-xl font-bold">Update Supplier</h2>
-            <p className="text-gray-500 mt-1">
-              Update the supplier&apos;s information below
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            {[1, 2, 3].map((num) => (
-              <div key={num} className="flex items-center">
-                <div className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === num ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
-                  {num}
-                </div>
-                {num < 3 && <div className="border-t border-gray-300 w-8"></div>}
-              </div>
-            ))}
-          </div>
-        </div>
+        <h2 className="text-xl font-bold mb-4">Update Supplier</h2>
+        <p className="text-gray-500 mb-6">Update the supplier&apos;s information below</p>
 
         {isSupplierLoading ? (
-          <div className="flex justify-center items-center min-h-[200px]">
-            <LoaderSpinner size="md" text="Loading supplier data..." />
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+            <div className="flex justify-between w-full mb-6">
+              <div className="flex items-center space-x-2">
+                {[1, 2, 3].map((num) => (
+                  <div key={num} className="flex items-center">
+                    <div className={cn(
+                      "rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center",
+                      step === num ? 'bg-primary text-white' : 'bg-white text-gray-700'
+                    )}>
+                      {num}
+                    </div>
+                    {num < 3 && <div className="border-t border-gray-300 w-8"></div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="flex flex-col">
               <p className="text-gray-500 mb-6">
                 {step === 1 ? "Basic details" : step === 2 ? "Address details" : "Bank details"}
               </p>
 
+              {/* Step 1: Basic Details */}
               {step === 1 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -254,7 +199,7 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
                       type="text"
                       label="Full Name"
                       className="mt-1 w-full"
-                      placeholder="Input full name"
+                      placeholder="Enter full name"
                       {...register("full_name")}
                     />
                     {errors.full_name && <p className="text-red-500 text-sm">{errors.full_name.message}</p>}
@@ -265,7 +210,7 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
                       type="email"
                       label="Email"
                       className="mt-1 w-full"
-                      placeholder="Input email address"
+                      placeholder="Enter email address"
                       {...register("email")}
                     />
                     {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
@@ -276,7 +221,7 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
                       type="text"
                       label="Phone Number"
                       className="mt-1 w-full"
-                      placeholder="Input phone number"
+                      placeholder="Enter phone number"
                       {...register("phone")}
                     />
                     {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
@@ -287,45 +232,31 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
                       label="Category"
                       options={categories}
                       {...register("category")}
-                      onChange={(e) => {
-                        setValue("category", e.target.value);
-                        const selectedCat = categories.find(cat => cat.id === e.target.value);
-                        if (selectedCat) {
-                          setSelectedCategory(selectedCat.name);
-                        }
-                      }}
-                      value={watch("category")}
-                      defaultValue={selectedCategory}
+                      onChange={(e) => setValue("category", e.target.value)}
+                      value={category}
                       error={errors.category?.message}
                       loading={categoryLoading}
                       isError={errorCategory}
                       required
+                      display="name"
                       placeholder="Select a category"
                       component={<CreateCategory add={true} />}
                     />
                   </div>
 
                   <div className="mt-5 sm:mt-0 col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Rating
-                    </label>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          className={`text-2xl ${Number(ratings) >= star ? "text-yellow-400" : "text-gray-300"}`}
-                          onClick={() => setValue("rating", star)}
-                        >
-                          ★
-                        </button>
-                      ))}
-                    </div>
-                    {errors.rating && <p className="text-red-500 text-sm">{errors.rating.message}</p>}
+                    <StarRating
+                      showLabel={true}
+                      maxRating={5}
+                      rating={rating}
+                      error={errors?.rating}
+                      setRating={(rating) => setValue("rating", rating)}
+                    />
                   </div>
                 </div>
               )}
 
+              {/* Step 2: Address Details */}
               {step === 2 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="col-span-2">
@@ -404,67 +335,46 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
                 </div>
               )}
 
+              {/* Step 3: Bank Details */}
               {step === 3 && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Input
-                        type="text"
-                        label="Account Number"
-                        className="mt-1 w-full"
-                        placeholder="Enter account number"
-                        {...register("bank_details.account_number")}
-                      />
-                      {errors.bank_details?.account_number && (
-                        <p className="text-red-500 text-sm">{errors.bank_details.account_number.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <Input
-                        type="text"
-                        label="Bank Name"
-                        className="mt-1 w-full"
-                        placeholder="Enter bank name"
-                        {...register("bank_details.bank_name")}
-                      />
-                      {errors.bank_details?.bank_name && (
-                        <p className="text-red-500 text-sm">{errors.bank_details.bank_name.message}</p>
-                      )}
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <Input
-                        type="text"
-                        label="Account Name"
-                        className="mt-1 w-full"
-                        placeholder="Enter account name"
-                        {...register("bank_details.account_name")}
-                      />
-                      {errors.bank_details?.account_name && (
-                        <p className="text-red-500 text-sm">{errors.bank_details.account_name.message}</p>
-                      )}
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      type="text"
+                      label="Account Number"
+                      className="mt-1 w-full"
+                      placeholder="Enter account number"
+                      {...register("bank_details.account_number")}
+                    />
+                    {errors.bank_details?.account_number && (
+                      <p className="text-red-500 text-sm">{errors.bank_details.account_number.message}</p>
+                    )}
                   </div>
 
-                  <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
-                    <Button
-                      className="px-5 py-2 bg-red-500 text-white rounded-lg flex justify-center items-center hover:bg-red-600 transition-colors"
-                      onClick={() => {
-                        reset();
-                        handleDeleteSupplier();
-                        setShowModal(false);
-                      }}
-                    >
-                      <span className="text-[13px]">Delete Supplier</span>
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="px-5 py-2 text-white rounded-lg flex justify-center items-center"
-                      disabled={isPending}
-                    >
-                      <span className="text-[13px]">{isPending ? "Updating..." : "Update Supplier"}</span>
-                    </Button>
+                  <div>
+                    <Input
+                      type="text"
+                      label="Bank Name"
+                      className="mt-1 w-full"
+                      placeholder="Enter bank name"
+                      {...register("bank_details.bank_name")}
+                    />
+                    {errors.bank_details?.bank_name && (
+                      <p className="text-red-500 text-sm">{errors.bank_details.bank_name.message}</p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <Input
+                      type="text"
+                      label="Account Name"
+                      className="mt-1 w-full"
+                      placeholder="Enter account name"
+                      {...register("bank_details.account_name")}
+                    />
+                    {errors.bank_details?.account_name && (
+                      <p className="text-red-500 text-sm">{errors.bank_details.account_name.message}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -488,11 +398,19 @@ const UpdateSupplier: React.FC<UpdateSupplierProps> = ({ showModal, setShowModal
                     Next
                   </Button>
                 )}
+                {step === 3 && (
+                  <Button
+                    type="submit"
+                    disabled={!isValid || updateSupplierMutation.isPending}
+                    className="px-5 py-2 text-white rounded-lg"
+                  >
+                    {updateSupplierMutation.isPending ? "Updating..." : "Update Supplier"}
+                  </Button>
+                )}
               </div>
             </div>
           </form>
         )}
-        {isError && <p className="text-red-500 mt-4">Error updating supplier</p>}
       </div>
     </Modal>
   );

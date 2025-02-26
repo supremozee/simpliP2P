@@ -368,6 +368,7 @@ export interface Owner {
     requestor_name: string;
     request_description: string;
     quantity: number;
+    currency:string;
     estimated_cost: number;
     justification: string;
     needed_by_date: string;
@@ -449,6 +450,7 @@ interface Role {
     name: string;
     description: string;
     unitPrice: number;
+    currency?:string;
     stockQty?: number;
     stockQtyAlert?: number;
     category: string;
@@ -464,7 +466,7 @@ interface Role {
       unitPrice: number;
       stockQty: number;
       stockQtyAlert: number;
-      category: string;
+      category: Category;
       productCode: string | null;
       id: string;
       created_at: string;
@@ -479,6 +481,7 @@ interface Role {
     updated_at: string;
     name: string;
     description: string;
+    currency:string
     unitPrice: number;
     stockQty: number;
     stockQtyAlert: number;
@@ -717,6 +720,7 @@ interface Role {
     updated_at: string;
     po_number: string;
     total_amount: string;
+    currency:string
     status: string;
     attachment: string;
     supplier: Supplier;
@@ -739,8 +743,10 @@ interface Role {
     };
   }
   export interface updateRequisitionStatus {
+    budget_id:string;
     status: string,
-    approval_justification: string
+    approval_justification: string;
+    action_type: "approve" | "reject" | "approve_and_create_po"
   }
   export interface updateOrderStatus {
     status: string,

@@ -47,6 +47,8 @@ interface SimpliP2PStore {
   setFormat: (format: string) => void;
   type: string;
   setType: (type: string) => void;
+  isUpdateSupplierOpen: boolean;
+  setIsUpdateSupplierOpen: (value: boolean) => void;
 }
 
 const useStore = create<SimpliP2PStore>()(
@@ -123,6 +125,8 @@ const useStore = create<SimpliP2PStore>()(
         setFormat: (format: string) => set({ format: format }),
         type: '',
         setType: (type: string) => set({ type: type }),
+        isUpdateSupplierOpen: false,
+        setIsUpdateSupplierOpen: (value: boolean) => set({ isUpdateSupplierOpen: value }),
     }),
     {
       name: 'pcp',

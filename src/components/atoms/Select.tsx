@@ -93,18 +93,6 @@ const Select = ({
     }
   };
 
-  // // Close dropdown when clicking outside
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     const target = event.target as HTMLElement;
-  //     if (!target.closest('.select-container')) {
-  //       setIsOpen(false);
-  //     }
-  //   };
-
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => document.removeEventListener('mousedown', handleClickOutside);
-  // }, []);
 
   if (isError) {
     return <p className="text-red-500 text-sm">Error occurred fetching {label}</p>;

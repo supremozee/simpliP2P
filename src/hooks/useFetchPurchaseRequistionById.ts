@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const useFetchPurchaseRequisitionById = (orgId: string, reqId:string) => {
   const { data, error, isLoading, isError } = useQuery<FetchPurchaseRequisitionById, Error>({
-    queryKey: ['fetchRequisition', orgId, reqId],
+    queryKey: ['fetchRequisitionById', orgId, reqId],
     queryFn: () => auth.fetchRequisitionById(orgId, reqId),
     refetchOnWindowFocus: false,
     enabled: !!orgId && !!orgId,

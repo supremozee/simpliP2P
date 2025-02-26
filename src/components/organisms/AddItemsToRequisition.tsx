@@ -4,7 +4,7 @@ import OpenInventory from './OpenInventory';
 import AddNewItem from './AddNewItem';
 const AddItemsToRequisition = () => {
   return (
-    <section className='flex justify-between w-full sm:px-4  bg-white rounded-[10px] border border-[#808080]'>
+    <section className='flex justify-between w-full sm:px-4 py-3  bg-white rounded-[10px] border border-[#808080]'>
         <div className='flex items-center gap-2'>
             <PiInfoFill size={24} color='#1764FE' />
               <h2 className='sm:text-sm text-[10px] leading-none'>Add items to this purchase request</h2>

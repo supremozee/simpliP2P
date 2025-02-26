@@ -74,7 +74,7 @@ const PurchaseRequisitionsPage = () => {
         req.requestor_name,
         req.request_description,
         req.quantity,
-        `$${req.estimated_cost.toLocaleString()}`,
+        `${req.currency} ${req.estimated_cost.toLocaleString()}`,
         <span key={req.id} className={`font-semibold ${req.status === 'PENDING' ? 'text-yellow-600' : ''}`}>{req.status}</span>,
         req.needed_by_date,
         activeTab === "SAVED APPROVAL" && (

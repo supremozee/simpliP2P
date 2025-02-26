@@ -35,6 +35,7 @@ const CreateCategory = ({add}: {add?:boolean}) => {
       add ? (
       <button 
       title="Add New"
+      type="button"
       onClick={() => setIsOpen(true)}
       className="w-[18px] h-[18px] rounded-full flex justify-center items-center bg-primary text-white">
       <FaPlus size={10} />

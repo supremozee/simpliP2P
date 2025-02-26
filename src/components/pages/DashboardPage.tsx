@@ -1,7 +1,6 @@
 "use client"
-import React, { useState } from 'react'
+import React from 'react'
 import Card from '../atoms/Card'
-import Button from '../atoms/Button'
 import useGetOrganizationDashboardById from '@/hooks/useGetOrganizationDashboardById'
 import DashboardSkeleton from '../atoms/Skeleton/Dashboard'
 import ErrorComponent from '../molecules/ErrorComponent'
@@ -16,7 +15,6 @@ import { formatNumber } from '@/utils/formatters'
 const DashboardPage = () => {
   const { currentOrg, error: deError, orgName } = useStore()
   const { organizationDashboard, isLoading, error } = useGetOrganizationDashboardById(currentOrg)
-  const [showSupplierModal, setShowSupplierModal] = useState(false)
 
   const metrics = organizationDashboard?.data?.metrics || {
     totalSuppliers: 0,
@@ -29,8 +27,6 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
-      {showSupplierModal && <CreateSupplier showModal={showSupplierModal} setShowModal={setShowSupplierModal} />}
-
       {/* Welcome Section */}
       <div className="bg-white rounded-xl p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-gray-800">
@@ -103,15 +99,7 @@ const DashboardPage = () => {
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <CreateProduct custom={true} />
-          <Button
-            className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3"
-            onClick={() => setShowSupplierModal(true)}
-          >
-            <span className="text-primary">
-              <FaUserTie className="w-5 h-5" />
-            </span>
-            <span className="text-gray-700">Add New Supplier</span>
-          </Button>
+          <CreateSupplier custom={true} />
         </div>
       </div>
 

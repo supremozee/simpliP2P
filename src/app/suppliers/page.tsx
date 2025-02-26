@@ -13,8 +13,6 @@ const SuppliersPage = () => {
     <div className="space-y-6">
       {showCreateModal && (
         <CreateSupplier 
-          showModal={showCreateModal} 
-          setShowModal={setShowCreateModal} 
         />
       )}
 

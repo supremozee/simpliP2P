@@ -44,6 +44,7 @@ const CreateDepartment = ({add}:{add?:boolean}) => {
       {
       add ? (<button
       title="Add New"
+      type="button"
         onClick={() => setIsOpen(true)}
       className="w-[18px] h-[18px] text-white rounded-full flex justify-center text-center items-center bg-primary">
       <FaPlus size={10} />

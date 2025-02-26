@@ -3,6 +3,20 @@ import { IoIosHome, IoIosNotifications, IoMdHelp } from "react-icons/io";
 import { MdInventory, MdOutlineDeliveryDining, MdOutlineMultilineChart } from "react-icons/md";
 import { RiAdminLine, RiFileList3Line } from "react-icons/ri";
 import { AiOutlineAudit } from "react-icons/ai";
+export const currencies = [
+  { id: "USD", name: "USD - US Dollar" },
+  { id: "EUR", name: "EUR - Euro" },
+  { id: "GBP", name: "GBP - British Pound" },
+  { id: "JPY", name: "JPY - Japanese Yen" },
+  { id: "NGN", name: "NGN - Nigerian Naira" },
+  { id: "GHS", name: "GHS - Ghanaian Cedi" },
+  { id: "KES", name: "KES - Kenyan Shilling" },
+  { id: "ZAR", name: "ZAR - South African Rand" },
+  { id: "AED", name: "AED - UAE Dirham" },
+  { id: "CNY", name: "CNY - Chinese Yuan" },
+  { id: "INR", name: "INR - Indian Rupee" },
+  { id: "BRL", name: "BRL - Brazilian Real" }
+];
 
 export const navbarLinks = [
   {
@@ -13,9 +27,30 @@ export const navbarLinks = [
         path: "/dashboard",
       },
       {
+        label: "Suppliers",
+        icon: MdOutlineDeliveryDining,
+        subLinks: [
+          { label: "Suppliers Management", path: "/suppliers/suppliers-management" },
+        ],
+      },
+      {
         label: "Requisitions",
         icon: BiSolidPurchaseTag,
         path: "/purchase-requisitions",
+      },
+      {
+        label: "Purchase Orders",
+        icon: BiSolidPurchaseTag,
+        subLinks: [
+          { label: "Manage Order", path: "/purchase-order-management" },
+        ],
+      },
+      {
+        label: "Inventory ",
+        icon: MdInventory,
+        subLinks: [
+          { label: "Manage Inventory", path: "/inventory/inventory-management" },
+        ],
       },
       {
         label: "Approvals",
@@ -33,30 +68,9 @@ export const navbarLinks = [
         ],
       },
       {
-        label: "Inventory ",
-        icon: MdInventory,
-        subLinks: [
-          { label: "Manage Inventory", path: "/inventory/inventory-management" },
-        ],
-      },
-      {
-        label: "Suppliers",
-        icon: MdOutlineDeliveryDining,
-        subLinks: [
-          { label: "Suppliers Management", path: "/suppliers/suppliers-management" },
-        ],
-      },
-      {
-        label: "Purchase Orders",
-        icon: BiSolidPurchaseTag,
-        subLinks: [
-          { label: "Manage Order", path: "/purchase-order-management" },
-        ],
-      },
-      {
         label: "Audit Logs",
         icon: AiOutlineAudit,
-         path: '/audit-logs'
+        path: '/audit-logs'
       },
       {
         label: "Settings",
