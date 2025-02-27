@@ -67,6 +67,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
   };
 
   const categories = categoryData?.data?.categories || [];
+  const category = watch("category")
   const selectedCurrency = watch("currency");
 
   const onSubmit = async (data: ProductFormData) => {
@@ -198,6 +199,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 label="Category"
                 options={categories}
                 {...register("category")}
+                value={category}
                 required
                 error={errors.category?.message}
                 onChange={(selectCategory) => setValue("category", selectCategory)}
