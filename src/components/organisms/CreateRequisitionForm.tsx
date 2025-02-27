@@ -10,6 +10,8 @@ import Select from '../atoms/Select';
 import useFetchBranch from '@/hooks/useFetchBranch';
 import CreateBranch from './CreateBranch';
 import { currencies } from "@/constants";
+import useFetchSuppliers from "@/hooks/useFetchSuppliers";
+import CreateSupplier from "./CreateSupplier";
 
 interface RequisitionFormType {
   department_id: string;
@@ -17,6 +19,7 @@ interface RequisitionFormType {
   requestor_name: string;
   request_description: string;
   branch_id: string;
+  supplier_id:string;
   quantity: number;
   estimated_cost: number;
   currency: string;
@@ -37,13 +40,16 @@ const today = new Date();
 
 const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register, errors, prNumber, watch, setValue }) => {
   const { currentOrg } = useStore();
-  const { data: departmentData, isLoading: loadingData, isError: errorData } = useFetchDepartment(currentOrg);
-  const { data: branchData, isLoading: branchLoading, isError: errorBranch } = useFetchBranch(currentOrg);
+  const { data: departmentData, isLoading: loadingData,  } = useFetchDepartment(currentOrg);
+  const { data: branchData, isLoading: branchLoading,  } = useFetchBranch(currentOrg);
+  const suppliers = useFetchSuppliers(currentOrg);
   const departments = departmentData?.data?.departments || [];
   const branches = branchData?.data?.branches || [];
+  const supplier = suppliers?.data?.data || []
   const departmentId = watch("department_id");
   const branchId = watch("branch_id");
   const selectedCurrency = watch("currency");
+  const supplierId = watch("supplier_id");
 
   return (
     <div className="flex flex-col w-full justify-center z-20 relative">
@@ -67,11 +73,10 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                   {...register("department_id")}
                   required
                   value={departmentId}
-                  display="name"
+                  defaultValue={departmentId}
                   error={errors.department_id?.message}
                   loading={loadingData}
-                  isError={errorData}
-                  onChange={(e) => setValue("department_id", e.target.value)}
+                  onChange={(e) => setValue("department_id", e || "")}
                   component={
                     <CreateDepartment add={true} />
                   }
@@ -83,17 +88,27 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                   label="Branch"
                   options={branches}
                   {...register("branch_id")}
-                  display="name"
                   value={branchId}
                   required
                   error={errors.branch_id?.message}
                   loading={branchLoading}
-                  isError={errorBranch}
-                  onChange={(e) => setValue("branch_id", e.target.value)}
+                  onChange={(selectedOption) => setValue("branch_id", selectedOption || "")}
                   component={<CreateBranch add={true} />}
                 />
               </div>
-
+              <div className="relative">
+                <Select
+                  label="Select a Supplier"
+                  options={supplier}
+                  {...register("supplier_id")}
+                  value={supplierId}
+                  required
+                  error={errors.supplier_id?.message}
+                  loading={branchLoading}
+                  onChange={(selectedOption) => setValue("supplier_id", selectedOption || "")}
+                  component={<CreateSupplier add={true} />}
+                />
+              </div>
               <InputField
                 label="Contact Information"
                 required
@@ -165,9 +180,8 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                     value={selectedCurrency}
                     error={errors.currency?.message}
                     required
-                    display="name"
                     placeholder="Select currency"
-                    onChange={(e) => setValue("currency", e.target.value)}
+                    onChange={(selectedOption) => setValue("currency", selectedOption || "")}
                   />
                   {errors.currency && <p className="text-red-500 text-xs">{errors.currency.message}</p>}
                 </div>

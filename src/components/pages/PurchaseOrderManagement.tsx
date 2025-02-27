@@ -182,7 +182,7 @@ const PurchaseOrdersManagement: React.FC = () => {
             onFilter={handleFilter}
           />
         </div>
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse border border-[#80808050]">
           <TableHead headers={headers} />
           <TableBody
             data={currentOrders}

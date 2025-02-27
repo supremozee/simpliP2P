@@ -22,6 +22,7 @@ import Link from "next/link";
 import useFileManager from "@/hooks/useFileManager";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import { motion } from "framer-motion";
+import CreateSupplier from "./CreateSupplier";
 
 const ACCEPTED_FILE_TYPES = {
   'image/jpeg': ['.jpg', '.jpeg'],
@@ -319,13 +320,14 @@ const CreatePurchaseOrder = () => {
                           label="Select Supplier"
                           options={suppliers}
                           {...register("supplier_id")}
-                          onChange={(e) => setValue("supplier_id", e.target.value)}
+                          onChange={(selectedSupplier) => setValue("supplier_id", selectedSupplier || filteredRequisitions[currentIndex]?.supplier.id)}
                           value={supplierId}
                           required
                           error={errors.supplier_id?.message}
                           loading={isSuppliersLoading}
                           placeholder="Choose a supplier"
                           className="w-full"
+                          component ={<CreateSupplier add={true}/>}
                         />
                         <InputField
                           label="Total Amount"

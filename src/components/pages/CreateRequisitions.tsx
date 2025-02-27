@@ -23,6 +23,7 @@ const PurchaseRequisitionSchema = z.object({
   requestor_name: z.string().min(1, "Requestor name is required"),
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
+  supplier_id: z.string().min(1, "Supplier is required"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   estimated_cost: z.number().min(1, "Estimated cost must be at least 1"),
   currency: z.string().min(1, "Currency is required"),
@@ -46,6 +47,7 @@ const CreateRequisitions = () => {
     requestor_name: "",
     request_description: "",
     branch_id: "",
+    supplier_id: "",
     quantity: 0,
     estimated_cost: 0,
     currency: "USD",
@@ -69,11 +71,12 @@ const CreateRequisitions = () => {
   useEffect(() => {
     if (saved) {
       const requisition = saved;
-      setValue("department_id", requisition?.department?.name);
+      setValue("department_id", requisition?.department?.id);
       setValue("contact_info", requisition.contact_info);
       setValue("requestor_name", requisition.requestor_name);
       setValue("request_description", requisition.request_description);
-      setValue("branch_id", requisition?.branch?.name);
+      setValue("branch_id", requisition?.branch?.id);
+      setValue("supplier_id", requisition?.supplier?.id);
       setValue("quantity", requisition.quantity);
       setValue("estimated_cost", requisition.estimated_cost);
       setValue("justification", requisition.justification);

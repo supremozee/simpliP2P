@@ -53,8 +53,8 @@ const InviteUserForm: React.FC<InviteProps> = ({ showModal = false, setShowModal
   const { register, handleSubmit, formState: { errors }, reset, setValue,watch } = useForm<InviteFormData>({
     resolver: zodResolver(InviteFormSchema)
   });
-const { data: departmentData, isLoading: loadingData, isError: errorData } = useFetchDepartment(currentOrg);
-  const { data: branchData, isLoading: branchLoading, isError: errorBranch } = useFetchBranch(currentOrg);
+const { data: departmentData, isLoading: loadingData } = useFetchDepartment(currentOrg);
+  const { data: branchData, isLoading: branchLoading } = useFetchBranch(currentOrg);
   const departments = departmentData?.data?.departments || [];
   const branches = branchData?.data?.branches || [];
   const departmentId = watch("department_id");
@@ -151,11 +151,9 @@ const { data: departmentData, isLoading: loadingData, isError: errorData } = use
                   {...register("department_id")}
                   required
                   value={departmentId}
-                  display="name"
                   error={errors.department_id?.message}
                   loading={loadingData}
-                  isError={errorData}
-                  onChange={(e) => setValue("department_id", e.target.value)}
+                  onChange={(value) => setValue("department_id", value)}
                   component={
                     <CreateDepartment add={true} />
                   }
@@ -167,13 +165,11 @@ const { data: departmentData, isLoading: loadingData, isError: errorData } = use
                   label="Branch"
                   options={branches}
                   {...register("branch_id")}
-                  display="name"
                   value={branchId}
                   required
                   error={errors.branch_id?.message}
                   loading={branchLoading}
-                  isError={errorBranch}
-                  onChange={(e) => setValue("branch_id", e.target.value)}
+                  onChange={(value) => setValue("branch_id",value)}
                   component={<CreateBranch add={true} />}
                 />
               </div>

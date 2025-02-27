@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from '../atoms/Input'; 
 import Button from '../atoms/Button';
@@ -45,7 +45,7 @@ const UpdateSupplier = () => {
   
   const updateSupplierMutation = useUpdateSupplier(currentOrg);
   const { data: supplierData, isLoading: isSupplierLoading } = useFetchSupplierById(currentOrg, supplierId);
-  const { data: categoryData, isLoading: categoryLoading, isError: errorCategory } = useFetchCategories(currentOrg);
+  const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
 
   const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<UpdateSupplierFormData>({
     resolver: zodResolver(UpdateSupplierSchema),
@@ -63,27 +63,21 @@ const UpdateSupplier = () => {
     return City.getCitiesOfState(selectedCountry, selectedState);
   }, [selectedCountry, selectedState]);
 
-  const categories = categoryData?.data?.categories || [];
-  const rating = watch("rating", 0);
-  const category = watch("category");
-
+const categories = categoryData?.data?.categories || [];  
   useEffect(() => {
     if (supplierData?.data) {
       const data = supplierData.data;
       setValue("full_name", data.full_name ?? "");
       setValue("email", data.email ?? "");
       setValue("phone", data.phone ?? "");
-      if(data?.category?.id) {
-        setValue("category", data.category.id, { shouldValidate: true });
-      }
-      if (data.address) {
-        setValue("address.street", data.address.street ?? "");
-        setValue("address.city", data.address.city ?? "");
-        setValue("address.state",  data.address.state ?? "");
-        setValue("address.country",  data.address.country ?? "");
-        setValue("address.zip_code",  data.address.zip_code ?? "");
+      setValue("category", data.category.id ?? "");
+        setValue("address.street", data.address?.street ?? "");
+        setValue("address.city", data.address?.city ?? "");
+        setValue("address.state",  data.address?.state ?? "");
+        setValue("address.country",  data.address?.country ?? "");
+        setValue("address.zip_code",  data.address?.zip_code ?? "");
 
-        const country = countries.find(c => c.name === data.address.country);
+        const country = countries.find(c => c.name === data.address?.country);
         if (country) {
           setSelectedCountry(country.isoCode);
           const state = State.getStatesOfCountry(country.isoCode)
@@ -92,8 +86,6 @@ const UpdateSupplier = () => {
             setSelectedState(state.isoCode);
           }
         }
-      }
-
       if (data.bank_details) {
         setValue("bank_details.account_number", data.bank_details.account_number ?? "");
         setValue("bank_details.bank_name", data.bank_details.bank_name ?? "");
@@ -104,7 +96,8 @@ const UpdateSupplier = () => {
       setValue("rating", ratingValue);
     }
   }, [supplierData, setValue, countries]);
-
+  const rating = watch("rating", 0);
+  const category = watch("category");
   const onSubmit = async (data: UpdateSupplierFormData) => {
     try {
       await updateSupplierMutation.mutateAsync({ supplierId, data });
@@ -231,16 +224,14 @@ const UpdateSupplier = () => {
                     <Select
                       label="Category"
                       options={categories}
-                      {...register("category")}
-                      onChange={(e) => setValue("category", e.target.value)}
+                      onChange={(selectedOption) => setValue("category", selectedOption || "")}
                       value={category}
+                      defaultValue={category}
                       error={errors.category?.message}
                       loading={categoryLoading}
-                      isError={errorCategory}
                       required
-                      display="name"
                       placeholder="Select a category"
-                      component={<CreateCategory add={true} />}
+                      component={<CreateCategory add={true}/>}
                     />
                   </div>
 
@@ -256,7 +247,6 @@ const UpdateSupplier = () => {
                 </div>
               )}
 
-              {/* Step 2: Address Details */}
               {step === 2 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="col-span-2">

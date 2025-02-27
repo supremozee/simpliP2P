@@ -359,11 +359,14 @@ export interface Owner {
   }
   export interface Requisition {
     department: {
+      id:string
       name:string
     };
     branch:{
+      id:string
       name:string
     };
+    supplier: Supplier
     contact_info: string;
     requestor_name: string;
     request_description: string;
@@ -787,6 +790,7 @@ export interface Budget {
   updated_at: string;
   name: string;
   currency: "USD" | "NGN";
+  balance: string;
   amount_allocated: string;
   amount_remaining: string;
   amount_reserved: string;

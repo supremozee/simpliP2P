@@ -171,14 +171,14 @@ const BudgetCentralPage = () => {
   const summaryMetrics = useMemo(() => {
     if (!filteredBudgets.length) return [];
 
-    return filteredBudgets.slice(0, 4).map(budget => ({
+    return filteredBudgets.map(budget => ({
       id: budget.id,
       name: budget.name,
       currency: budget.currency,
       allocated: parseFloat(budget.amount_allocated),
       available: parseFloat(budget.amount_available),
       reserved: parseFloat(budget.amount_reserved),
-      remaining: parseFloat(budget.amount_remaining)
+      balance: parseFloat(budget.balance)
     }));
   }, [filteredBudgets]);
 
@@ -229,13 +229,13 @@ const BudgetCentralPage = () => {
               }).format(budget.allocated)}
             </h2>
             <div className="flex justify-between text-sm text-gray-500 mt-2">
-              <span>Available: {budget.available}</span>
+              <span>Available Balance: {budget.balance}</span>
               <span>Reserved: {budget.reserved}</span>
             </div>
             <div className="relative pt-2">
               <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-100">
                 <div
-                  style={{ width: `${(budget.remaining / budget.allocated) * 100}%` }}
+                  style={{ width: `${(budget.balance / budget.allocated) * 100}%` }}
                   className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"
                 ></div>
               </div>

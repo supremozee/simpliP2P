@@ -30,9 +30,9 @@ type CreateBudgetFormData = z.infer<typeof CreateBudgetSchema>;
 const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowModal }) => {
   const { currentOrg } = useStore();
   const { createBudget, loading, errorMessage } = useCreateBudget();
-  const { data: branchData, isLoading: branchLoading, isError: branchError } = useFetchBranch(currentOrg);
-  const { data: departmentData, isLoading: departmentLoading, isError: departmentError } = useFetchDepartments(currentOrg);
-  const { data: categoryData, isLoading: categoryLoading, isError: categoryError } = useFetchCategories(currentOrg);
+  const { data: branchData, isLoading: branchLoading } = useFetchBranch(currentOrg);
+  const { data: departmentData, isLoading: departmentLoading } = useFetchDepartments(currentOrg);
+  const { data: categoryData, isLoading: categoryLoading, } = useFetchCategories(currentOrg);
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<CreateBudgetFormData>({
     resolver: zodResolver(CreateBudgetSchema),
     mode: "onSubmit",
@@ -45,9 +45,12 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
 
   const onSubmit = async (data: CreateBudgetFormData) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await createBudget(data, currentOrg);
-      reset();
-      toggleModal();
+      setTimeout(()=> {
+        setShowModal(false);
+        reset();
+      }, 1500)
     } catch (error) {
       console.error("Error creating budget:", error);
     }
@@ -89,10 +92,9 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               label="Currency"
               options={[{ id: 'USD', name: 'USD' }, { id: 'NGN', name: 'NGN' }]}
               {...register("currency")}
-              onChange={(e) => setValue("currency", e.target.value as "USD" | "NGN")}
+              onChange={(selectBudget) => setValue("currency", selectBudget as "USD" | "NGN")}
               required
               value={watch("currency")}
-              display="name"
               error={errors.currency?.message}
             />
           </div>
@@ -102,13 +104,11 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               label="Branch"
               options={branches}
               {...register("branchId")}
-              onChange={(e) => setValue("branchId", e.target.value)}
+              onChange={(selectBranch) => setValue("branchId", selectBranch)}
               required
               value={watch("branchId")}
-              display="name"
               error={errors.branchId?.message}
               loading={branchLoading}
-              isError={branchError}
               component={<CreateBranch add={true}/>}
             />
           </div>
@@ -118,13 +118,11 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               label="Department"
               options={departments}
               {...register("departmentId")}
-              onChange={(e) => setValue("departmentId", e.target.value)}
+              onChange={(selectDepartment) => setValue("departmentId", selectDepartment)}
               required
               value={watch("departmentId")}
-              display="name"
               error={errors.departmentId?.message}
               loading={departmentLoading}
-              isError={departmentError}
               component={<CreateDepartment add={true}/>}
             />
           </div>
@@ -134,13 +132,11 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
               label="Category"
               options={categories}
               {...register("categoryId")}
-              onChange={(e) => setValue("categoryId", e.target.value)}
+              onChange={(selectCategory) => setValue("categoryId", selectCategory)}
               required
               value={watch("categoryId")}
-              display="name"
               error={errors.categoryId?.message}
               loading={categoryLoading}
-              isError={categoryError}
               component={<CreateCategory add={true}/>}
 
             />

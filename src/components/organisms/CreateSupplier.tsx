@@ -40,7 +40,7 @@ type SupplierFormData = z.infer<typeof CreateSupplierSchema>;
 const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) => {
   const { currentOrg } = useStore();
   const { createSupplier, loading, errorMessage, successCreate } = useCreateSupplier();
-  const { data: categoryData, isLoading: categoryLoading, isError: errorCategory } = useFetchCategories(currentOrg);
+  const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
   
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -70,8 +70,11 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
   const onSubmit = async (data: SupplierFormData) => {
     try {
       await createSupplier(data, currentOrg);
-      reset();
-      toggleModal();
+      setTimeout (()=> {
+        reset();
+        toggleModal();
+      }, 1500)
+     
     } catch (error) {
       console.error("Error creating supplier:", error);
     }
@@ -158,13 +161,17 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
             <div className="flex justify-between w-full mb-6">
               <h2 className="sm:text-xl text-sm font-bold">Create Supplier</h2>
               <div className="flex items-center space-x-2">
-                {[1, 2, 3].map((num) => (
-                  <>
-                    <div className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === num ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
+                {[1, 2, 3].map((num, i) => (
+                  <div
+                  className="flex items-center justify-center gap-2"
+                  key={i}
+                  >
+                    <div
+                    className={`rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center ${step === num ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}>
                       {num}
                     </div>
                     {num < 3 && <div className="border-t border-gray-300 w-8"></div>}
-                  </>
+                  </div>
                 ))}
               </div>
             </div>
@@ -214,13 +221,11 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
                       label="Categories"
                       options={categories}
                       {...register("category")}
-                      onChange={(e) => setValue("category", e.target.value)}
+                      onChange={(selectedCat) => setValue("category", selectedCat)}
                       required
                       value={category}
-                      display="id"
                       error={errors.category?.message}
                       loading={categoryLoading}
-                      isError={errorCategory}
                       component={<CreateCategory add={true} />}
                     />
                   </div>

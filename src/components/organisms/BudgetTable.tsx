@@ -3,7 +3,6 @@ import { Budget } from '@/types';
 import TableHead from '../atoms/TableHead';
 import TableBody from '../atoms/TableBody';
 import OpenBudget from './OpenBudget';
-import { format_price } from '@/utils/helpers';
 const BudgetTable = ({budgets}: {budgets:Budget[]}) => {
   
   const headers = [
@@ -28,10 +27,10 @@ const BudgetTable = ({budgets}: {budgets:Budget[]}) => {
         budget.branch.name,
         budget.department.name,
         budget.name,
-       format_price(Number(budget.amount_allocated)),
+       `${budget.currency} ${budget.amount_allocated}`,
         budget.currency,
         budget.amount_available,
-        budget.amount_remaining,
+        budget.balance,
         <div  key={`edit-button-${budget.id}`}  title='View Budget' className='flex justify-center w-full items-center'>
           <OpenBudget budgetId={budget.id} />
         </div>

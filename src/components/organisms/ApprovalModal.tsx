@@ -251,11 +251,10 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                       label="Select Budget"
                       options={budgets || []}
                       value={selectedBudget}
-                      onChange={(e) => setSelectedBudget(e.target.value)}
+                      onChange={(selectedOption) => setSelectedBudget(selectedOption)}
                       error={!selectedBudget ? "Please select a budget" : ""}
                       loading={isBudgetLoading}
                       required
-                      display="name"
                       placeholder="Select a budget"
                     />
                   </div>
@@ -265,10 +264,9 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                         label="Action Type"
                         options={actionTypes}
                         value={selectedActionType}
-                        onChange={(e) => setSelectedActionType(e.target.value)}
+                        onChange={(selectedOption) => setSelectedActionType(selectedOption)}
                         error={!selectedActionType ? "Please select an action type" : ""}
                         required
-                        display="name"
                         placeholder="Select action type"
                       />
                     </div>

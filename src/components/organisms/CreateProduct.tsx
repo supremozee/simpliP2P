@@ -77,8 +77,11 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
       stockQtyAlert: Number(data.stockQtyAlert || 0),
     };
     await createProduct(formattedData, currentOrg);
-    reset();
-    setIsOpen(false);
+    setTimeout(()=> {
+      reset();
+      setIsOpen(false);
+    }, 1500)
+    
   };
 
   return (
@@ -146,10 +149,10 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 label="Currency"
                 options={currencies}
                 {...register("currency")}
+                onChange={(selectCurrency)=> setValue("currency", selectCurrency)}
                 value={selectedCurrency}
                 error={errors.currency?.message}
                 required
-                display="name"
                 placeholder="Select currency"
               />
               {errors.currency && <p className="text-red-500 text-sm">{errors.currency.message}</p>}
@@ -195,10 +198,9 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 label="Category"
                 options={categories}
                 {...register("category")}
-                display="name"
                 required
                 error={errors.category?.message}
-                onChange={(e) => setValue("category", e.target.value)}
+                onChange={(selectCategory) => setValue("category", selectCategory)}
                 loading={categoryLoading}
                 component={
                   <CreateCategory add={true} />

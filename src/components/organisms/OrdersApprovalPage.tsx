@@ -138,19 +138,19 @@ const OrdersApprovalPage = () => {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => handleSort('date')}
-                  className={`flex items-center gap-1 text-sm ${sortField === 'date' ? 'text-primary' : 'text-gray-500'} hover:text-primary transition-colors`}
+                  className={`flex items-center gap-1 text-sm ${sortField === 'date' ? 'text-primary font-bold' : 'text-gray-500'} hover:text-primary transition-colors`}
                 >
                   Date {sortField === 'date' && (sortOrder === 'asc' ? <BsArrowUp /> : <BsArrowDown />)}
                 </button>
                 <button
                   onClick={() => handleSort('amount')}
-                  className={`flex items-center gap-1 text-sm ${sortField === 'amount' ? 'text-primary' : 'text-gray-500'} hover:text-primary transition-colors`}
+                  className={`flex items-center gap-1 text-sm ${sortField === 'amount' ? 'text-primary font-bold' : 'text-gray-500'} hover:text-primary transition-colors`}
                 >
                   Amount {sortField === 'amount' && (sortOrder === 'asc' ? <BsArrowUp /> : <BsArrowDown />)}
                 </button>
                 <button
                   onClick={() => handleSort('supplier')}
-                  className={`flex items-center gap-1 text-sm ${sortField === 'supplier' ? 'text-primary' : 'text-gray-500'} hover:text-primary transition-colors`}
+                  className={`flex items-center gap-1 text-sm ${sortField === 'supplier' ? 'text-primary font-bold' : 'text-gray-500'} hover:text-primary transition-colors`}
                 >
                   Supplier {sortField === 'supplier' && (sortOrder === 'asc' ? <BsArrowUp /> : <BsArrowDown />)}
                 </button>

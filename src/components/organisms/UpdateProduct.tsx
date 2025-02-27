@@ -45,7 +45,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
   const { currentOrg } = useStore();
   const { updateProduct } = useUpdateProduct();
   const { data, isLoading, isError } = useFetchProductById(currentOrg, productId);
-  const { data: categoryData, isLoading: categoryLoading, isError: errorCategory } = useFetchCategories(currentOrg);
+  const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<UpdateProductFormData>({
     resolver: zodResolver(UpdateProductSchema),
@@ -67,7 +67,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
     if (data?.data) {
       setValue("name", data.data.name);
       setValue("description", data.data.description);
-      setValue("unitPrice", data.data.unitPrice);
+      setValue("unitPrice", Number(data.data.unitPrice));
       setValue("stockQtyAlert", data.data.stockQtyAlert);
       setValue("category", data.data.category?.id || "");
       setValue("stockQty", data.data.stockQty);
@@ -122,7 +122,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
 
             <div>
               <Input
-                type="text"
+                type="number"
                 label="Unit Price"
                 className="mt-1 w-full"
                 placeholder="Enter unit price"
@@ -139,7 +139,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                 value={watch("currency")}
                 error={errors.currency?.message}
                 required
-                display="name"
+                onChange={(value)=> setValue("currency", value)}
                 placeholder="Select currency"
               />
             </div>
@@ -183,13 +183,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                 label="Category"
                 options={categories}
                 {...register("category")}
-                onChange={(e) => setValue("category", e.target.value)}
+                onChange={(selectCategory) => setValue("category", selectCategory)}
                 value={selectedCategory}
                 error={errors.category?.message}
                 loading={categoryLoading}
-                isError={errorCategory}
                 required
-                display="name"
                 placeholder="Select a category"
                 component={<CreateCategory add={true} />}
               />
