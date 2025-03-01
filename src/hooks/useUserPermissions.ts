@@ -26,10 +26,11 @@ const useUserPermissions = () => {
     };
   };
 
-  const checkPermission = (requiredPermission: Permission) => {
+  const checkPermission = (requiredPermissions: Permission[]) => {
     const { isCreator, permissions, hasAllPermissions } = getUserPermissions();
-    return isCreator || hasAllPermissions || permissions.includes(requiredPermission);
+    return isCreator || hasAllPermissions || requiredPermissions.some(permission => permissions.includes(permission));
   };
+
 
   const hasAccess = (path: string) => {
     if (PUBLIC_ROUTES.some(route => path.startsWith(route))) {
@@ -42,28 +43,19 @@ const useUserPermissions = () => {
     
     const routePermissions: Record<string, Permission[]> = {
       '/audit-logs': ['all_permissions'],
-      // Supplier Management
-      '/suppliers': ['manage_suppliers', 'get_suppliers'],
+      '/suppliers': ['manage_suppliers', 'create_suppliers', 'get_suppliers', 'update_suppliers', 'delete_suppliers'],
       '/suppliers/suppliers-management': ['manage_suppliers', 'create_suppliers', 'update_suppliers'],
       '/approvals/vendor-onboarding': ['manage_suppliers'],
-
-      // Purchase Management
       '/purchase-requisitions': ['manage_purchase_requisitions', 'get_purchase_requisitions'],
       '/purchase-order-management': ['manage_purchase_orders'],
       '/approval/requisition-approval': ['manage_purchase_requisitions'],
       '/approval/order-approval': ['manage_purchase_orders'],
-
-      // Inventory Management
       '/inventory/inventory-management': ['manage_products'],
       '/inventory/request': ['manage_products'],
       '/approvals/inventory': ['manage_products'],
-
-      // Budget Management
       '/budgets-central': ['manage_budgets'],
       '/approvals/budget': ['manage_budgets']
     };
-
-    // Find matching route
     const matchingRoute = Object.entries(routePermissions)
       .find(([route]) => path.startsWith(route));
     if (!matchingRoute) return true; 
@@ -76,7 +68,7 @@ const useUserPermissions = () => {
   return {
     getUserPermissions,
     checkPermission,
-    hasAccess
+    hasAccess,
   };
 };
 

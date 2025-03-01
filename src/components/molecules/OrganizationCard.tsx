@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { MdEdit, MdAdd } from 'react-icons/md';
-import { IoCheckmarkCircle } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoChevronDown, IoChevronUp } from 'react-icons/io5';
 
 interface OrganizationCardProps {
   name?: string;
@@ -28,6 +28,9 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
   isAddCard,
   onClick,
 }) => {
+  const [showAllPermissions, setShowAllPermissions] = useState(false);
+  const PERMISSIONS_TO_SHOW = 3;
+
   if (isAddCard) {
     return (
       <button
@@ -42,6 +45,16 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
       </button>
     );
   }
+
+  const displayPermissions = showAllPermissions 
+    ? permissions 
+    : permissions?.slice(0, PERMISSIONS_TO_SHOW);
+
+  const formatPermission = (permission: string) => {
+    return permission.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
 
   return (
     <div 
@@ -98,15 +111,41 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
 
       {/* Permissions */}
       {permissions && permissions.length > 0 && (
-        <div className="mt-4 space-y-2">
-          {permissions.map((permission) => (
-            <div key={permission} className="flex items-center text-sm text-gray-600">
-              <IoCheckmarkCircle className="w-4 h-4 text-green-500 mr-2" />
-              {permission.split('_').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-              ).join(' ')}
-            </div>
-          ))}
+        <div className="mt-4 w-full">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700">Permissions</span>
+            <span className="text-xs text-gray-500">{permissions.length}</span>
+          </div>
+          <div className="space-y-2 bg-gray-50 rounded-lg p-3">
+            {displayPermissions?.map((permission) => (
+              <div 
+                key={permission} 
+                className="flex items-center text-sm text-gray-600 bg-white rounded-md px-3 py-2 shadow-sm"
+              >
+                <IoCheckmarkCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                <span className="line-clamp-1">{formatPermission(permission)}</span>
+              </div>
+            ))}
+            {permissions.length > PERMISSIONS_TO_SHOW && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAllPermissions(!showAllPermissions);
+                }}
+                className="flex items-center justify-center w-full text-sm text-primary hover:text-primary/80 transition-colors py-1"
+              >
+                {showAllPermissions ? (
+                  <>
+                    Show Less <IoChevronUp className="ml-1 w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Show More ({permissions.length - PERMISSIONS_TO_SHOW} more) <IoChevronDown className="ml-1 w-4 h-4" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

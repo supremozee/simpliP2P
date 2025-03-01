@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import useStore from "@/store";
 import useFetchMembers from "@/hooks/useFetchMembers";
 import OrganizationCard from "../molecules/OrganizationCard";
-import InviteUserForm from "./InviteUserForm";
+import InviteMemberForm from "./InviteMemberForm";
 import EditMemberForm from "./EditMemberForm";
 import Tabs from "../molecules/Tabs";
 import Button from "../atoms/Button";
@@ -73,7 +73,6 @@ const OrganizationMembers = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800">Organization Members</h2>
@@ -90,7 +89,6 @@ const OrganizationMembers = () => {
         </Button>
       </div>
 
-      {/* Search and Tabs Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-lg shadow-sm">
         <div className="relative w-full sm:w-64">
           <Input
@@ -150,7 +148,7 @@ const OrganizationMembers = () => {
       )}
 
       {/* Modals */}
-      <InviteUserForm
+      <InviteMemberForm
         showModal={showInviteModal}
         setShowModal={setShowInviteModal}
       />

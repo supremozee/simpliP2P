@@ -14,19 +14,7 @@ import CreateBranch from './CreateBranch';
 import CreateDepartment from './CreateDepartment';
 import useFetchDepartment from '@/hooks/useFetchDepartments';
 import useFetchBranch from '@/hooks/useFetchBranch';
-
-const PERMISSIONS: { value: Permission; label: string; description: string }[] = [
-  {
-    value: "manage_users",
-    label: "Manage Users",
-    description: "Can manage users and their permissions"
-  },
-  {
-    value: "manage_suppliers",
-    label: "Manage Suppliers",
-    description: "Can manage suppliers and their information"
-  },
-];
+import PermissionSelect from '../molecules/PermissionSelect';
 
 const InviteFormSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -35,9 +23,7 @@ const InviteFormSchema = z.object({
   role: z.string().min(1, "Role is required"),
   branch_id: z.string().min(1, "Branch is required"),
   department_id: z.string().min(1, "Department is required"),
-  permission: z.enum(["manage_users", "manage_suppliers", "all_permissions"], {
-    required_error: "Please select a permission"
-  })
+  permission: z.array(z.custom<Permission>()).min(1, "Permission level is required")
 });
 
 type InviteFormData = z.infer<typeof InviteFormSchema>;
@@ -47,28 +33,29 @@ interface InviteProps {
   setShowModal: (showModal: boolean) => void;
 }
 
-const InviteUserForm: React.FC<InviteProps> = ({ showModal = false, setShowModal }) => {
-  const { inviteUser, loading } = useInviteMember();
+const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowModal }) => {
+  const { inviteMember, loading } = useInviteMember();
   const { currentOrg } = useStore();
-  const { register, handleSubmit, formState: { errors }, reset, setValue,watch } = useForm<InviteFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<InviteFormData>({
     resolver: zodResolver(InviteFormSchema)
   });
-const { data: departmentData, isLoading: loadingData } = useFetchDepartment(currentOrg);
+  const { data: departmentData, isLoading: loadingData } = useFetchDepartment(currentOrg);
   const { data: branchData, isLoading: branchLoading } = useFetchBranch(currentOrg);
   const departments = departmentData?.data?.departments || [];
   const branches = branchData?.data?.branches || [];
   const departmentId = watch("department_id");
   const branchId = watch("branch_id");
+  const permissions = watch("permission") || [];
 
   const onSubmit = async (data: InviteFormData) => {
-    await inviteUser({
+    await inviteMember({
       first_name: data.first_name,
       last_name: data.last_name,
       email: data.email,
       role: data.role,
       branch_id: data.branch_id,
       department_id: data.department_id,
-      permissions: [data.permission]
+      permissions: data.permission
     }, currentOrg);
     
     reset();
@@ -144,64 +131,42 @@ const { data: departmentData, isLoading: loadingData } = useFetchDepartment(curr
               <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
             )}
           </div>
-          <div className="relative">
-                <Select
-                  label="Department"
-                  options={departments}
-                  {...register("department_id")}
-                  required
-                  value={departmentId}
-                  error={errors.department_id?.message}
-                  loading={loadingData}
-                  onChange={(value) => setValue("department_id", value)}
-                  component={
-                    <CreateDepartment add={true} />
-                  }
-                />
-              </div>
 
-              <div className="relative">
-                <Select
-                  label="Branch"
-                  options={branches}
-                  {...register("branch_id")}
-                  value={branchId}
-                  required
-                  error={errors.branch_id?.message}
-                  loading={branchLoading}
-                  onChange={(value) => setValue("branch_id",value)}
-                  component={<CreateBranch add={true} />}
-                />
-              </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Permission Level
-            </label>
-            <div className="space-y-3">
-              {PERMISSIONS.map((permission) => (
-                <label
-                  key={permission.value}
-                  className="relative flex items-start p-4 cursor-pointer rounded-lg border border-gray-200 hover:bg-gray-50"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        {...register("permission")}
-                        value={permission.value}
-                        className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
-                      />
-                      <span className="ml-3 font-medium text-gray-900">{permission.label}</span>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">{permission.description}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-            {errors.permission && (
-              <p className="text-red-500 text-sm mt-1">{errors.permission.message}</p>
-            )}
+          <div className="relative">
+            <Select
+              label="Department"
+              options={departments}
+              {...register("department_id")}
+              required
+              value={departmentId}
+              error={errors.department_id?.message}
+              loading={loadingData}
+              onChange={(value) => setValue("department_id", value)}
+              component={
+                <CreateDepartment add={true} />
+              }
+            />
           </div>
+
+          <div className="relative">
+            <Select
+              label="Branch"
+              options={branches}
+              {...register("branch_id")}
+              value={branchId}
+              required
+              error={errors.branch_id?.message}
+              loading={branchLoading}
+              onChange={(value) => setValue("branch_id", value)}
+              component={<CreateBranch add={true} />}
+            />
+          </div>
+
+          <PermissionSelect
+            value={permissions}
+            onChange={(value) => setValue("permission", value)}
+            error={errors.permission?.message}
+          />
 
           <div className="flex justify-end gap-3">
             <Button
@@ -225,4 +190,4 @@ const { data: departmentData, isLoading: loadingData } = useFetchDepartment(curr
   );
 };
 
-export default InviteUserForm;
+export default InviteMemberForm;

@@ -56,11 +56,11 @@ const Footer = () => {
                 </li>
                 <li className="flex items-center gap-2 text-gray-600">
                   <IoLocation className="w-5 h-5" />
-                  <span>32, STREET STREET, UNIVERSE, UNITED STATE</span>
+                  <span>10, Agboola Aina Street, Off Toyin Street, Ikeja</span>
                 </li>
                 <li className="flex items-center gap-2 text-gray-600">
                   <IoMail className="w-5 h-5" />
-                  <span>HELP@SIMPLIP2P.COM</span>
+                  <span>Help@simplip2p.COM</span>
                 </li>
               </ul>
             </div>

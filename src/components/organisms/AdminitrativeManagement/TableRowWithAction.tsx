@@ -6,6 +6,7 @@ import { VscEdit } from "react-icons/vsc";
 import Button from "@/components/atoms/Button";
 import { FaTimes } from "react-icons/fa";
 import StarRating from "@/components/atoms/StarRating";
+import useUserPermissions from "@/hooks/useUserPermissions";
 
 type Item = Branch | Department | Category | Supplier;
 
@@ -24,6 +25,7 @@ const TableRowWithActions = <T extends Item>({
   onDelete,
   index = 0,
 }: TableRowWithActionsProps<T>) => {
+  const {checkPermission} = useUserPermissions()
   const renderData = () => {
     switch (activeTab) {
       case "Branches":
@@ -70,14 +72,16 @@ const TableRowWithActions = <T extends Item>({
     if (!activeTab && "full_name" in item) {
       return (
         <div className="flex gap-3 justify-center">
-          <Button
+         <Button
             onClick={() => onEdit?.(item.id)}
+            disabled= {!checkPermission(['update_suppliers', 'manage_suppliers'])}
             className="flex justify-center items-center w-6 h-6 text-white px-0 py-0 rounded-full bg-primary"
           >
             <VscEdit size={12} />
           </Button>
-          <Button
+        <Button
             onClick={() => onDelete?.(item.id)}
+            disabled={!checkPermission(['delete_suppliers', 'manage_suppliers'])}
             className="text-white px-0 py-0 rounded-full flex justify-center items-center w-6 h-6 bg-red-700"
           >
             <FaTimes size={12} />

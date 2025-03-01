@@ -14,8 +14,8 @@ import { forgotData,
            CreateOrganizationResponse,
             UserProfileResponse, 
             OrganizationDashboardByIdResponse,
-             InviteUserResponse, 
-             InviteUserData, 
+             inviteMemberResponse, 
+             inviteMemberData, 
              FetchMembersResponse,
               AcceptInvitationData,
                EditMemberData, 
@@ -126,7 +126,7 @@ const auth = {
   updateOrganization: async (orgId: string, data:Organization): Promise<any> => {
     return apiRequest(`${ORGANIZATION_ENDPOINTS.ORGANIZATIONS}/${orgId}`, putConfig(data));
   },
-  inviteUser: async (data: InviteUserData, orgId: string): Promise<InviteUserResponse> => {
+  inviteMember: async (data: inviteMemberData, orgId: string): Promise<inviteMemberResponse> => {
     return apiRequest(ORGANIZATION_ENDPOINTS.INVITE_MEMBER(orgId), postConfig(data));
   },
   logout:async(data:Logout):Promise<any> => {

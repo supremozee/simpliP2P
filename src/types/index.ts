@@ -61,7 +61,7 @@ export type RegisterFormData = {
     name: string;
     role: string;
     logo: string;
-    permissions: ["manage_users" | "manage_suppliers" | "all_permissions"];
+    permissions: Permission[];
     is_creator:boolean;
     accepted_invitation: string;
 }
@@ -163,25 +163,44 @@ export interface UserProfileResponse {
   }
   
 
-export type Permission = "manage_users" | "manage_suppliers" 
- | "manage_departments" |"manage_budgets" | "org_member"|
- "manage_products" |"manage_purchase_orders"| "manage_purchase_requisitions"| "create_suppliers"
-| "get_suppliers" | "update_suppliers" | "delete_suppliers" | "manage_purchase_requisitions"| "create_purchase_requisitions"|
-"get_purchase_requisitions"|
-"all_permissions"
- ;
+  export type Permission = 
+  | "manage_users"
+  | "create_users"
+  | "get_users"
+  | "manage_suppliers"
+  | "create_suppliers"
+  | "get_suppliers"
+  | "update_suppliers"
+  | "delete_suppliers"
+  | "manage_departments"
+  | "manage_budgets"
+  | "manage_products"
+  | "create_products"
+  | "get_products"
+  | "manage_purchase_orders"
+  | "create_purchase_orders"
+  | "get_purchase_orders"
+  | "manage_purchase_requisitions"
+  | "create_purchase_requisitions"
+  | "get_purchase_requisitions"
+  | "org_member"
+  | "all_permissions"| 
+   "create_budgets" |
+  "delete_budgets" |
+  "update_budgets"
 
-export interface InviteUserData {
+
+export interface inviteMemberData {
   first_name: string;
   last_name: string;
   email: string;
   role: string;
   department_id:string;
   branch_id:string;
-  permissions: [Permission];
+  permissions:string[];
 }
 
-export interface InviteUserResponse {
+export interface inviteMemberResponse {
   status: string;
   message: string;
   data: {
@@ -236,13 +255,13 @@ export interface Owner {
     message: string;
   } 
   export interface EditMemberData {
-    role:string;
-    permissions: ["manage_users" | "manage_suppliers" | "all_permissions"];
+    role: string;
+    permissions: Permission[];
   }
   export interface EditMemberResponse {
     status:string;
     message: string;
-    data:InviteUserData;
+    data:inviteMemberData;
   }
   export interface Address {
     street: string 

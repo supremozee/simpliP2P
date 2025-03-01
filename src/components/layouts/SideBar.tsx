@@ -14,6 +14,7 @@ import useUserPermissions from "@/hooks/useUserPermissions";
 import Button from "../atoms/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "@/types";
+import useGetUser from "@/hooks/useGetUser";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -32,6 +33,10 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ isOpen, toggleSi
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const router = useRouter();
 
+  const {user} = useGetUser()
+  const findOrg = user?.data?.user_organisations?.find(org => org.name === orgName);
+  const userPermissions = findOrg?.permissions || [];
+  console.log(userPermissions)
   const toggleCollapse = () => {
     setOnToggle(!isCollapsed);
     setIsCollapsed(!isCollapsed);
@@ -65,7 +70,12 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ isOpen, toggleSi
   const filteredLinks = navbarLinks
     .map(navbarLink => ({
       ...navbarLink,
-      links: navbarLink.links?.filter(link => hasPermissionForLink(link))
+      links: navbarLink.links?.filter(link => {
+        if (link.subLinks) {
+          return link.subLinks.some(subLink => hasPermissionForLink(subLink));
+        }
+        return hasPermissionForLink(link);
+      })
     }))
     .filter(navbarLink => navbarLink.links && navbarLink.links.length > 0);
 
@@ -213,7 +223,6 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ isOpen, toggleSi
             ))}
           </div>
 
-          {/* Footer Section */}
           <div className="border-t border-gray-100 p-4">
             <LogoutButton onClick={toggleSidebar} isCollapsed={isCollapsed} />
           </div>

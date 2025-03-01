@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
 import { auth } from "@/api/auths";
-import { InviteUserData, InviteUserResponse } from "@/types";
+import { inviteMemberData, inviteMemberResponse } from "@/types";
 
 export default function useInviteMember() {
   const [loading, setLoading] = useState(false);
@@ -12,16 +12,16 @@ export default function useInviteMember() {
   const [successInvite, setSuccessInvite] = useState(false);
   const { success: notifySuccess, error: notifyError } = useNotify();
   const queryClient = useQueryClient()
-  const { mutateAsync: inviteUserMutation } = useMutation({
-    mutationFn: async ({ data, orgId }: { data: InviteUserData; orgId: string }) => {
-        return auth.inviteUser(data, orgId);
+  const { mutateAsync: inviteMemberMutation } = useMutation({
+    mutationFn: async ({ data, orgId }: { data: inviteMemberData; orgId: string }) => {
+        return auth.inviteMember(data, orgId);
       },
     onMutate: () => {
       setLoading(true);
       setErrorMessage(null);
       setSuccessInvite(false);
     },
-    onSuccess: (response:InviteUserResponse) => {
+    onSuccess: (response:inviteMemberResponse) => {
       setLoading(false);
       if (response && response.status === 'success') {
         notifySuccess(response?.message);
@@ -43,11 +43,11 @@ export default function useInviteMember() {
     },
   });
 
-  const inviteUser = async (data: InviteUserData, orgId:string) => {
-    inviteUserMutation({data, orgId});
+  const inviteMember = async (data: inviteMemberData, orgId:string) => {
+    inviteMemberMutation({data, orgId});
   };
 
-  return { inviteUser,
+  return { inviteMember,
      loading,
       errorMessage, 
       successInvite,

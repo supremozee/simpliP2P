@@ -7,10 +7,13 @@ import { motion } from 'framer-motion';
 import { IoTrendingUp } from 'react-icons/io5';
 import SupplierDetails from './SupplierDetails';
 import { cn } from '@/utils/cn';
+import useUserPermissions from '@/hooks/useUserPermissions';
+import Button from '../atoms/Button';
 
 const SupplierGrid = () => {
   const { currentOrg, supplierId, setSupplierId } = useStore();
   const { data: supplierData, isLoading } = useFetchSuppliers(currentOrg);
+  const { checkPermission } = useUserPermissions();
 
   const handleSupplierClick = (id: string) => {
     setSupplierId(id);
@@ -64,7 +67,7 @@ const SupplierGrid = () => {
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t">
+              <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Category:</span>
                   <span className="font-medium text-gray-700">
@@ -81,6 +84,27 @@ const SupplierGrid = () => {
                       <IoTrendingUp className="w-4 h-4 text-green-500" />
                     )}
                   </div>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      disabled= {!checkPermission(['update_suppliers', 'manage_suppliers'])}
+                      onClick={() =>{
+                        handleSupplierClick(supplier.id);
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        // Add delete handler here
+                      }}
+                      disabled={!checkPermission(['delete_suppliers', 'manage_suppliers'])}
+                      className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                    >
+                      Delete
+                    </Button>
                 </div>
               </div>
             </Card>

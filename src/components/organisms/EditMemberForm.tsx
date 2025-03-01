@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Modal from '../atoms/Modal';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -11,36 +11,15 @@ import useDeactivateMember from '@/hooks/useDeactivateMembers';
 import useFetchMemberById from '@/hooks/useFetchMemberById';
 import useReactivateMember from '@/hooks/useReactivateMembers';
 import { IoShieldCheckmark } from 'react-icons/io5';
-import { Permission } from '@/types';
-
-const PERMISSIONS: { value: Permission; label: string; description: string }[] = [
-  {
-    value: "manage_users",
-    label: "Manage Users",
-    description: "Can manage users and their permissions"
-  },
-  {
-    value: "manage_suppliers",
-    label: "Manage Suppliers",
-    description: "Can manage suppliers and their information"
-  },
-  {
-    value: "all_permissions",
-    label: "All Permissions",
-    description: "Full access to all features and settings"
-  }
-];
+import { Permission, UserMember } from '@/types';
+import PermissionSelect from '../molecules/PermissionSelect';
 
 const EditMemberSchema = z.object({
   role: z.string().min(1, "Role is required"),
-  permissions: z.array(z.enum(["manage_users", "manage_suppliers", "all_permissions"]))
-    .min(1, "At least one permission is required")
+  permissions: z.array(z.custom<Permission>()).min(1, "At least one permission is required")
 });
 
-type EditMemberData = {
-  role: string;
-  permissions: ["manage_users" | "manage_suppliers" | "all_permissions"];
-};
+type EditMemberData = z.infer<typeof EditMemberSchema>;
 
 interface EditMemberProps {
   showModal: boolean;
@@ -54,15 +33,27 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
   const { deactivateMember } = useDeactivateMember();
   const { reactivateMember } = useReactivateMember();
   const { data } = useFetchMemberById(currentOrg, memberId);
-  const member = data?.data?.member;
+  const member = data?.data?.member as UserMember | undefined;
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<EditMemberData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<EditMemberData>({
     resolver: zodResolver(EditMemberSchema),
     defaultValues: {
-      role: member?.role || "",
-      permissions: member?.permissions?.filter(p => p === "manage_users" || p === "manage_suppliers") as ["manage_users" | "manage_suppliers"]
+      role: "",
+      permissions: []
     }
   });
+
+  // Update form when member data is loaded
+  useEffect(() => {
+    if (member) {
+      reset({
+        role: member.role,
+        permissions: member.permissions
+      });
+    }
+  }, [member, reset]);
+
+  const permissions = watch("permissions") || [];
 
   const handleDeactivate = () => {
     deactivateMember(currentOrg, memberId);
@@ -74,13 +65,8 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
     setShowModal(false);
   };
 
-  const onSubmit = (data: EditMemberData) => {
-    editMember({
-      role: data.role,
-      permissions: data.permissions
-    }, currentOrg, selectedMemberId);
-    
-    reset();
+  const onSubmit = (formData: EditMemberData) => {
+    editMember(formData, currentOrg, selectedMemberId);
     setShowModal(false);
   };
 
@@ -116,35 +102,11 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Permissions
-            </label>
-            <div className="space-y-3">
-              {PERMISSIONS.map((permission) => (
-                <label
-                  key={permission.value}
-                  className="relative flex items-start p-4 cursor-pointer rounded-lg border border-gray-200 hover:bg-gray-50"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        {...register("permissions")}
-                        value={permission.value}
-                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                      />
-                      <span className="ml-3 font-medium text-gray-900">{permission.label}</span>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">{permission.description}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-            {errors.permissions && (
-              <p className="text-red-500 text-sm mt-1">{errors.permissions.message}</p>
-            )}
-          </div>
+          <PermissionSelect
+            value={permissions}
+            onChange={(value) => setValue("permissions", value)}
+            error={errors.permissions?.message}
+          />
 
           <div className="flex justify-between">
             <div>

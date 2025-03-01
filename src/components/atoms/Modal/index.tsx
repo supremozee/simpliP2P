@@ -40,8 +40,10 @@ const Modal: React.FC<ModalProps> = ({
 
   return ReactDOM.createPortal(
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center  backdrop-blur-sm" 
-      onClick={(e)=>e.stopPropagation()}
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg" 
+      onClick={(e)=>{e.stopPropagation() 
+        onClose()
+      }}
     >
       <div
         className={cn(
