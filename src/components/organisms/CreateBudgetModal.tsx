@@ -15,11 +15,12 @@ import useFetchBranch from "@/hooks/useFetchBranch";
 import CreateBranch from "./CreateBranch";
 import CreateDepartment from "./CreateDepartment";
 import CreateCategory from "./CreateCategory";
+import { currencies } from "@/constants";
 
 const CreateBudgetSchema = z.object({
   name: z.string().min(1, "Budget name is required"),
   amount: z.number().min(1, "Amount must be greater than 0"),
-  currency: z.enum(['USD', 'NGN']),
+  currency: z.string().optional(),
   branchId: z.string().min(1, "Branch ID is required"),
   departmentId: z.string().min(1, "Department ID is required"),
   categoryId: z.string().min(1, "Category ID is required"),
@@ -90,11 +91,11 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
           <div>
             <Select
               label="Currency"
-              options={[{ id: 'USD', name: 'USD' }, { id: 'NGN', name: 'NGN' }]}
+              options={currencies}
               {...register("currency")}
-              onChange={(selectBudget) => setValue("currency", selectBudget as "USD" | "NGN")}
+              onChange={(selectBudget) => setValue("currency", selectBudget)}
               required
-              value={watch("currency")}
+              value={watch("currency") || "NGN"}
               error={errors.currency?.message}
             />
           </div>

@@ -13,12 +13,12 @@ export function useFetchData<T, E = Error>(
     ...options,
   });
 }
-export function format_price(price: number) {
-  return new Intl.NumberFormat('en-NG', {
+export function format_price(price: number, currency?: string) {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'NGN',
+    currency: currency,
     minimumFractionDigits: 0
-  }).format(price)
+  }).format(price);
 }
 export const formatNumber = (num: string | number | undefined) => {
   if (num === undefined) return '0';

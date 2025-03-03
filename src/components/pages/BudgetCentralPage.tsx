@@ -8,6 +8,7 @@ import useFetchBudget from '@/hooks/useFetchBudget';
 import useStore from '@/store';
 import TableSkeleton from '../atoms/Skeleton/Table';
 import BudgetSummarySkeleton from '../atoms/Skeleton/Budget';
+import { format_price } from '@/utils/helpers';
 
 type FilterType = {
   currency?: string;
@@ -223,10 +224,7 @@ const BudgetCentralPage = () => {
           >
             <p className="text-gray-500">{budget.name} ({budget.currency})</p>
             <h2 className="text-lg font-semibold text-gray-700">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: budget.currency,
-              }).format(budget.allocated)}
+               {format_price(budget.allocated, budget.currency)}
             </h2>
             <div className="flex justify-between text-sm text-gray-500 mt-2">
               <span>Available Balance: {budget.balance}</span>

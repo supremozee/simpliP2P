@@ -1,6 +1,7 @@
 "use client";
 
 import { Budget } from "@/types";
+import { format_price } from "@/utils/helpers";
 import React from "react";
 import {
   XAxis,
@@ -33,18 +34,6 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'mont
   };
 
   const trendData = generateTrendData();
-
-  const formatCurrency = (value: number | undefined) => {
-    if (value === undefined) return '';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: budgetData.currency || 'USD',
-      notation: 'compact',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1
-    }).format(value);
-  };
-
   const CustomTooltip: React.FC<TooltipProps<number, string>> = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -58,7 +47,7 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'mont
                 color: entry.dataKey === 'allocation' ? '#4F46E5' : '#F87171'
               }}
             >
-              {entry.dataKey === 'allocation' ? 'Budget Allocation' : 'Actual Spending'}: {formatCurrency(entry.value)}
+              {entry.dataKey === 'allocation' ? 'Budget Allocation' : 'Actual Spending'}: {budgetData.currency + " " + (entry.value)}
             </p>
           ))}
         </div>
@@ -72,7 +61,7 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'mont
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold text-gray-800">
-            {formatCurrency(parseFloat(budgetData.amount_allocated))}
+          {format_price(Number(budgetData.amount_allocated), budgetData.currency)}
           </h2>
           <p className="text-sm text-gray-500">Budget Allocation</p>
         </div>
@@ -109,7 +98,7 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'mont
             tick={{ fill: '#9CA3AF', fontSize: 12 }}
           />
           <YAxis 
-            tickFormatter={(value) => formatCurrency(value)}
+            tickFormatter={(value) => (budgetData.currency + parseFloat(value))}
             axisLine={false}
             tickLine={false}
             tick={{ fill: '#9CA3AF', fontSize: 12 }}

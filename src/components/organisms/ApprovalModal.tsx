@@ -190,14 +190,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                           data={[
                             item.item_name,
                             item.pr_quantity,
-                            new Intl.NumberFormat('en-US', {
-                              style: 'currency',
-                              currency: 'USD'
-                            }).format(item.unit_price),
-                            new Intl.NumberFormat('en-US', {
-                              style: 'currency',
-                              currency: 'USD'
-                            }).format(item.unit_price * item.pr_quantity)
+                            (item && (item.currency ?? 'NGN') + item.unit_price),
+                            (item && (item.currency ?? 'NGN') + item.unit_price * item.pr_quantity)
                           ]}
                           index={i}
                         />

@@ -377,6 +377,7 @@ export interface Owner {
     pr_quantity: number,
     unit_price: number
     image_url?:string;
+    currency?:string;
     status?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION'
   }
   export interface Requisition {
@@ -801,7 +802,7 @@ export interface AllComment{
 export interface CreateBudget {
   name: string;
   amount: number;
-  currency: "USD" | "NGN";
+  currency?: string;
   branchId: string;
   departmentId: string;
   categoryId: string;
@@ -811,7 +812,7 @@ export interface Budget {
   created_at: string;
   updated_at: string;
   name: string;
-  currency: "USD" | "NGN";
+  currency: string;
   balance: string;
   amount_allocated: string;
   amount_remaining: string;

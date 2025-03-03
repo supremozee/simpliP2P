@@ -177,7 +177,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                     label="Currency"
                     options={currencies}
                     {...register("currency")}
-                    value={selectedCurrency}
+                    value={selectedCurrency || "NGN"}
                     error={errors.currency?.message}
                     required
                     placeholder="Select currency"

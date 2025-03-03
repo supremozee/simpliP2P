@@ -4,11 +4,11 @@ import { MdInventory, MdOutlineDeliveryDining, MdOutlineMultilineChart } from "r
 import { RiAdminLine, RiFileList3Line } from "react-icons/ri";
 import { AiOutlineAudit } from "react-icons/ai";
 export const currencies = [
+  { id: "NGN", name: "NGN - Nigerian Naira" },
   { id: "USD", name: "USD - US Dollar" },
   { id: "EUR", name: "EUR - Euro" },
   { id: "GBP", name: "GBP - British Pound" },
   { id: "JPY", name: "JPY - Japanese Yen" },
-  { id: "NGN", name: "NGN - Nigerian Naira" },
   { id: "GHS", name: "GHS - Ghanaian Cedi" },
   { id: "KES", name: "KES - Kenyan Shilling" },
   { id: "ZAR", name: "ZAR - South African Rand" },
