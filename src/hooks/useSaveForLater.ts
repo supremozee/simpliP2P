@@ -2,11 +2,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { auth } from '@/api/auths';
 import { PurchaseRequisitionSavedForLater } from '@/types';
-import useStore from '@/store';
 import useNotify from './useNotify';
+import { useState } from 'react';
 
 const useSaveForLater = () => {
-  const { setLoading, loading } = useStore();
+  const [loading,setLoading ] = useState(false);
   const { success, error: notifyError } = useNotify();
   const queryClient = useQueryClient();
 

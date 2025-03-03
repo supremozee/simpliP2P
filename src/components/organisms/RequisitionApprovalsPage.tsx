@@ -198,6 +198,12 @@ const RequisitionsApprovalPage = () => {
                         </p>
                       </div>
                       <div>
+                        <p className="text-sm text-gray-500">Supplier</p>
+                        <p className="text-base font-medium text-gray-700">
+                          {requisition.supplier?.full_name}
+                        </p>
+                        </div>
+                      <div>
                         <p className="text-sm text-gray-500">Branch</p>
                         <p className="text-base font-medium text-gray-700">
                           {requisition.branch?.name}

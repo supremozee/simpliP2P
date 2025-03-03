@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { auth } from '@/api/auths';
-import useStore from '@/store';
 import { FinalizePurchaseRequisition } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useNotify from './useNotify';
 
 const useFinaliseRequisition = () => {
-  const { setLoading, loading } = useStore();
+  const [loading, setLoading  ] = useState(false);
   const { success, error: notifyError } = useNotify();
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

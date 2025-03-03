@@ -60,7 +60,7 @@ const AddNewItem = () => {
   return (
     <>
       <Button
-        type="button"
+        type="submit"
         className="sm:px-4 sm:py-2 px-10   py-1 text-sm  bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
         onClick={() => setIsOpen(true)}
       >

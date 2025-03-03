@@ -14,7 +14,7 @@ const NumberedListItem: React.FC<NumberedListItemProps> = ({
   description 
 }) => {
   return (
-    <li className="w-full list-none">
+    <li className="w-full list-none" onClick={(e)=>e.stopPropagation()}>
       <div className="flex items-start sm:gap-4 gap-2 mb-4">
         <div className="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center">
           {number}

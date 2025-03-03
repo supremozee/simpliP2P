@@ -113,7 +113,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 label="Contact Information"
                 required
                 type="email"
-                placeholder="Contact phone/mail"
+                placeholder="Contact email"
                 {...register("contact_info")}
               />
               {errors.contact_info && <p className="text-red-500 text-xs">{errors.contact_info.message}</p>}

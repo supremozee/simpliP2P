@@ -769,6 +769,7 @@ interface Role {
     };
   }
   export interface updateRequisitionStatus {
+    supplier_id:string;
     budget_id:string;
     status: string,
     approval_justification: string;

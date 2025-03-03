@@ -19,7 +19,7 @@ import LoaderSpinner from '../atoms/LoaderSpinner';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
-  contact_info: z.union([z.string().email("Invalid contact information"), z.string()]),
+  contact_info: z.string().email().min(1,"Invalid contact information"),
   requestor_name: z.string().min(1, "Requestor name is required"),
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
@@ -80,6 +80,7 @@ const CreateRequisitions = () => {
       setValue("quantity", requisition.quantity);
       setValue("estimated_cost", requisition.estimated_cost);
       setValue("justification", requisition.justification);
+      setValue("currency", requisition.currency);
       setValue("needed_by_date", new Date(requisition.needed_by_date).toISOString().split('T')[0]);
       
     }

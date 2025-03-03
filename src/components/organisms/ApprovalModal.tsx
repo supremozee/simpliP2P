@@ -18,6 +18,8 @@ import { cn } from "@/utils/cn";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import useFetchBudget from '@/hooks/useFetchBudget';
 import Select from '../atoms/Select';
+import { format_price } from '@/utils/helpers';
+import useFetchSuppliers from '@/hooks/useFetchSuppliers';
 
 const actionTypes = [
   { id: "approve", name: "Approve Only" },
@@ -29,11 +31,14 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
   const { isOpen, setIsOpen, currentOrg } = useStore();
   const { data, isLoading, isError } = useFetchPurchaseRequisitionById(currentOrg, pr_id);
   const { data: budgets, isLoading: isBudgetLoading } = useFetchBudget(currentOrg);
+  const suppliers = useFetchSuppliers(currentOrg);
+  const supplier = suppliers?.data?.data || []
   const { updateRequisitionStatus, loading } = useUpdateRequisitionStatus();
   const [isRejectModalOpen, setIsRejectModalOpen] = useState<boolean>(false);
   const [justification, setJustification] = useState<string>("");
   const [showConfirmApproval, setShowConfirmApproval] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<string>("");
+  const [selectedSupplier, setSelectedSupplier] = useState<string>("");
   const [selectedActionType, setSelectedActionType] = useState<string>("approve_and_create_po");
 
   if (isLoading) {
@@ -65,6 +70,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
       status: 'APPROVED', 
       approval_justification: justification,
       budget_id: selectedBudget,
+      supplier_id: selectedSupplier,
       action_type: selectedActionType as "approve" | "approve_and_create_po"
     });
     setShowConfirmApproval(false);
@@ -77,6 +83,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
       status: 'REJECTED', 
       approval_justification: justification,
       budget_id: selectedBudget,
+      supplier_id: selectedSupplier,
       action_type: "reject"
     });
     setIsRejectModalOpen(false);
@@ -190,8 +197,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                           data={[
                             item.item_name,
                             item.pr_quantity,
-                            (item && (item.currency ?? 'NGN') + item.unit_price),
-                            (item && (item.currency ?? 'NGN') + item.unit_price * item.pr_quantity)
+                            (item && format_price(item.unit_price, item?.currency)),
+                            (item && format_price(item.unit_price * item.pr_quantity, item?.currency))
                           ]}
                           index={i}
                         />
@@ -203,10 +210,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                     <div className="bg-gray-50 px-4 py-2 rounded-lg">
                       <span className="text-sm text-gray-500">Total Amount: </span>
                       <span className="text-lg font-semibold text-primary">
-                        {new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'USD'
-                        }).format(calculateTotal())}
+                       {format_price(calculateTotal(), requisition?.currency)}  
                       </span>
                     </div>
                   </div>
@@ -250,6 +254,18 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                       loading={isBudgetLoading}
                       required
                       placeholder="Select a budget"
+                    />
+                  </div>
+                  <div>
+                    <Select
+                      label="Select Supplier"
+                      options={supplier || []}
+                      value={requisition?.supplier?.id}
+                      onChange={(selectedOption) => setSelectedSupplier(selectedOption)}
+                      error={!selectedBudget ? "Please select a supplier" : ""}
+                      loading={isBudgetLoading}
+                      required
+                      placeholder="Select a Supplier"
                     />
                   </div>
                   {!isRejectModalOpen && (
