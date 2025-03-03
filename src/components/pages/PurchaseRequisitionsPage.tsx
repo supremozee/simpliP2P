@@ -13,6 +13,7 @@ import Button from "../atoms/Button";
 import useNotify from "@/hooks/useNotify";
 import InitializeRequisition from "../molecules/InitializeRequisition";
 import CreateRequisitions from "./CreateRequisitions";
+import { format_price } from "@/utils/helpers";
 
 interface CompletionProps {
   id: string;
@@ -74,7 +75,7 @@ const PurchaseRequisitionsPage = () => {
         req.requestor_name,
         req.request_description,
         req.quantity,
-        `${req.currency} ${req.estimated_cost.toLocaleString()}`,
+         format_price(Number(req.estimated_cost), req.currency),
         <span key={req.id} className={`font-semibold ${req.status === 'PENDING' ? 'text-yellow-600' : ''}`}>{req.status}</span>,
         req.needed_by_date,
         activeTab === "SAVED APPROVAL" ? (

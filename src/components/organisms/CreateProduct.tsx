@@ -151,7 +151,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 options={currencies}
                 {...register("currency")}
                 onChange={(selectCurrency)=> setValue("currency", selectCurrency)}
-                value={selectedCurrency}
+                value={selectedCurrency || "NGN"}
                 error={errors.currency?.message}
                 required
                 placeholder="Select currency"

@@ -14,6 +14,7 @@ import TableHead from '../atoms/TableHead';
 import TableBody from '../atoms/TableBody';
 import TableRow from '../molecules/TableRow';
 import { FetchProduct } from '@/types';
+import { format_price } from '@/utils/helpers';
 
 const InventoryManagement = () => {
   const { currentOrg, setProductId, productId } = useStore();
@@ -56,7 +57,7 @@ const InventoryManagement = () => {
     const rowData = [
       product?.name,
       product.description,
-      `${product.currency}${product.unitPrice}`,
+      format_price(Number(product.unitPrice), product.currency),
       product.stockQty,
       product.stockQtyAlert,
       product.category?.name ?? null
