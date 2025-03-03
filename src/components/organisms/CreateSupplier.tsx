@@ -12,8 +12,20 @@ import useFetchCategories from "@/hooks/useFetchCategories";
 import CreateCategory from "./CreateCategory";
 import { useState, useMemo } from "react";
 import { City, Country, State } from 'country-state-city';
-import { cn } from "@/utils/cn";
 import { FaPlus, FaUserTie } from "react-icons/fa";
+
+const paymentTermOptions = [
+  { id: "Payment in Advance", name: "Payment in Advance" },
+  { id: "Cash on Delivery", name: "Cash on Delivery" },
+  { id: "Line of Credit", name: "Line of Credit" },
+  { id: "Payment Immediately", name: "Payment Immediately" },
+  { id: "15 days payment after invoice", name: "15 days payment after invoice" },
+  { id: "30 days payment after invoice", name: "30 days payment after invoice" },
+  { id: "45 days payment after invoice", name: "45 days payment after invoice" },
+  { id: "60 days payment after invoice", name: "60 days payment after invoice" },
+  { id: "90 days payment after invoice", name: "90 days payment after invoice" },
+  { id: "120 days payment after invoice", name: "120 days payment after invoice" }
+];
 
 const CreateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
@@ -21,6 +33,8 @@ const CreateSupplierSchema = z.object({
   email: z.string().email("Invalid email address"),
   category: z.string().min(1, "Category is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
+  payment_term: z.string().min(1, "Payment term is required"),
+  lead_time: z.string().min(1, "Lead time is required"),
   address: z.object({
     street: z.string().min(1, "Street address is required"),
     city: z.string().min(1, "City is required"),
@@ -37,7 +51,7 @@ const CreateSupplierSchema = z.object({
 
 type SupplierFormData = z.infer<typeof CreateSupplierSchema>;
 
-const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) => {
+const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boolean, create?:boolean }) => {
   const { currentOrg } = useStore();
   const { createSupplier, loading, errorMessage, successCreate } = useCreateSupplier();
   const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
@@ -47,7 +61,7 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
 
-  const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<SupplierFormData>({
+  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, trigger } = useForm<SupplierFormData>({
     resolver: zodResolver(CreateSupplierSchema),
     mode: "onChange"
   });
@@ -71,7 +85,6 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
     try {
       await createSupplier(data, currentOrg);
       setTimeout (()=> {
-        reset();
         toggleModal();
       }, 1500)
      
@@ -125,7 +138,7 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
 
   return (
     <>
-      {add ? (
+      {add && (
         <button
           title="Add New"
           type="button"
@@ -134,7 +147,8 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
         >
           <FaPlus size={10} />
         </button>
-      ) : custom ? (
+      ) }
+       {custom && (
         <Button
           className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3"
           onClick={() => setIsOpen(true)}
@@ -144,12 +158,14 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
           </span>
           <span className="text-gray-700">Add New Supplier</span>
         </Button>
-      ) : (
+      )}
+        {create && (
         <Button
-          className={cn("px-10 text-white py-2 bg-primary rounded-md")}
-          onClick={() => setIsOpen(true)}
+        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white rounded-lg px-3 py-2 w-[20%] transition-all"
+        onClick={() => setIsOpen(true)}
         >
-          <span className="text-[10px]">Add New</span>
+          <FaPlus className="w-4 h-4" />
+          <span className="text-white">Create Supplier</span>
         </Button>
       )}
       <Modal onClose={() => {
@@ -238,6 +254,29 @@ const CreateSupplier = ({ add, custom }: { add?: boolean; custom?: boolean }) =>
                       error={errors?.rating}
                       setRating={(rating) => setValue("rating", rating)}
                     />
+                  </div>
+
+                  <div className='relative'>
+                    <Select
+                      label="Payment Terms"
+                      options={paymentTermOptions}
+                      {...register("payment_term")}
+                      onChange={(selectedTerm) => setValue("payment_term", selectedTerm)}
+                      required
+                      value={watch("payment_term")}
+                      error={errors.payment_term?.message}
+                    />
+                  </div>
+
+                  <div>
+                    <Input
+                      type="text"
+                      label="Lead Time (days)"
+                      className="mt-1 w-full"
+                      placeholder="Enter lead time in days"
+                      {...register("lead_time")}
+                    />
+                    {errors.lead_time && <p className="text-red-500 text-sm">{errors.lead_time.message}</p>}
                   </div>
                 </div>
               )}

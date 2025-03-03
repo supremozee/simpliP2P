@@ -77,11 +77,11 @@ const PurchaseRequisitionsPage = () => {
         `${req.currency} ${req.estimated_cost.toLocaleString()}`,
         <span key={req.id} className={`font-semibold ${req.status === 'PENDING' ? 'text-yellow-600' : ''}`}>{req.status}</span>,
         req.needed_by_date,
-        activeTab === "SAVED APPROVAL" && (
+        activeTab === "SAVED APPROVAL" ? (
           <Button key={req.id} onClick={() => handleCompleteRequisition({ pr_number: req.pr_number, id: req.id })} className="p-1 px-2 bg-[#F10000]">
             <p className="text-white text-[10px]">Complete Requisition</p>
           </Button>
-        ),
+        ): null,
       ]}
       index={index}
     />

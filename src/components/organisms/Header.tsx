@@ -50,7 +50,7 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <Button
               onClick={handleLogin}
-              className="text-white hover:text-primary  px-6 py-2 transition-colors"
+              className="text-white hover:text-white  px-6 py-2 transition-colors"
             >
               Login
             </Button>

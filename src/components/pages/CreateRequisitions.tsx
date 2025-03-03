@@ -19,7 +19,7 @@ import LoaderSpinner from '../atoms/LoaderSpinner';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
-  contact_info: z.string().email("Invalid contact information"),
+  contact_info: z.union([z.string().email("Invalid contact information"), z.string()]),
   requestor_name: z.string().min(1, "Requestor name is required"),
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
@@ -82,17 +82,11 @@ const CreateRequisitions = () => {
       setValue("justification", requisition.justification);
       setValue("needed_by_date", new Date(requisition.needed_by_date).toISOString().split('T')[0]);
       
-      // These fields will be handled when the API supports them
-      // setValue("priority_level", requisition.priority_level);
-      // setValue("budget_code", requisition.budget_code);
-      // setValue("delivery_location", requisition.delivery_location);
-      // setValue("special_instructions", requisition.special_instructions);
     }
   }, [saved, setValue]);
 
   const onSubmit = async (data: PurchaseRequsitionData) => {
     if (pr) {
-      // Only send fields that the API currently supports
       const submissionData = {
         pr_number: pr.pr_number,
         department_id: data.department_id,

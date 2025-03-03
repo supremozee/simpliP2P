@@ -2,7 +2,7 @@
 import React from 'react'
 import Search from '../atoms/Search'
 import Notifications from '../atoms/Notifications'
-import Profile from '../atoms/Profile'
+import Profile from '../molecules/Profile'
 import { usePathname } from 'next/navigation'
 
 const DashboardNav = () => {

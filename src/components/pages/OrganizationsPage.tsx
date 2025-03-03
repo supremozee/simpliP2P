@@ -119,7 +119,7 @@ const OrganizationsPage: React.FC = () => {
       >
         <motion.div variants={item}>
           <Card
-            onClick={() => router.push('/create-organization')}
+            onClick={() => router.push(`/create-organization`)}
             className="group relative p-8 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border-2 border-dashed border-primary/20 hover:border-primary/30 flex flex-col items-center justify-center h-[320px]"
           >
             <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">

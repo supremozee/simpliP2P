@@ -82,7 +82,7 @@ const CustomSelect: React.FC<SelectProps> = ({
           <input
             type="text"
             placeholder="Search..."
-            value={searchTerm || value}
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-[70%] py-1 border-b rounded-full"
           />

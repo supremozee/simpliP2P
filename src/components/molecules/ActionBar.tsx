@@ -20,7 +20,7 @@ type ActionBarTypes = {
   onSearch?: (query: string) => void;
   showDate?: boolean;
   exportId?: string;
-  buttonName: string;
+  buttonName?: string;
   viewMode?: boolean;
   toggleView?: () => void;
   view?: 'grid' | 'list';
@@ -105,14 +105,15 @@ const ActionBar: React.FC<ActionBarTypes> = ({
     <>
       {isExportLoading && <LoadingModal />}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full gap-4 p-2 rounded-xl shadow-sm">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
-          <Button
+       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
+       {buttonName&&buttonName?.length > 0 &&  <Button
             className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white rounded-lg px-5 py-2.5 transition-all min-w-[160px]"
             onClick={onClick}
           >
             <FaPlus className="w-4 h-4" />
             <span className="text-sm font-medium">{buttonName}</span>
           </Button>
+}
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">

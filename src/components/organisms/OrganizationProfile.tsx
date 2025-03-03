@@ -33,7 +33,6 @@ const OrganizationProfile = () => {
   const { error: showError, success: showSuccess } = useNotify();
   const { isCreator } = getUserPermissions();
   const [isUpdating, setIsUpdating] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<OrganizationFormType>({
@@ -49,15 +48,8 @@ const OrganizationProfile = () => {
     if(file) {
       try {
         setIsImageLoading(true);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewImage(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-
         await uploadOrganizationLogo(file, currentOrg);
       } catch {
-        setPreviewImage(null);
       } finally {
         setIsImageLoading(false);
       }
@@ -158,7 +150,7 @@ const OrganizationProfile = () => {
         <div className="flex flex-col items-center space-y-4">
           <div className="relative w-[300px] h-[300px]">
             <div className={cn(
-              "w-full h-full rounded-full overflow-hidden",
+              "w-full h-full rounded-full flex justify-center flex-col items-center overflow-hidden",
               "border-4 border-gray-100 shadow-lg"
             )}>
               {isImageLoading ? (
@@ -167,13 +159,11 @@ const OrganizationProfile = () => {
                 </div>
               ) : (
                 <Image
-                  src={previewImage || getUserRole?.logo || "/placeholder.png"}
+                  src={(getUserRole?.logo) || "/logo-black.png"}
                   alt="Organization Logo"
-                  fill
-                  className="object-cover"
-                  priority
-                  onLoadingComplete={() => setIsImageLoading(false)}
-                  onError={() => setIsImageLoading(false)}
+                  width={200}
+                  height={200}
+                  className="object-cover bg-contain w-full h-full rounded-full"
                 />
               )}
             </div>

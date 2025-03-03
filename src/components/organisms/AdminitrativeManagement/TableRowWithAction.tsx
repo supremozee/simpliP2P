@@ -49,6 +49,7 @@ const TableRowWithActions = <T extends Item>({
         break;
       default:
         if ("full_name" in item) return [
+          item?.supplier_no,
           item.full_name,
           item.created_at.split('T')[0],
           item?.category.name,

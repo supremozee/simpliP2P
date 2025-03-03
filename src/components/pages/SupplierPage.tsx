@@ -4,7 +4,6 @@ import useFetchSuppliers from '@/hooks/useFetchSuppliers';
 import useStore from '@/store';
 import Loader from '../molecules/Loader';
 import Pagination from '../molecules/Pagination';
-import UpdateSupplier from '../organisms/UpdateSupplier';
 import ActionBar from '../molecules/ActionBar';
 import TableHead from '../atoms/TableHead';
 import TableBody from '../atoms/TableBody';
@@ -15,6 +14,8 @@ import Card from '../atoms/Card';
 import Button from '../atoms/Button';
 import { BsGrid3X3GapFill, BsListUl } from 'react-icons/bs';
 import { Supplier } from '@/types';
+import CreateSupplier from '../organisms/CreateSupplier';
+import UpdateSupplier from '../organisms/UpdateSupplier';
 
 interface FilteredSupplier extends Supplier {
   category: {
@@ -33,8 +34,7 @@ const SupplierPage = () => {
   const { mutateAsync: deleteSupplier } = useDeleteSupplier(currentOrg);
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
-  
-  const headers = ["Name", "Date created", "Category", "Rating", "Actions"];
+  const headers = ["Supplier Number","Supplier Name", "Date created", "Category", "Rating", "Actions"];
 
   const toggleView = () => {
     setView(prev => prev === 'list' ? 'grid' : 'list');
@@ -88,7 +88,7 @@ const SupplierPage = () => {
 
   return (
     <>
-      <UpdateSupplier />
+      <UpdateSupplier/>
       {openConfirmDeleteModal && selectedSupplierId && (
         <ConfirmDelete
           isOpen={openConfirmDeleteModal}
@@ -98,9 +98,8 @@ const SupplierPage = () => {
         />
       )}
 
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-800">Suppliers</h1>
+      <div className="space-y-6 relative">
+        <div className="flex items-center justify-end">
           <button
             onClick={toggleView}
             className="p-2 rounded-lg z-20 hover:bg-gray-100 transition-colors"
@@ -109,14 +108,16 @@ const SupplierPage = () => {
             <ViewIcon className="w-5 h-5 text-gray-600" />
           </button>
         </div>
-
-        <ActionBar
-          onSearch={handleSearch}
-          showDate
-          type="suppliers"
-          buttonName='Create Supplier'
-          onClick={() => setIsUpdateSupplierOpen(true)}
-        />
+        <div className='absolute w-full top-12'>
+          {<CreateSupplier create={true} />}
+        </div>
+           <div className='flex w-full justify-between'>
+                  <ActionBar
+                    onSearch={handleSearch}
+                    showDate
+                    type="suppliers"
+                  />
+           </div>
 
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-6">
@@ -128,7 +129,7 @@ const SupplierPage = () => {
 
             {view === 'list' ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white">
+                <table className="min-w-full bg-white border border-[#80808050]">
                   <TableHead headers={headers} />
                   <TableBody
                     data={suppliers}

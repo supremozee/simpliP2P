@@ -4,7 +4,7 @@ import { cn } from "@/utils/cn";
 import Logo from "../atoms/Logo";
 import { usePathname, useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import Profile from "../atoms/Profile";
+import Profile from "../molecules/Profile";
 import LogoutButton from "../molecules/LogoutButton";
 import Link from "next/link";
 import useStore from "@/store";

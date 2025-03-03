@@ -283,9 +283,12 @@ export interface Owner {
     category: string;
     rating: number;
     bank_details: BankDetails
+    lead_time:string;
+    payment_term:string
   }
   export interface Supplier {
     id: string;
+    supplier_no:string;
     full_name: string;
     created_at:string;
     email: string;

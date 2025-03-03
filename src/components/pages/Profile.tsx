@@ -2,13 +2,13 @@
 import useGetUser from '@/hooks/useGetUser'
 import Image from 'next/image'
 import React, { useState, useRef, useEffect } from 'react'
-import ProfileSkeleton from './Skeleton/profile'
 import { useRouter } from 'next/navigation'
 import useStore from '@/store'
-import { IoChevronDown, IoPersonOutline } from 'react-icons/io5'
+import { IoAddOutline, IoChevronDown, IoPersonOutline } from 'react-icons/io5'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/cn'
 import LogoutButton from '../molecules/LogoutButton'
+import ProfileSkeleton from '../atoms/Skeleton/profile'
 
 const Profile = () => {
   const { user, isLoading } = useGetUser();
@@ -109,6 +109,19 @@ const Profile = () => {
                 <span className="text-sm text-gray-700">Change Profile Picture</span>
               </button>
             </div>
+              {/* Create Organization Button */}
+              <div className="px-4 py-2 border-b border-gray-100">
+              <button
+                onClick={() => {
+                  router.push('/create-organization');
+                  setIsOpen(false);
+                }}
+                className="flex items-center gap-3 w-full p-2 rounded-lg bg-primary/5 hover:bg-primary/10 text-primary transition-colors text-left"
+              >
+                <IoAddOutline className="w-5 h-5" />
+                <span className="text-sm font-medium">Create New Organization</span>
+              </button>
+            </div>
 
             {/* Organizations Section */}
             <div className="px-4 py-2">
@@ -134,7 +147,7 @@ const Profile = () => {
                             : "bg-gray-100"
                         )}>
                           <Image
-                            src={org.logo || "/placeholder-org.png"}
+                            src={org.logo || "/logo-black.png"}
                             alt={org.name}
                             fill
                             className="object-cover"
@@ -182,7 +195,7 @@ const Profile = () => {
                             : "bg-gray-100"
                         )}>
                           <Image
-                            src={org.logo || "/placeholder-org.png"}
+                            src={org.logo || "/logo-black.png"}
                             alt={org.name}
                             fill
                             className="object-cover"

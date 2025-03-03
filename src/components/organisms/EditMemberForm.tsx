@@ -13,6 +13,7 @@ import useReactivateMember from '@/hooks/useReactivateMembers';
 import { IoShieldCheckmark } from 'react-icons/io5';
 import { Permission, UserMember } from '@/types';
 import PermissionSelect from '../molecules/PermissionSelect';
+import LoaderSpinner from '../atoms/LoaderSpinner';
 
 const EditMemberSchema = z.object({
   role: z.string().min(1, "Role is required"),
@@ -32,7 +33,7 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
   const { editMember, loading } = useEditMember();
   const { deactivateMember } = useDeactivateMember();
   const { reactivateMember } = useReactivateMember();
-  const { data } = useFetchMemberById(currentOrg, memberId);
+  const { data, isLoading:memberLoading } = useFetchMemberById(currentOrg, memberId);
   const member = data?.data?.member as UserMember | undefined;
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<EditMemberData>({
@@ -69,6 +70,8 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
     editMember(formData, currentOrg, selectedMemberId);
     setShowModal(false);
   };
+
+  if(memberLoading) return <LoaderSpinner/>;
 
   return (
     <Modal
@@ -108,7 +111,7 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
             error={errors.permissions?.message}
           />
 
-          <div className="flex justify-between">
+          <div className="flex gap-5 w-full">
             <div>
               {member?.deactivated_at ? (
                 <Button
@@ -138,7 +141,7 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
               </Button>
               <Button
                 type="submit"
-                className="px-4 py-2 text-white bg-primary hover:bg-primary/90 rounded-lg"
+                className="px-3 py-2 text-white bg-primary hover:bg-primary/90 rounded-lg"
                 disabled={loading}
               >
                 {loading ? "Saving Changes..." : "Save Changes"}
