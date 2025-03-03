@@ -260,9 +260,9 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                     <Select
                       label="Select Supplier"
                       options={supplier || []}
-                      value={selectSupplier}
+                      value={selectedSupplier}
                       onChange={(selectedOption) => setSelectedSupplier(selectedOption)}
-                      error={!selectSupplier ? "Please select a supplier" : ""}
+                      error={!selectedSupplier ? "Please select a supplier" : ""}
                       loading={isBudgetLoading}
                       required
                       placeholder="Select a Supplier"
