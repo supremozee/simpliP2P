@@ -187,7 +187,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                   <h3 className="font-semibold text-gray-800">Items & Costs</h3>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full border border-[#80808050]">
                     <TableHead headers={['Item Name', 'Quantity', 'Unit Price', 'Total']} />
                     <TableBody
                       data={requisition?.items || []}
