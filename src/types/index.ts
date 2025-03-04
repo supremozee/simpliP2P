@@ -273,7 +273,9 @@ export interface Owner {
   interface BankDetails {
       bank_name: string,
       account_number: string,
-      account_name: string
+      account_name: string,
+      swift_code?:string;
+      bank_key?:string
   }
   export interface CreateSupplierData {
     full_name: string;

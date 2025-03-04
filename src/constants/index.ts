@@ -17,6 +17,18 @@ export const currencies = [
   { id: "INR", name: "INR - Indian Rupee" },
   { id: "BRL", name: "BRL - Brazilian Real" }
 ];
+export const paymentTermOptions = [
+  { id: "Payment in Advance", name: "Payment in Advance" },
+  { id: "Cash on Delivery", name: "Cash on Delivery" },
+  { id: "Line of Credit", name: "Line of Credit" },
+  { id: "Payment Immediately", name: "Payment Immediately" },
+  { id: "15 days payment after invoice", name: "15 days payment after invoice" },
+  { id: "30 days payment after invoice", name: "30 days payment after invoice" },
+  { id: "45 days payment after invoice", name: "45 days payment after invoice" },
+  { id: "60 days payment after invoice", name: "60 days payment after invoice" },
+  { id: "90 days payment after invoice", name: "90 days payment after invoice" },
+  { id: "120 days payment after invoice", name: "120 days payment after invoice" }
+];
 
 export const navbarLinks = [
   {

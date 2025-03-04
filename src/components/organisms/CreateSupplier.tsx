@@ -13,19 +13,7 @@ import CreateCategory from "./CreateCategory";
 import { useState, useMemo } from "react";
 import { City, Country, State } from 'country-state-city';
 import { FaPlus, FaUserTie } from "react-icons/fa";
-
-const paymentTermOptions = [
-  { id: "Payment in Advance", name: "Payment in Advance" },
-  { id: "Cash on Delivery", name: "Cash on Delivery" },
-  { id: "Line of Credit", name: "Line of Credit" },
-  { id: "Payment Immediately", name: "Payment Immediately" },
-  { id: "15 days payment after invoice", name: "15 days payment after invoice" },
-  { id: "30 days payment after invoice", name: "30 days payment after invoice" },
-  { id: "45 days payment after invoice", name: "45 days payment after invoice" },
-  { id: "60 days payment after invoice", name: "60 days payment after invoice" },
-  { id: "90 days payment after invoice", name: "90 days payment after invoice" },
-  { id: "120 days payment after invoice", name: "120 days payment after invoice" }
-];
+import { paymentTermOptions } from "@/constants";
 
 const CreateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
@@ -46,6 +34,8 @@ const CreateSupplierSchema = z.object({
     account_number: z.string().min(1, "Account number is required"),
     bank_name: z.string().min(1, "Bank name is required"),
     account_name: z.string().min(1, "Account name is required"),
+    swift_code: z.string().optional(),
+    bank_key: z.string().optional()
   })
 });
 
@@ -392,6 +382,25 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
                       {...register("bank_details.account_name")}
                     />
                     {errors.bank_details?.account_name && <p className="text-red-500 text-sm">{errors.bank_details.account_name.message}</p>}
+                  </div>
+                  <div>
+                    <Input
+                      type="text"
+                      label="Swift Code"
+                      className="mt-1 w-full"
+                      placeholder="Swift Code"
+                      {...register("bank_details.swift_code")}
+                    />
+                    {errors.bank_details?.swift_code && <p className="text-red-500 text-sm">{errors.bank_details.swift_code.message}</p>}
+                  </div>  <div>
+                    <Input
+                      type="text"
+                      label="Bank Key"
+                      className="mt-1 w-full"
+                      placeholder="Bank key"
+                      {...register("bank_details.bank_key")}
+                    />
+                    {errors.bank_details?.bank_key && <p className="text-red-500 text-sm">{errors.bank_details.bank_key.message}</p>}
                   </div>
                 </div>
               )}
