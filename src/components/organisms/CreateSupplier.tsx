@@ -67,16 +67,13 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
     return City.getCitiesOfState(selectedCountry, selectedState);
   }, [selectedCountry, selectedState]);
 
-  const toggleModal = () => {
-    setIsOpen(!isOpen);
-  };
+  // const toggleModal = () => {
+  //   setIsOpen(!isOpen);
+  // };
 
   const onSubmit = async (data: SupplierFormData) => {
     try {
       await createSupplier(data, currentOrg);
-      setTimeout (()=> {
-        toggleModal();
-      }, 1500)
      
     } catch (error) {
       console.error("Error creating supplier:", error);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Branch, Department, Requisition, Supplier } from '@/types';
 import LoaderSpinner from './LoaderSpinner';
-import { IoChevronDownSharp } from 'react-icons/io5';
+import { IoChevronDownSharp, IoClose } from 'react-icons/io5';
 
 type Option = Branch | Department | Requisition | Supplier;
 
@@ -77,7 +77,7 @@ const CustomSelect: React.FC<SelectProps> = ({
         </div>
       )}
       {isOpen && !disabled && (
-        <div className="absolute top-full mt-1 w-full bg-white border rounded-md shadow-lg z-50">
+        <div className="absolute bottom-full w-full bg-white border rounded-md shadow-lg z-50">
           <div className='flex justify-between items-center p-2 border-b'>
           <input
             type="text"
@@ -86,7 +86,20 @@ const CustomSelect: React.FC<SelectProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-[70%] py-1 border-b rounded-full"
           />
-            {component && <div className="">{component}</div>}
+          <div className='flex items-center'>
+          {component && <div className="">{component}</div>}
+            <button
+                type='button'
+                onClick={(e)=> {
+                  e.preventDefault();
+                  e.stopPropagation()
+                  setIsOpen(!isOpen)
+                }}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 z-10"
+              >
+                <IoClose className="w-6 h-6 text-gray-500" />
+            </button>
+          </div>
           </div>
           <div className="max-h-40 overflow-y-auto">
             {filteredOptions.map((option) => (
