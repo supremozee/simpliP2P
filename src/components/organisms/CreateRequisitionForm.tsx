@@ -110,7 +110,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 />
               </div>
               <InputField
-                label="Contact Information"
+                label="Requisitor Information"
                 required
                 type="email"
                 placeholder="Contact email"

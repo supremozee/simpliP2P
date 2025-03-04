@@ -54,10 +54,22 @@ const PurchaseRequisitionsPage = () => {
     "Estimated Cost",
     "Status",
     "Needed By",
-    ...(activeTab === "SAVED APPROVAL" ? ["Complete Requisition"] : []),
   ];
-
+  if (activeTab === "SAVED APPROVAL") {
+    headers.push("Complete Requisition");
+  }
+  if (activeTab === "PENDING") {
+    headers.push("Edit Requisition");
+  }
   const handleCompleteRequisition = ({ pr_number, id }: CompletionProps) => {
+    if (pr_number && id) {
+      setPr({ pr_number, id });
+      setIsOpen(true);
+    } else {
+      error("Invalid PR Number or ID");
+    }
+  };
+  const handleEditRequisition = ({ pr_number, id }: CompletionProps) => {
     if (pr_number && id) {
       setPr({ pr_number, id });
       setIsOpen(true);
@@ -79,10 +91,19 @@ const PurchaseRequisitionsPage = () => {
         <span key={req.id} className={`font-semibold ${req.status === 'PENDING' ? 'text-yellow-600' : ''}`}>{req.status}</span>,
         req.needed_by_date,
         activeTab === "SAVED APPROVAL" ? (
-          <Button key={req.id} onClick={() => handleCompleteRequisition({ pr_number: req.pr_number, id: req.id })} className="p-1 px-2 bg-[#F10000]">
+          <div className="flex w-full justify-center items-center">
+            <Button key={req.id} onClick={() => handleCompleteRequisition({ pr_number: req.pr_number, id: req.id })} className="p-1 px-2 bg-[#F10000]">
             <p className="text-white text-[10px]">Complete Requisition</p>
           </Button>
-        ): null,
+          </div>
+        ):
+        activeTab === "PENDING" && (
+          <div className="flex w-full justify-center items-center">
+            <Button key={req.id} onClick={() => handleEditRequisition({ pr_number: req.pr_number, id: req.id })} className="p-1 px-2 bg-yellow-600">
+            <p className="text-white text-[10px]">Edit Requisition</p>
+          </Button>
+          </div>
+        )
       ]}
       index={index}
     />

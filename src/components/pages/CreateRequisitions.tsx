@@ -16,6 +16,7 @@ import { FaPlus } from 'react-icons/fa';
 import useFetchRequsitionsSavedForLater from '@/hooks/useFetchRequistionsSavedForLater';
 import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
 import LoaderSpinner from '../atoms/LoaderSpinner';
+import useFetchPurchaseRequisition from '@/hooks/useFetchPurchaseRequisition';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
@@ -41,6 +42,7 @@ const CreateRequisitions = () => {
   const [saveForLaterChecked, setSaveForLaterChecked] = useState(false);
 
   const { data: savedRequisitions, isLoading: isLoadingSavedRequisitions } = useFetchRequsitionsSavedForLater(currentOrg);
+  const { data:pendingRequisitions, isLoading:pendingLoading } = useFetchPurchaseRequisition(currentOrg, "PENDING");
   const defaultValues = {
     department_id: "",
     contact_info: "",
@@ -50,7 +52,7 @@ const CreateRequisitions = () => {
     supplier_id: "",
     quantity: 0,
     estimated_cost: 0,
-    currency: "USD",
+    currency: "NGN",
     justification: "",
     needed_by_date: "",
   };
@@ -67,7 +69,7 @@ const CreateRequisitions = () => {
     defaultValues,
   });
   const saved = savedRequisitions && savedRequisitions.data.requisitions.find((req)=> req?.pr_number === pr?.pr_number);
-
+  const pending =pendingRequisitions &&pendingRequisitions.data.requisitions.find((req)=> req?.pr_number === pr?.pr_number);
   useEffect(() => {
     if (saved) {
       const requisition = saved;
@@ -85,12 +87,30 @@ const CreateRequisitions = () => {
       
     }
   }, [saved, setValue]);
+  useEffect(() => {
+    if (pending) {
+      const requisition = pending;
+      setValue("department_id", requisition?.department?.id);
+      setValue("contact_info", requisition.contact_info);
+      setValue("requestor_name", requisition.requestor_name);
+      setValue("request_description", requisition.request_description);
+      setValue("branch_id", requisition?.branch?.id);
+      setValue("supplier_id", requisition?.supplier?.id);
+      setValue("quantity", requisition.quantity);
+      setValue("estimated_cost", requisition.estimated_cost);
+      setValue("justification", requisition.justification);
+      setValue("currency", requisition.currency);
+      setValue("needed_by_date", new Date(requisition.needed_by_date).toISOString().split('T')[0]);
+      
+    }
+  }, [pending, setValue]);
 
   const onSubmit = async (data: PurchaseRequsitionData) => {
     if (pr) {
       const submissionData = {
         pr_number: pr.pr_number,
         department_id: data.department_id,
+        supplier_id: data.supplier_id,
         contact_info: data.contact_info,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
@@ -125,7 +145,7 @@ const CreateRequisitions = () => {
             </div>
 
             <ol className="list-decimal list-inside bg-white h-auto py-4 flex flex-col justify-center gap-5 items-center rounded-sm">
-              {isLoadingSavedRequisitions ? (
+              {isLoadingSavedRequisitions || pendingLoading ? (
                 <LoaderSpinner/>
               ) : (
                 <>
@@ -178,14 +198,16 @@ const CreateRequisitions = () => {
 
               <div className="flex justify-between items-center">
                 <Button 
+                type='button'
                   className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200"
                   onClick={() => setIsOpen(false)}
                 >
-                  Cancel
+                 <span className='text-white'>Cancel</span> 
                 </Button>
 
                 <div className="flex gap-3">
                   <Button 
+                  type='button'
                     className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
                     onClick={() => {/* Add export logic */}}
                   >

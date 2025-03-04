@@ -300,7 +300,7 @@ const auth = {
      return response
   },
   finaliseRequistion: async(orgId:string, data:FinalizePurchaseRequisition):Promise<any> => {
-    const config = postConfig(data, orgId)
+    const config = putConfig(data, orgId)
     const response = await apiRequest(USER_ENDPOINTS.FINALISE_REQUISITION, config);
     return response
   },

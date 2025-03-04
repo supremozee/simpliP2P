@@ -24,7 +24,7 @@ const OpenBudget: React.FC<OpenBudgetProps> = ({ budgetId }) => {
     if (!budget) {
       return {
         allocated: 0,
-        available: 0,
+        balance: 0,
         reserved: 0,
         used: 0,
         utilizationRate: 0,
@@ -34,17 +34,17 @@ const OpenBudget: React.FC<OpenBudgetProps> = ({ budgetId }) => {
     }
 
     const allocated = parseFloat(budget.amount_allocated) || 0;
-    const available = parseFloat(budget.amount_available) || 0;
+    const balance = parseFloat(budget.balance) || 0;
     const reserved = parseFloat(budget.amount_reserved) || 0;
-    const used = allocated - available - reserved;
+    const used = allocated - balance - reserved;
     
     const utilizationRate = allocated > 0 ? (used / allocated) * 100 : 0;
     const reservationRate = allocated > 0 ? (reserved / allocated) * 100 : 0;
-    const availabilityRate = allocated > 0 ? (available / allocated) * 100 : 0;
+    const availabilityRate = allocated > 0 ? (balance/ allocated) * 100 : 0;
 
     return {
       allocated,
-      available,
+      balance,
       reserved,
       used,
       utilizationRate,
@@ -96,7 +96,7 @@ const OpenBudget: React.FC<OpenBudgetProps> = ({ budgetId }) => {
 
                 <BudgetDetailCard
                   label="Available Balance"
-                  value={metrics.available}
+                  value={metrics.balance}
                   previousValue={metrics.allocated}
                   icon={<IoTrendingUp className="w-6 h-6 text-green-600" />}
                   trend={metrics.availabilityRate > 50 ? 'up' : 'down'}

@@ -51,7 +51,6 @@ const AddNewItem = () => {
       await addItemsToRequisition({ ...data, image_url: imageUrl }, currentOrg);
       reset();
       setImagePreview(null);
-      setIsOpen(false);
     } catch (error) {
       console.error("Error adding item:", error);
     } 
@@ -60,7 +59,7 @@ const AddNewItem = () => {
   return (
     <>
       <Button
-        type="submit"
+        type="button"
         className="sm:px-4 sm:py-2 px-10   py-1 text-sm  bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
         onClick={() => setIsOpen(true)}
       >
@@ -182,8 +181,11 @@ const AddNewItem = () => {
               >
                 Cancel
               </Button>
-              <Button
+              <button
                 type="submit"
+                onClick={(e)=> {
+                  e.stopPropagation();
+                }}
                 className="px-6 py-2 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg flex items-center gap-2"
                 disabled={loading}
               >
@@ -195,7 +197,7 @@ const AddNewItem = () => {
                 ) : (
                   <span>Add Item</span>
                 )}
-              </Button>
+              </button>
             </div>
           </form>
         </div>
