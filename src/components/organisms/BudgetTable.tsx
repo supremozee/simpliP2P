@@ -14,7 +14,6 @@ const BudgetTable = ({budgets}: {budgets:Budget[]}) => {
     "Creator",
     "Budget Amount",
     "Currency",
-    "Budget Used",
     "Budget Balance",
     "Action"
   ];
@@ -30,7 +29,6 @@ const BudgetTable = ({budgets}: {budgets:Budget[]}) => {
         budget.name,
         format_price(Number(budget.amount_allocated), budget.currency),
         budget.currency,
-        format_price(Number(budget.amount_allocated) - Number(budget.amount_remaining), budget.currency),
         format_price(Number(budget.balance), budget.currency),,
         <div  key={`edit-button-${budget.id}`}  title='View Budget' className='flex justify-center w-full items-center'>
           <OpenBudget budgetId={budget.id} />
