@@ -28,7 +28,6 @@ const AuditLogsPage = () => {
     "Action Type",
     "Entity Type",
     "Changes Made",
-    "Log ID",
   ];
 
   const renderRow = (orgs: AuditLog, index: number) => (
@@ -41,7 +40,6 @@ const AuditLogsPage = () => {
         orgs.action,
         orgs.entity_type.replaceAll("_", " ").toLowerCase(),
         orgs.description,
-        orgs.id,
       ]}
       index={index}
     />
