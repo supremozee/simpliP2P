@@ -13,6 +13,8 @@ import { cn } from "@/utils/cn";
 import useAddItemsToRequistion from "@/hooks/useAddItemsToRequisition";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import useFileManager from "@/hooks/useFileManager";
+import { currencies } from "@/constants";
+import CustomSelect from "../atoms/Select";
 
 const AddItemSchema = z.object({
   pr_id: z.string().min(1, "PR ID is required"),
@@ -20,6 +22,7 @@ const AddItemSchema = z.object({
   pr_quantity: z.number().nonnegative("Quantity must be at least 0"),
   unit_price: z.number().positive("Unit price must be a positive number"),
   image_url: z.instanceof(File).optional(),
+  currency: z.string().min(1, "Currency is required"),
 });
 
 type AddItemFormData = z.infer<typeof AddItemSchema>;
@@ -28,12 +31,16 @@ const AddNewItem = () => {
   const { currentOrg, pr, loading } = useStore();
   const { addItemsToRequisition } = useAddItemsToRequistion();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors }, reset} = useForm<AddItemFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue} = useForm<AddItemFormData>({
     resolver: zodResolver(AddItemSchema),
+    defaultValues: {
+      currency: "NGN",
+    },
   });
   const [isOpen, setIsOpen] = useState(false);
   const {uploadFile, loading:imageLoading} = useFileManager()
   const productRef = useRef<HTMLInputElement>(null)
+  const selectedCurrency = watch("currency", "NGN");
   const handleFileChange = async () => {
     const file = productRef.current?.files?.[0];
     if (file) {
@@ -107,7 +114,18 @@ const AddNewItem = () => {
                   <p className="mt-1 text-sm text-red-500">{errors.pr_quantity.message}</p>
                 )}
               </div>
-
+              <div>
+                <CustomSelect
+                  label="Currency"
+                  options={currencies}
+                  {...register("currency")}
+                  onChange={(selectCurrency) => setValue("currency", selectCurrency)}
+                  value={selectedCurrency}
+                  error={errors.currency?.message}
+                  required
+                  placeholder="Select currency"
+                />
+              </div>
               <div>
                 <Input
                   type="number"

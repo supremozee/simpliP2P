@@ -12,6 +12,7 @@ import TableCell from "../atoms/TableCell";
 import TableHead from "../atoms/TableHead";
 import Image from "next/image";
 import {  FaTimes } from "react-icons/fa";
+import { format_price } from "@/utils/helpers";
 
 const FetchItemByPrNumber = () => {
   const { currentOrg, pr } = useStore();
@@ -25,7 +26,7 @@ const FetchItemByPrNumber = () => {
   if (isLoading) return <TableSkeleton />;
   if (isError) return <ErrorComponent text={error?.message || "Failed to fetch products."} />;
 
-  const headers = ["Image", "Item Name", "Description", "Unit Price", "Quantity", "Actions"];
+  const headers = ["Item Image", "Item Name", "Description", "Unit Price", "Quantity", "Actions"];
 
   return (
     <div className="overflow-x-auto">
@@ -43,7 +44,7 @@ const FetchItemByPrNumber = () => {
               </TableCell>
               <TableCell>{item.item_name}</TableCell>
               <TableCell>{item.description || "No Description"}</TableCell>
-              <TableCell>${item.unit_price}</TableCell>
+              <TableCell>{format_price(item.unit_price, item.currency)}</TableCell>
               <TableCell>{item.pr_quantity}</TableCell>
               <TableCell className="flex gap-2 justify-center">
                 <UpdateItem id={item.id}/>

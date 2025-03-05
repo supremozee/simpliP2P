@@ -42,7 +42,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<ProductFormData>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
-      currency: "USD",
+      currency: "NGN",
       stockQtyAlert: 0,
       stockQty: 0,
     },
@@ -68,7 +68,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
 
   const categories = categoryData?.data?.categories || [];
   const category = watch("category")
-  const selectedCurrency = watch("currency");
+  const selectedCurrency = watch("currency", "NGN");
 
   const onSubmit = async (data: ProductFormData) => {
     const formattedData = {
@@ -151,12 +151,11 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 options={currencies}
                 {...register("currency")}
                 onChange={(selectCurrency)=> setValue("currency", selectCurrency)}
-                value={selectedCurrency || "NGN"}
+                value={selectedCurrency}
                 error={errors.currency?.message}
                 required
                 placeholder="Select currency"
               />
-              {errors.currency && <p className="text-red-500 text-sm">{errors.currency.message}</p>}
             </div>
 
             <div>

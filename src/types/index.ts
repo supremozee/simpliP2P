@@ -624,17 +624,18 @@ interface Role {
   export interface PurchaseItems {
     pr_id: string,
     product_id?: string,
-     image_url?: string
+    image_url?: string
     item_name?: string,
     pr_quantity?: number,
     unit_price?: number
-
+    currency?:string | undefined
   }
   export interface AllItems {
     id: string,
     created_at: string,
     updated_at: string,
     item_name: string,
+    currency:string;
     description:string;
     unit_price: number,
     image_url: string | null,
