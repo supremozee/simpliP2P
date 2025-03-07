@@ -34,7 +34,7 @@ export const postConfig = <T>(data: T, oid?: string) => {
       "Content-Type": "application/json"
     };
     if (oid) {
-      headers["X-Organization-ID"] = oid; 
+      headers.oid = oid; 
     }
     return {
       method: "PUT" as const,
