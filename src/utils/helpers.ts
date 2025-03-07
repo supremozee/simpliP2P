@@ -31,3 +31,7 @@ export const formatNumber = (num: string | number | undefined) => {
     maximumFractionDigits: 1
   }).format(value);
 };
+
+export const sanitize = (name: string): string => {
+  return name.replace(/\s+/g, '');
+};

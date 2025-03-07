@@ -8,6 +8,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { IoBusinessOutline, IoAddCircle, IoChevronForward } from "react-icons/io5";
 import Button from "../atoms/Button";
+import { sanitize } from "@/utils/helpers";
 
 const OrganizationsPage: React.FC = () => {
   const router = useRouter();
@@ -78,9 +79,10 @@ const OrganizationsPage: React.FC = () => {
   }
 
   const handleCardClick = (orgId: string, name: string) => {
-    router.push(`/${name}/dashboard`);
+    const sanitizedOrgName =sanitize(name); 
+    router.push(`/${sanitizedOrgName}/dashboard`);
     setCurrentOrg(orgId);
-    setOrgName(name);
+    setOrgName(sanitizedOrgName);
   };
 
   const container = {

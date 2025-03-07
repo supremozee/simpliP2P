@@ -7,6 +7,7 @@ import { auth } from "@/api/auths";
 import { CreateOrganizationResponse, OrganizationData } from "@/types";
 import { useRouter } from "next/navigation";
 import useStore from "@/store";
+import { sanitize } from "@/utils/helpers";
 
 export default function useCreateOrganization() {
   const [loading, setLoading] = useState(false);
@@ -30,8 +31,9 @@ export default function useCreateOrganization() {
       queryClient.invalidateQueries({queryKey: ['organizationById']})
       setLoading(false);
       if (response && response.status === 'success') {
+        const sanitizedOrgName = sanitize(response?.data?.name)
         setCreateOrganization(true);
-        setOrgName(response?.data?.name)
+        setOrgName(sanitizedOrgName)
         setCurrentOrg(response?.data?.id)
         setSuccessMessage(response?.data?.name + " " + response?.message);
       } else {

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import useNotify from './useNotify';
 import { useRouter, usePathname } from 'next/navigation';
 import useStore from '@/store';
+import { sanitize } from '@/utils/helpers';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -39,9 +40,10 @@ useEffect(() => {
         setLoginRespone(response?.data?.user)
         const adminOrg = response?.data?.user?.user_organisations?.find(o => o.is_creator);
         if (adminOrg?.is_creator === true) {
-          setOrgName(adminOrg.name);
+          const sanitizedOrgName = sanitize(adminOrg?.name)
+          setOrgName(sanitizedOrgName);
           setCurrentOrg(adminOrg.org_id);
-          router.push(`/${adminOrg.name}/dashboard`);
+          router.push(`/${sanitizedOrgName}/dashboard`);
         } else {
           const userOrgs = response?.data?.user?.user_organisations?.filter(o => !o.is_creator);
           if (userOrgs && userOrgs.length > 0) {

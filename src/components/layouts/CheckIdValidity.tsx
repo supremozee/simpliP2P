@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import useGetUser from "@/hooks/useGetUser";
 import useNotify from "@/hooks/useNotify";
 import { usePathname, useRouter } from 'next/navigation';
+import { sanitize } from '@/utils/helpers';
 
 interface CheckIdValidityProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ const CheckIdValidity: React.FC<CheckIdValidityProps> = ({ children }) => {
   const orgName = pathname.split('/')[1];
   const { error } = useNotify();
   const router = useRouter();
-  const [isValid, setIsValid] = useState<boolean>(false); // Initialize to false
+  const [isValid, setIsValid] = useState<boolean>(false);
 
   useEffect(() => {
     const checkValidity = async () => {
@@ -26,8 +27,9 @@ const CheckIdValidity: React.FC<CheckIdValidityProps> = ({ children }) => {
       }
 
       // Check if the user has access to the organization
-      const findValidName = user.data.user_organisations?.find((org) => org.name === orgName);
-      const isValidName = findValidName?.name === orgName;
+      const findValidName = user.data.user_organisations?.find((org) => sanitize(org.name) === orgName);
+      const sanitizedOrgName = sanitize(findValidName?.name || "")
+      const isValidName = sanitizedOrgName === orgName;
 
       if (!isValidName) {
         setIsValid(false);

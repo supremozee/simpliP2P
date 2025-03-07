@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/cn'
 import LogoutButton from './LogoutButton'
 import Button from '../atoms/Button'
+import { sanitize } from '@/utils/helpers'
 
 const Profile = () => {
   const { user, isLoading } = useGetUser();
@@ -39,9 +40,10 @@ const Profile = () => {
   const memberOrgs = organizationDetails.filter(org => !org.is_creator);
 
   const handleOrgSwitch = (orgId: string, name: string) => {
+    const sanitizedOrgName = sanitize(name); 
     setCurrentOrg(orgId)
-    setOrgName(name)
-    router.push(`/${name}/dashboard`)
+    setOrgName(sanitizedOrgName)
+    router.push(`/${sanitizedOrgName}/dashboard`)
     setIsOpen(false)
   }
 
