@@ -3,6 +3,7 @@ import { auth } from '@/api/auths';
 import { Organization } from '@/types';
 import useStore from '@/store';
 import useNotify from './useNotify';
+import { sanitize } from '@/utils/helpers';
 
 const useUpdateOrganization = (orgId: string) => {
   const queryClient = useQueryClient();
@@ -18,8 +19,9 @@ const useUpdateOrganization = (orgId: string) => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: (response: any) => {
+      const sanitizedOrgName = sanitize(response?.data?.name)
       setLoading(false);
-      setOrgName(response?.data?.name);
+      setOrgName(sanitizedOrgName);
       success(response?.message);
       queryClient.invalidateQueries({ queryKey: ['organizationById', orgId] });
     },
