@@ -29,7 +29,7 @@ const CreateProductSchema = z.object({
   stockQty: z.number().nonnegative("Stock quantity must be at least 0"),
   stockQtyAlert: z.number().optional(),
   category: z.string().min(1, "Category is required"),
-  image_url: z.string().min(1, "Image is required"),
+  image_url: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof CreateProductSchema>;

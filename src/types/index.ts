@@ -380,7 +380,7 @@ export interface Owner {
     unit_price: number
     image_url?:string;
     currency?:string;
-    status?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION'
+    status?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | "SAVED_FOR_LATER"
   }
   export interface Requisition {
     department: {
@@ -408,7 +408,7 @@ export interface Owner {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-    status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION'
+    status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | 'SAVED_FOR_LATER'
     items: RequisitionItems[];
   }
   export interface CreatePurchaseRequisitionData {
@@ -668,7 +668,7 @@ interface Role {
   export interface UpdateData {
     item_name: string;
     unit_price: number;
-    status?: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" ;
+    status?: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" | "SAVED_FOR_LATER" ;
     pr_quantity?: number | undefined;
     image_url?: string | undefined;
   }
@@ -684,7 +684,7 @@ interface Role {
     quantity: number;
     estimated_cost: number;
     justification: string;
-    status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION";
+    status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" | "SAVED_FOR_LATER";
     approval_justification: string | null;
     needed_by_date: string;
     currency: string;
@@ -699,7 +699,7 @@ interface Role {
     image_url: string | null;
     pr_quantity: number;
     po_quantity: number | null;
-    status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION";
+    status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" | "SAVED_FOR_LATER";
     purchase_requisition: PurchaseRequisition;
     purchase_order: null;
     product: null;

@@ -67,7 +67,6 @@ const CreatePurchaseOrder = () => {
   
   const suppliers = suppliersData?.data || [];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const supplierId = watch("supplier_id");
   
   const { data: ordersData, isLoading: isOrdersLoading, isError: isOrdersError } = useFetchAllOrders(currentOrg);
 
@@ -118,6 +117,7 @@ const CreatePurchaseOrder = () => {
           id: firstRequisition.id,
           pr_number: firstRequisition.pr_number,
         });
+      setValue("supplier_id", firstRequisition.supplier?.id);
         setValue("request_id", firstRequisition.id);
         setValue("total_amount", Number(firstRequisition.estimated_cost));
       }
@@ -138,6 +138,7 @@ const CreatePurchaseOrder = () => {
         pr_number: requisition.pr_number,
       });
       setValue("request_id", requisition.id);
+      setValue("supplier_id", requisition.supplier?.id);
       setValue("total_amount", Number(requisition.estimated_cost));
       setCurrentIndex(newIndex);
     }
@@ -320,8 +321,8 @@ const CreatePurchaseOrder = () => {
                           label="Select Supplier"
                           options={suppliers}
                           {...register("supplier_id")}
-                          onChange={(selectedSupplier) => setValue("supplier_id", selectedSupplier || filteredRequisitions[currentIndex]?.supplier.id)}
-                          value={supplierId}
+                          onChange={(selectedSupplier) => setValue("supplier_id", selectedSupplier)}
+                          value={filteredRequisitions[currentIndex]?.supplier?.id}
                           required
                           error={errors.supplier_id?.message}
                           loading={isSuppliersLoading}
@@ -517,12 +518,6 @@ const CreatePurchaseOrder = () => {
                         }}
                       >
                         Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        className="px-4 py-2 text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors"
-                      >
-                        Preview
                       </Button>
                     </div>
                   </div>

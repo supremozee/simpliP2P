@@ -8,7 +8,7 @@ import { FiSearch } from "react-icons/fi";
 import { IoFilterOutline, IoTimeOutline } from "react-icons/io5";
 import { BsArrowUp, BsArrowDown } from "react-icons/bs";
 import { motion } from "framer-motion";
-import { formatNumber } from "@/utils/helpers";
+import { format_price } from "@/utils/helpers";
 import { Order } from "@/types";
 
 type SortField = 'date' | 'amount' | 'supplier';
@@ -197,7 +197,7 @@ const OrdersApprovalPage = () => {
                       <div>
                         <p className="text-sm text-gray-500">Total Amount</p>
                         <p className="text-lg font-semibold text-primary">
-                          {formatNumber(order.total_amount)}
+                          {format_price(Number(order.total_amount), order?.currency)}
                         </p>
                       </div>
                       <div>

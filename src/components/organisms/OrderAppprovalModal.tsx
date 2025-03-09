@@ -13,6 +13,7 @@ import { FaFileInvoiceDollar, FaUserTie } from "react-icons/fa";
 import { BsClockHistory } from "react-icons/bs";
 import { cn } from "@/utils/cn";
 import LoaderSpinner from "../atoms/LoaderSpinner";
+import { format_price } from "@/utils/helpers";
 
 const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
   const { isOpen, setIsOpen, currentOrg } = useStore();
@@ -55,12 +56,6 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
     setIsOpen(false);
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
 
   return (
     <>
@@ -169,7 +164,7 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
                   <div>
                     <p className="text-sm text-gray-500">Total Amount</p>
                     <p className="text-lg font-semibold text-primary">
-                      {formatCurrency(Number(order?.total_amount))}
+                      {format_price(Number(order?.total_amount), order?.currency)}
                     </p>
                   </div>
                   <div>
