@@ -699,7 +699,7 @@ interface Role {
     image_url: string | null;
     pr_quantity: number;
     po_quantity: number | null;
-    status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" | "SAVED_FOR_LATER";
+    status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION";
     purchase_requisition: PurchaseRequisition;
     purchase_order: null;
     product: null;
