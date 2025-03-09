@@ -52,12 +52,12 @@ const PurchaseRequisitionsPage = () => {
     "PR Number",
     "Department",
     "Requestor",
-    "Line Items",
     "Description",
     "Quantity",
     "Estimated Cost",
     "Status",
     "Needed By",
+    "Line Items",
     "Action"
   ];
 
@@ -84,18 +84,6 @@ const PurchaseRequisitionsPage = () => {
           req.pr_number,
           req.department?.name,
           req.requestor_name,
-          <div
-          key={req.id}
-          className="flex  justify-center items-center"
-          >
-           <Button
-             className="p-1 px-2 bg-secondary"
-             onClick={() => toggleRow(req.id)}>
-              <span className="text-white text-[10px]">
-              {expandedRows.includes(req.id) ? "Hide Items" : "Show Items"}
-              </span>
-          </Button>
-          </div>,
           req.request_description,
           req.quantity,
           format_price(Number(req.estimated_cost), req.currency),
@@ -112,7 +100,19 @@ const PurchaseRequisitionsPage = () => {
               <p className="text-white text-[10px]">
                 {(activeTab === "SAVED APPROVAL" || req.status === "SAVED_FOR_LATER" ) ? "Complete": (activeTab === "REQUEST_MODIFICATION" || req.status === "REQUESTED MODIFICATION") ? "View Request": ((req.status === "PENDING" || req.status==="APPROVED") &&"View Requisition")}</p>
             </Button>
-          </div>
+          </div>,
+           <div
+           key={req.id}
+           className="flex  justify-center items-center"
+           >
+            <Button
+              className="p-1 px-3 bg-secondary"
+              onClick={() => toggleRow(req.id)}>
+               <span className="text-white text-[10px]">
+               {expandedRows.includes(req.id) ? "Hide Items" : "Show Items"}
+               </span>
+           </Button>
+           </div>,
         ]}
         index={index}
       />
