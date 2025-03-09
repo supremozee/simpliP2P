@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import Tabs from "../molecules/Tabs";
 import TableHead from "../atoms/TableHead";
 import TableBody from "../atoms/TableBody";
@@ -14,6 +15,7 @@ import useNotify from "@/hooks/useNotify";
 import InitializeRequisition from "../molecules/InitializeRequisition";
 import CreateRequisitions from "./CreateRequisitions";
 import { format_price } from "@/utils/helpers";
+import { cn } from "@/utils/cn";
 
 interface CompletionProps {
   id: string;
@@ -22,6 +24,7 @@ interface CompletionProps {
 
 const PurchaseRequisitionsPage = () => {
   const [activeTab, setActiveTab] = useState("ALL");
+  const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const tabNames = [
     "ALL",
     "PENDING",
@@ -49,27 +52,16 @@ const PurchaseRequisitionsPage = () => {
     "PR Number",
     "Department",
     "Requestor",
+    "Line Items",
     "Description",
     "Quantity",
     "Estimated Cost",
     "Status",
     "Needed By",
+    "Action"
   ];
-  if (activeTab === "SAVED APPROVAL") {
-    headers.push("Complete Requisition");
-  }
-  if (activeTab === "PENDING") {
-    headers.push("Edit Requisition");
-  }
-  const handleCompleteRequisition = ({ pr_number, id }: CompletionProps) => {
-    if (pr_number && id) {
-      setPr({ pr_number, id });
-      setIsOpen(true);
-    } else {
-      error("Invalid PR Number or ID");
-    }
-  };
-  const handleEditRequisition = ({ pr_number, id }: CompletionProps) => {
+
+  const handleViewRequisition = ({ pr_number, id }: CompletionProps) => {
     if (pr_number && id) {
       setPr({ pr_number, id });
       setIsOpen(true);
@@ -78,35 +70,93 @@ const PurchaseRequisitionsPage = () => {
     }
   };
 
+  const toggleRow = (id: string) => {
+    setExpandedRows(prev =>
+      prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
+    );
+  };
+
   const renderRow = (req: Requisition, index: number) => (
-    <TableRow
-      key={req.id}
-      data={[
-        req.pr_number,
-        req.department?.name,
-        req.requestor_name,
-        req.request_description,
-        req.quantity,
-         format_price(Number(req.estimated_cost), req.currency),
-        <span key={req.id} className={`font-semibold ${req.status === 'PENDING' ? 'text-yellow-600' : ''}`}>{req.status}</span>,
-        req.needed_by_date,
-        activeTab === "SAVED APPROVAL" ? (
-          <div className="flex w-full justify-center items-center">
-            <Button key={req.id} onClick={() => handleCompleteRequisition({ pr_number: req.pr_number, id: req.id })} className="p-1 px-2 bg-[#F10000]">
-            <p className="text-white text-[10px]">Complete Requisition</p>
+    <>
+      <TableRow
+        key={req.id}
+        data={[
+          req.pr_number,
+          req.department?.name,
+          req.requestor_name,
+          <div
+          key={req.id}
+          className="flex  justify-center items-center"
+          >
+           <Button
+             className="p-1 px-2 bg-secondary"
+             onClick={() => toggleRow(req.id)}>
+              <span className="text-white text-[10px]">
+              {expandedRows.includes(req.id) ? "Hide Items" : "Show Items"}
+              </span>
           </Button>
+          </div>,
+          req.request_description,
+          req.quantity,
+          format_price(Number(req.estimated_cost), req.currency),
+          <span key={req.id} className={`font-semibold ${req.status === 'PENDING' ? 'text-yellow-600' : ''}`}>{req.status}</span>,
+          req.needed_by_date,
+          <div className="flex w-full justify-center items-center" key={req.id}>
+            <Button onClick={() => handleViewRequisition({ pr_number: req.pr_number, id: req.id })} className={cn("p-1 px-2 bg-[#F10000]",
+              activeTab === "SAVED APPROVAL" && 'bg-[#F10000]',
+              (activeTab === "PENDING" || req.status === "PENDING") && 'bg-yellow-600',
+              (activeTab === "APPROVED" || req.status === "APPROVED") && 'bg-green-600',
+              activeTab === "REJECTED" && 'bg-[#F10000]',
+              activeTab === "REQUEST_MODIFICATION" && 'bg-[#F10000]'
+            )}>
+              <p className="text-white text-[10px]">
+                {(activeTab === "SAVED APPROVAL" || req.status === "SAVED_FOR_LATER" ) ? "Complete": (activeTab === "REQUEST_MODIFICATION" || req.status === "REQUESTED MODIFICATION") ? "View Request": ((req.status === "PENDING" || req.status==="APPROVED") &&"View Requisition")}</p>
+            </Button>
           </div>
-        ):
-        activeTab === "PENDING" && (
-          <div className="flex w-full justify-center items-center">
-            <Button key={req.id} onClick={() => handleEditRequisition({ pr_number: req.pr_number, id: req.id })} className="p-1 px-2 bg-yellow-600">
-            <p className="text-white text-[10px]">Edit Requisition</p>
-          </Button>
-          </div>
-        )
-      ]}
-      index={index}
-    />
+        ]}
+        index={index}
+      />
+      {expandedRows.includes(req.id) && (
+        <motion.tr
+          key={`${req.id}-items`}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+          translate= "yes"
+        >
+          <td colSpan={headers.length}>
+            <div className="p-4 bg-gray-100">
+              <h3 className="font-semibold mb-2">Line Items</h3>
+              {req.items && req.items.length > 0 ? (
+                <table className="w-full table-auto border-collapse border border-gray-300">
+                  <thead>
+                    <tr>
+                      <th className="border px-4 py-2">Item</th>
+                      <th className="border px-4 py-2">Quantity</th>
+                      <th className="border px-4 py-2">Unit Price</th>
+                      <th className="border px-4 py-2">Total Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {req.items.map((item, idx) => (
+                      <tr key={idx} className="text-center">
+                        <td className="border px-4 py-2">{item.item_name}</td>
+                        <td className="border px-4 py-2">{item.pr_quantity}</td>
+                        <td className="border px-4 py-2">{format_price(item.unit_price, req.currency)}</td>
+                        <td className="border px-4 py-2">{format_price((item.unit_price * item.pr_quantity), req.currency)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center text-gray-500">No items available</p>
+              )}
+            </div>
+          </td>
+        </motion.tr>
+      )}
+    </>
   );
 
   const tabnamesToRender = tabNames.map(name =>
