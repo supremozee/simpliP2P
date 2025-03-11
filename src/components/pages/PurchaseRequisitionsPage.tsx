@@ -57,8 +57,8 @@ const PurchaseRequisitionsPage = () => {
     "Estimated Cost",
     "Status",
     "Needed By",
-    "Line Items",
-    "Action"
+    "Action",
+    "Line Items"
   ];
 
   const handleViewRequisition = ({ pr_number, id }: CompletionProps) => {
