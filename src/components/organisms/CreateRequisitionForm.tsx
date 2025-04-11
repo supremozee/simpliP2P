@@ -12,6 +12,7 @@ import CreateBranch from './CreateBranch';
 import { currencies } from "@/constants";
 import useFetchSuppliers from "@/hooks/useFetchSuppliers";
 import CreateSupplier from "./CreateSupplier";
+import { useGetRequisitions } from "@/hooks/useGetRequisition";
 
 interface RequisitionFormType {
   department_id: string;
@@ -50,6 +51,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
   const branchId = watch("branch_id");
   const selectedCurrency = watch("currency");
   const supplierId = watch("supplier_id");
+  const {isDisabled} = useGetRequisitions()
 
   return (
     <div className="flex flex-col w-full justify-center z-20 relative">
@@ -72,6 +74,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                   options={departments}
                   {...register("department_id")}
                   required
+                  disabled={!!isDisabled}
                   value={departmentId}
                   defaultValue={departmentId}
                   error={errors.department_id?.message}
@@ -87,6 +90,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 <Select
                   label="Branch"
                   options={branches}
+                  disabled={!!isDisabled}
                   {...register("branch_id")}
                   value={branchId}
                   required
@@ -101,6 +105,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                   label="Select a Supplier"
                   options={supplier}
                   {...register("supplier_id")}
+                  disabled={!!isDisabled}
                   value={supplierId}
                   required
                   error={errors.supplier_id?.message}
@@ -111,6 +116,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
               </div>
               <InputField
                 label="Requisitor Contact"
+                disabled={!!isDisabled}
                 required
                 type="email"
                 placeholder="Contact email"
@@ -121,6 +127,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
               <InputField
                 label="Requestor Name"
                 required
+                disabled={!!isDisabled}
                 type="text"
                 placeholder="John Doe"
                 {...register("requestor_name")}
@@ -130,6 +137,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
               <InputField
                 label="Needed By Date"
                 required
+                disabled={!!isDisabled}
                 min={today.toISOString().split('T')[0]}
                 type="date"
                 placeholder="yyyy-MM-dd"
@@ -144,6 +152,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
             <h1 className="text-[#888888] text-[14px] font-bold">Goods or Services Details</h1>
             <div className="flex flex-col gap-4 w-full">
               <TextAreaField
+              disabled={!!isDisabled}
                 label="Description of Goods/Services"
                 placeholder="Describe goods/service needed"
                 className="h-40"
@@ -153,6 +162,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
 
               <InputField
                 label="Quantity"
+                disabled={!!isDisabled}
                 required
                 type="number"
                 placeholder="Input quantity"
@@ -163,6 +173,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
               <div className="flex gap-4 flex-col">
                 <div className="flex-1">
                   <InputField
+                  disabled={!!isDisabled}
                     label="Estimated Cost"
                     required
                     type="number"
@@ -175,6 +186,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 <div className="w-full">
                   <Select
                     label="Currency"
+                    disabled={!!isDisabled}
                     options={currencies}
                     {...register("currency")}
                     value={selectedCurrency || "NGN"}
@@ -189,6 +201,7 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
 
               <TextAreaField
                 label="Justification"
+                disabled={!!isDisabled}
                 placeholder="Input justification for the purchase of goods/services"
                 className="h-28"
                 {...register("justification")}

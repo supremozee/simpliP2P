@@ -35,6 +35,7 @@ export default {
         montserrat: ['Montserrat', 'sans-serif'],
         roboto: ['roboto', 'sans-serif'],
         bricolage: ['Bricolage Grotesque', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
       },
       
     },

@@ -49,9 +49,9 @@ const TableRowWithActions = <T extends Item>({
         break;
       default:
         if ("full_name" in item) return [
-          item?.supplier_no,
+          `${item.supplier_no?.split("-")[0]}-${item.supplier_no?.split("-").pop()}`,
           item.full_name,
-          item.created_at.split('T')[0],
+          new Date(item.created_at.split("T")[0]).toLocaleDateString('en-US', {year:'numeric', month: 'short', day: 'numeric'}),
           item?.category.name,
           <div key={item.id}>
             <StarRating

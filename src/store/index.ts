@@ -121,7 +121,7 @@ const useStore = create<SimpliP2PStore>()(
         setStartDate: (date: string) => set({ startDate: date }),
         endDate: '',
         setEndDate: (date: string) => set({ endDate: date }),
-        format: 'word',
+        format: 'csv',
         setFormat: (format: string) => set({ format: format }),
         type: '',
         setType: (type: string) => set({ type: type }),

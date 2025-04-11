@@ -14,6 +14,7 @@ import { AllItems, FetchProduct } from "@/types";
 import useRemoveItem from "@/hooks/useRemoveItems";
 import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
 import LoaderSpinner from "../atoms/LoaderSpinner";
+import { useGetRequisitions } from "@/hooks/useGetRequisition";
 
 const OpenInventory = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +25,7 @@ const OpenInventory = () => {
   const { data, error, isLoading, isError } = useFetchProducts(currentOrg, 1, 10);
   const { addItemsToRequisition } = useAddItemsToRequistion();
   const { removeItem } = useRemoveItem();
+  const {isDisabled} = useGetRequisitions()
   const products = data?.data || [];
   const headers = [
     "Name",
@@ -77,6 +79,7 @@ const OpenInventory = () => {
     <>
       <Button
         type="button"
+        disabled={!!isDisabled}
         className="sm:px-4 sm:py-2 px-2 py-0 sm:text-sm text-[10px] bg-[#181819] text-white rounded-lg hover:bg-[#181819]/90 transition-colors"
         onClick={() => setIsOpen(true)}
       >

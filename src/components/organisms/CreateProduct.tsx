@@ -18,6 +18,7 @@ import useFetchCategories from "@/hooks/useFetchCategories";
 import useFileManager from "@/hooks/useFileManager";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import { currencies } from "@/constants";
+import { MdAdd } from "react-icons/md";
 
 // Currency data
 
@@ -98,12 +99,13 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
         </button>
       ) : (
         <Button
-          className={cn("px-10 text-white py-2 bg-primary rounded-md",
+          className={cn("px-10 text-white py-2 bg-primary rounded-md justify-center flex items-center",
             custom && "w-full text-[#305D88] sm:py-7 rounded-[15px] flex gap-5 bg-white sm:justify-start justify-center items-center shadow-lg drop-shadow"
           )}
           onClick={() => setIsOpen(true)}
         >
-          <span className={cn("text-[10px]", custom && "text-[16px]")}>Create New Inventory</span>
+          {!custom && <MdAdd className="mr-2" size={28} />}
+          <span className={cn("text-[14px] font-bold", custom && "text-[16px]")}>Create New Inventory</span>
         </Button>
       )}
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>

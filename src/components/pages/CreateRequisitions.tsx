@@ -12,12 +12,12 @@ import FetchItemByPrNumber from '../organisms/FetchItemByPrNumber';
 import useFinaliseRequisition from '@/hooks/useFinaliseRequisition';
 import useNotify from '@/hooks/useNotify';
 import useSaveForLater from '@/hooks/useSaveForLater';
-import { FaPlus } from 'react-icons/fa';
-import useFetchRequsitionsSavedForLater from '@/hooks/useFetchRequistionsSavedForLater';
+import { FaPlus, FaFilePdf } from 'react-icons/fa';
 import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
 import LoaderSpinner from '../atoms/LoaderSpinner';
-import useFetchPurchaseRequisition from '@/hooks/useFetchPurchaseRequisition';
 import { Requisition } from '@/types';
+import { useGetRequisitions } from '@/hooks/useGetRequisition';
+import useExportData from '@/hooks/useExportData';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
@@ -36,17 +36,33 @@ const PurchaseRequisitionSchema = z.object({
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
 
 const CreateRequisitions = () => {
-  const { currentOrg, pr, isOpen, setIsOpen } = useStore();
-  const { finaliseRequisition, loading, errorMessage } = useFinaliseRequisition();
-  const { saveForLater } = useSaveForLater();
-  const { error } = useNotify();
+  const { currentOrg, pr, isOpen, setIsOpen, setFormat } = useStore();
+  const { finaliseRequisition, loading: finalizeLoading, errorMessage: finalizeError } = useFinaliseRequisition();
+  const { saveForLater, loading: saveForLaterLoading } = useSaveForLater();
+  const { success, error } = useNotify();
   const [saveForLaterChecked, setSaveForLaterChecked] = useState(false);
-
-  const { data: savedRequisitions, isLoading: isLoadingSavedRequisitions } = useFetchRequsitionsSavedForLater(currentOrg);
-  const { data: pendingRequisitions, isLoading: pendingLoading } = useFetchPurchaseRequisition(currentOrg, "PENDING");
-  const { data: approvedRequisitions, isLoading: approvedLoading } = useFetchPurchaseRequisition(currentOrg, "APPROVED");
-  const { data: rejectedRequisitions, isLoading: rejectedLoading } = useFetchPurchaseRequisition(currentOrg, "REJECTED");
-  const { data: requestRequisitions, isLoading: requestLoading } = useFetchPurchaseRequisition(currentOrg, "REQUEST_MODIFICATION");
+  const [isExporting, setIsExporting] = useState(false);
+  const {
+    savedRequisitions,
+    pendingRequisitions,
+    approvedRequisitions,
+    rejectedRequisitions,
+    requestRequisitions,
+    isLoadingSavedRequisitions,
+    isPendingLoading,
+    isApprovedLoading,
+    isRejectedLoading,
+    isRequestLoading,
+    isDisabled,
+  } = useGetRequisitions();
+  
+  const { refetch: exportData, isLoading: isExportLoading } = useExportData({
+    orgId: currentOrg,
+    type: 'single_requisition',
+    format: 'pdf',
+    startDate: new Date().toISOString(), 
+    endDate: new Date().toISOString(),   
+  });
 
   const defaultValues = {
     department_id: "",
@@ -91,41 +107,47 @@ const CreateRequisitions = () => {
 
   useEffect(() => {
     if (savedRequisitions) {
-      const saved = savedRequisitions.data.requisitions.find((req) => req?.pr_number === pr?.pr_number);
+      const saved = savedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (saved) setRequisitionValues(saved);
     }
-  }, [savedRequisitions, pr, setValue, setRequisitionValues]);
+  }, [savedRequisitions, pr, setRequisitionValues]);
 
   useEffect(() => {
     if (pendingRequisitions) {
-      const pending = pendingRequisitions.data.requisitions.find((req) => req?.pr_number === pr?.pr_number);
+      const pending = pendingRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (pending) setRequisitionValues(pending);
     }
-  }, [pendingRequisitions, pr, setRequisitionValues, setValue]);
+  }, [pendingRequisitions, pr, setRequisitionValues]);
 
   useEffect(() => {
     if (approvedRequisitions) {
-      const approved = approvedRequisitions.data.requisitions.find((req) => req?.pr_number === pr?.pr_number);
+      const approved = approvedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (approved) setRequisitionValues(approved);
     }
-  }, [approvedRequisitions, pr, setRequisitionValues, setValue]);
+  }, [approvedRequisitions, pr, setRequisitionValues]);
 
   useEffect(() => {
     if (rejectedRequisitions) {
-      const rejected = rejectedRequisitions.data.requisitions.find((req) => req?.pr_number === pr?.pr_number);
+      const rejected = rejectedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (rejected) setRequisitionValues(rejected);
     }
-  }, [rejectedRequisitions, pr, setValue, setRequisitionValues]);
+  }, [rejectedRequisitions, pr, setRequisitionValues]);
 
   useEffect(() => {
     if (requestRequisitions) {
-      const request = requestRequisitions.data.requisitions.find((req) => req?.pr_number === pr?.pr_number);
+      const request = requestRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (request) setRequisitionValues(request);
     }
-  }, [requestRequisitions, pr, setValue, setRequisitionValues]);
+  }, [requestRequisitions, pr, setRequisitionValues]);
 
-  const onSubmit = async (data: PurchaseRequsitionData) => {
-    if (pr) {
+  // Function to handle save for later
+  const handleSaveForLater = async (data: PurchaseRequsitionData) => {
+    if (!pr) {
+      error("No PR number specified");
+      return;
+    }
+
+    try {
       const submissionData = {
         pr_number: pr.pr_number,
         department_id: data.department_id,
@@ -141,20 +163,78 @@ const CreateRequisitions = () => {
         needed_by_date: data.needed_by_date,
       };
 
-      if (saveForLaterChecked) {
-        await saveForLater(currentOrg, submissionData);
-      } else {
-        await finaliseRequisition(submissionData, currentOrg);
-        setIsOpen(false);
-      }
+      await saveForLater(currentOrg, submissionData);
+      setIsOpen(false);
       reset();
-    } else {
-      error("No PR number specified");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      error("Failed to save requisition as draft");
     }
   };
-  const isDisbaled = approvedRequisitions?.data.requisitions.find((req)=> req.pr_number === pr?.pr_number) || pendingRequisitions?.data.requisitions.find((req)=> req.pr_number === pr?.pr_number) || requestRequisitions?.data.requisitions.find((req)=> req.pr_number === pr?.pr_number) 
+
+  // Function to handle submit requisition
+  const handleFinalizeRequisition = async (data: PurchaseRequsitionData) => {
+    if (!pr) {
+      error("No PR number specified");
+      return;
+    }
+
+    try {
+      const submissionData = {
+        pr_number: pr.pr_number,
+        department_id: data.department_id,
+        supplier_id: data.supplier_id,
+        contact_info: data.contact_info,
+        requestor_name: data.requestor_name,
+        request_description: data.request_description,
+        branch_id: data.branch_id,
+        quantity: data.quantity,
+        estimated_cost: data.estimated_cost,
+        currency: data.currency,
+        justification: data.justification,
+        needed_by_date: data.needed_by_date,
+      };
+
+      await finaliseRequisition(submissionData, currentOrg);
+      setIsOpen(false);
+      reset();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      // Error is already handled in the hook
+    }
+  };
+
+  const onSubmit = (data: PurchaseRequsitionData) => {
+    if (saveForLaterChecked) {
+      handleSaveForLater(data);
+    } else {
+      handleFinalizeRequisition(data);
+    }
+  };
+
+  const handleExportAsPdf = async () => {
+    if (!pr?.id) {
+      error("Cannot export: No requisition ID found");
+      return;
+    }
+    
+    try {
+      setIsExporting(true);
+      setFormat('pdf'); 
+      await exportData();
+      success("Requisition exported as PDF successfully");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      error("Failed to export requisition");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const isSubmitting = finalizeLoading || saveForLaterLoading || isExporting;
+
   return (
-    <>
+    <div>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="overflow-y-scroll w-full max-h-[600px] sm:px-10 sm:pb-10">
           <div className="flex flex-col sm:gap-4 gap-2">
@@ -164,7 +244,7 @@ const CreateRequisitions = () => {
             </div>
 
             <ol className="list-decimal list-inside bg-white h-auto py-4 flex flex-col justify-center gap-5 items-center rounded-sm">
-              {isLoadingSavedRequisitions || pendingLoading || approvedLoading || rejectedLoading || requestLoading ? (
+              {isLoadingSavedRequisitions || isPendingLoading || isApprovedLoading || isRejectedLoading || isRequestLoading ? (
                 <LoaderSpinner />
               ) : (
                 <>
@@ -205,12 +285,20 @@ const CreateRequisitions = () => {
               <div className="flex items-center justify-between border-b pb-4">
                 <div className="flex items-center gap-2">
                   <Button
-                    className="rounded-full bg-primary justify-center flex p-0 w-6 h-6 items-center"
-                    onClick={() => setSaveForLaterChecked(true)}
+                    disabled={!!isDisabled || isSubmitting}
+                    className={`rounded-full ${saveForLaterChecked ? 'bg-green-600' : 'bg-primary'} justify-center flex p-0 w-6 h-6 items-center`}
+                    onClick={() => setSaveForLaterChecked(prev => !prev)}
                   >
-                    <FaPlus color="white" size={16} />
+                    {saveForLaterChecked ? (
+                      <span className="text-white text-xs">✓</span>
+                    ) : (
+                      <FaPlus color="white" size={16} />
+                    )}
                   </Button>
-                  <p className="text-sm font-medium text-gray-700">Save as Draft</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    Save as Draft
+                    {saveForLaterChecked && <span className="ml-2 text-xs text-green-600">(Selected)</span>}
+                  </p>
                 </div>
                 <p className="text-xs text-gray-500">Save your progress and continue later</p>
               </div>
@@ -218,49 +306,67 @@ const CreateRequisitions = () => {
               <div className="flex justify-between items-center">
                 <Button
                   type='button'
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200"
                   onClick={() => setIsOpen(false)}
                 >
-                  <span className='text-white'>Cancel</span>
+                  Cancel
                 </Button>
 
                 <div className="flex gap-3 items-center justify-center">
                   <Button
                     type='button'
-                    className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
-                    onClick={() => {/* Add export logic */}}
+                    disabled={!!isDisabled || isExporting || isExportLoading || isSubmitting}
+                    className={`px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center gap-2 ${(isExporting || isExportLoading) ? 'opacity-75' : ''}`}
+                    onClick={handleExportAsPdf}
                   >
-                    Export as PDF
-                  </Button>
-                  {(isDisbaled?.status === "APPROVED" || isDisbaled?.status === "PENDING") ?
-                  <p className='text-primary font-serif '> <span className='text-yellow-600 italic text-sm'>{isDisbaled.status}</span></p>:
-                  <div
-                    role="button"
-                    onClick={() => handleSubmit(onSubmit)()}
-                    className="px-6 py-2 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg flex items-center gap-2"
-                  >
-                    {loading ? (
+                    {isExporting || isExportLoading ? (
                       <>
                         <span className="animate-spin">⏳</span>
-                        <span>Processing...</span>
+                        <span>Exporting...</span>
                       </>
                     ) : (
-                      <span>Submit Requisition</span>
+                      <>
+                        <FaFilePdf className="text-red-500" />
+                        <span>Export as PDF</span>
+                      </>
                     )}
-                  </div>}
+                  </Button>
+                  
+                  {(isDisabled?.status === "APPROVED" || isDisabled?.status === "PENDING") ? (
+                    <p className='text-primary font-serif'> 
+                      <span className='text-yellow-600 italic text-sm'>{isDisabled.status}</span>
+                    </p>
+                  ) : (
+                    <Button
+                      type='submit'
+                      disabled={isSubmitting}
+                      className="px-6 py-2 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg flex items-center gap-2"
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      {finalizeLoading || saveForLaterLoading ? (
+                        <>
+                          <span className="animate-spin">⏳</span>
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <span>{saveForLaterChecked ? 'Save Draft' : 'Submit Requisition'}</span>
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
 
-            {errorMessage && (
+            {finalizeError && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{errorMessage}</p>
+                <p className="text-sm text-red-600">{finalizeError}</p>
               </div>
             )}
           </div>
         </Modal>
       )}
-    </>
+    </div>
   );
 };
 

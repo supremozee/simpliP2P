@@ -13,9 +13,11 @@ import TableHead from "../atoms/TableHead";
 import Image from "next/image";
 import {  FaTimes } from "react-icons/fa";
 import { format_price } from "@/utils/helpers";
+import { useGetRequisitions } from "@/hooks/useGetRequisition";
 
 const FetchItemByPrNumber = () => {
   const { currentOrg, pr } = useStore();
+  const {isDisabled} = useGetRequisitions()
   const { data, error, isLoading, isError } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 10, 1);
   const products = data?.data?.data || [];
   const { removeItem } = useRemoveItem();
@@ -47,10 +49,13 @@ const FetchItemByPrNumber = () => {
               <TableCell>{format_price(item.unit_price, item.currency)}</TableCell>
               <TableCell>{item.pr_quantity}</TableCell>
               <TableCell className="flex gap-2 justify-center">
-                <UpdateItem id={item.id}/>
+                <UpdateItem id={item.id}
+                disabled={!!isDisabled}
+                />
                 <Button 
-                type="button"
-                onClick={() => handleRemove(item.id)} className="bg-[#F10000] text-white p-2 flex justify-center items-center max-w-8  rounded-full">
+                    type="button"
+                    disabled={!!isDisabled}
+                    onClick={() => handleRemove(item.id)} className="bg-[#F10000] text-white p-2 flex justify-center items-center max-w-8  rounded-full">
                   <FaTimes />
                 </Button>
               </TableCell>

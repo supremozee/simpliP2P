@@ -1,7 +1,7 @@
-"use client"
-import React, { useState } from 'react';
-import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
-import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+"use client";
+import React, { useState } from "react";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import PasswordStrengthIndicator from "./PasswordStrengthIndicator";
 
 const InputContainer = ({ children }: { children: React.ReactNode }) => (
   <div className="mb-2 relative font-roboto">{children}</div>
@@ -12,21 +12,24 @@ const Input = ({
   value,
   onChange,
   className,
+  disabled,
   ...props
 }: {
   isDropdown?: boolean;
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  disabled?: boolean;
   [key: string]: unknown;
 }) => (
   <input
     onChange={onChange}
     value={value}
+    disabled={disabled}
     {...props}
-    className={`w-full   p-2 border border-[#dddada] font-[400] rounded-[12px] text-[17px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] placeholder:text-[10px] placeholder:pl-2 ${
-      isDropdown ? 'pr-10' : ''
-    } ${className || ''}`}
+    className={`w-full p-2 border border-[#dddada] font-[400] rounded-[12px] text-[17px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] placeholder:text-[10px] placeholder:pl-2 ${
+      isDropdown ? "pr-10" : ""
+    } ${disabled ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""} ${className || ""}`}
   />
 );
 
@@ -53,10 +56,10 @@ interface Props {
   placeholder: string;
   label?: string;
   className?: string;
-  step?:string;
+  step?: string;
   dropdownOptions?: string[];
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  readOnly?:boolean;
+  readOnly?: boolean;
   onPaste?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   onFocus?: () => void;
@@ -82,39 +85,36 @@ const InputField = ({
   ...props
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   return (
     <InputContainer>
-    <label className='text-[12px] text-[#424242] font-bold'>
-      {label} {required && <span className="text-red-500">*</span>}
+      <label className="text-[12px] text-[#424242] font-bold">
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
-        <Input
-          name={name}
-          disabled={disabled}
-          type={type === 'password' && showPassword ? 'text' : type}
-          placeholder={placeholder}
-          className={className}
-          readOnly={!!dropdownOptions}
-          value={value}
-          onChange={onChange}
-          onPaste={onPaste}
-          onFocus={onFocus}
-          step={step}
-          ref={ref}
-          {...props}
-        />
-         {type === 'password' && value && (
-        <PasswordStrengthIndicator password={value} />
+      <Input
+        name={name}
+        disabled={disabled}
+        type={type === "password" && showPassword ? "text" : type}
+        placeholder={placeholder}
+        className={className}
+        readOnly={!!dropdownOptions}
+        value={value}
+        onChange={onChange}
+        onPaste={onPaste}
+        onFocus={onFocus}
+        step={step}
+        ref={ref}
+        {...props}
+      />
+      {type === "password" && value && <PasswordStrengthIndicator password={value} />}
+      {type === "password" && (
+        <VisibilityToggle onClick={togglePasswordVisibility}>
+          {showPassword ? <IoEyeOutline size={20} /> : <IoEyeOffOutline size={20} />}
+        </VisibilityToggle>
       )}
-        {type === 'password' && (
-          <VisibilityToggle onClick={togglePasswordVisibility}>
-            {showPassword ? <IoEyeOutline size={20} />:<IoEyeOffOutline size={20} /> }
-          </VisibilityToggle>
-        )}
     </InputContainer>
   );
 };

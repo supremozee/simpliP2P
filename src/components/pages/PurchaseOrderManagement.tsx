@@ -140,15 +140,37 @@ const PurchaseOrdersManagement: React.FC = () => {
   };
 
   const renderRow = (order: Order, index: number) => {
+    // Format currency properly
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: order?.currency || 'USD',
+      minimumFractionDigits: 2,
+    }).format(Number(order.total_amount));
+    
+    // Status badge styles based on status
+    const getStatusBadge = (status: string) => {
+      const statusClasses = {
+        APPROVED: "bg-green-100 text-green-800 border-green-300",
+        PENDING: "bg-yellow-100 text-yellow-800 border-yellow-300",
+        REJECTED: "bg-red-100 text-red-800 border-red-300",
+      };
+      
+      return (
+        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusClasses[status as keyof typeof statusClasses] || "bg-gray-100 text-gray-800 border-gray-300"}`}>
+          {status}
+        </span>
+      );
+    };
+    
     return (
       <TableRow
         key={order.po_number}
         data={[
-          order.po_number,
-          order.supplier.full_name,
-          new Date(order.created_at).toLocaleDateString(),
-          order?.currency +Number(order.total_amount),
-          order.status,
+            `${order.po_number?.split("-")[0]}-${order.po_number?.split("-").pop()}`,
+           order.supplier.full_name,
+         new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+         formattedAmount,
+          getStatusBadge(order.status),
         ]}
         index={index}
       />

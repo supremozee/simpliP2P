@@ -50,7 +50,7 @@ function MultiSelect<T = string>({
   };
 
   const removeOption = (optionToRemove: MultiSelectOption<T>, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening the dropdown
+    e.stopPropagation(); 
     const newValue = value.filter(v => v.value !== optionToRemove.value);
     onChange(newValue);
   };

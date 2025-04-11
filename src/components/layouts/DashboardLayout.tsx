@@ -13,13 +13,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   
-  const sidebarRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
+  // Fix ref types to be more specific
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setCollapsed(!isDesktopDevice);
   }, [isDesktopDevice]);
 
+  // Use the dependencies array properly with isDesktopDevice and isOpen
   useClickOutside(sidebarRef, () => {
     if (!isDesktopDevice && isOpen) {
       setIsOpen(false);
@@ -41,7 +43,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Mobile Header */}
       <div ref={headerRef} className="sm:hidden fixed top-0 left-0 right-0 z-40">
         <MobileHeader
-          ref={sidebarRef}
           collapsed={collapsed}
           isOpen={isOpen}
           toggleSidebar={toggleSidebar}

@@ -71,7 +71,10 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={(e)=>{
+        e.stopPropagation();
+        onClick?.()
+      }}
       className={cn(
         'focus:outline-none flex font-bold font-roboto z-10 ',
         radiusClasses[radius],

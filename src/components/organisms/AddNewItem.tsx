@@ -15,6 +15,7 @@ import LoaderSpinner from "../atoms/LoaderSpinner";
 import useFileManager from "@/hooks/useFileManager";
 import { currencies } from "@/constants";
 import CustomSelect from "../atoms/Select";
+import { useGetRequisitions } from "@/hooks/useGetRequisition";
 
 const AddItemSchema = z.object({
   pr_id: z.string().min(1, "PR ID is required"),
@@ -28,6 +29,7 @@ const AddItemSchema = z.object({
 type AddItemFormData = z.infer<typeof AddItemSchema>;
 
 const AddNewItem = () => {
+  const {isDisabled} = useGetRequisitions()
   const { currentOrg, pr, loading } = useStore();
   const { addItemsToRequisition } = useAddItemsToRequistion();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -67,6 +69,7 @@ const AddNewItem = () => {
     <>
       <Button
         type="button"
+        disabled={!!isDisabled}
         className="sm:px-4 sm:py-2 px-10   py-1 text-sm  bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
         onClick={() => setIsOpen(true)}
       >
@@ -199,15 +202,12 @@ const AddNewItem = () => {
               >
                 Cancel
               </Button>
-              <button
+              <Button
                 type="submit"
-                onClick={(e)=> {
-                  e.stopPropagation();
-                }}
                 className="px-6 py-2 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg flex items-center gap-2"
                 disabled={loading}
               >
-                {(loading) ? (
+                {loading ? (
                   <>
                     <LoaderSpinner size="sm" color="white" />
                     <span>Adding Item...</span>
@@ -215,7 +215,7 @@ const AddNewItem = () => {
                 ) : (
                   <span>Add Item</span>
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

@@ -10,10 +10,18 @@ import StarRating from "../atoms/StarRating";
 import Select from "../atoms/Select";
 import useFetchCategories from "@/hooks/useFetchCategories";
 import CreateCategory from "./CreateCategory";
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { City, Country, State } from 'country-state-city';
 import { FaPlus, FaUserTie } from "react-icons/fa";
-import { paymentTermOptions } from "@/constants";
+
+const paymentTermOptions = [
+  { id: "net_30", name: "Net 30" },
+  { id: "net_45", name: "Net 45" },
+  { id: "net_60", name: "Net 60" },
+  { id: "immediate", name: "Immediate Payment" },
+  { id: "cod", name: "Cash on Delivery" },
+  { id: "advance", name: "Advance Payment" }
+];
 
 const CreateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
@@ -22,7 +30,7 @@ const CreateSupplierSchema = z.object({
   category: z.string().min(1, "Category is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
   payment_term: z.string().min(1, "Payment term is required"),
-  lead_time: z.string().min(1, "Lead time is required"),
+  lead_time: z.number().min(0, "Lead time must be positive").nullable(),
   address: z.object({
     street: z.string().min(1, "Street address is required"),
     city: z.string().min(1, "City is required"),
@@ -34,8 +42,6 @@ const CreateSupplierSchema = z.object({
     account_number: z.string().min(1, "Account number is required"),
     bank_name: z.string().min(1, "Bank name is required"),
     account_name: z.string().min(1, "Account name is required"),
-    swift_code: z.string().optional(),
-    bank_key: z.string().optional()
   })
 });
 
@@ -51,7 +57,7 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
 
-  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, trigger } = useForm<SupplierFormData>({
+  const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<SupplierFormData>({
     resolver: zodResolver(CreateSupplierSchema),
     mode: "onChange"
   });
@@ -67,13 +73,17 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
     return City.getCitiesOfState(selectedCountry, selectedState);
   }, [selectedCountry, selectedState]);
 
-  // const toggleModal = () => {
-  //   setIsOpen(!isOpen);
-  // };
+  const toggleModal = () => {
+    setIsOpen(!isOpen);
+  };
 
   const onSubmit = async (data: SupplierFormData) => {
     try {
       await createSupplier(data, currentOrg);
+      setTimeout (()=> {
+        reset();
+        toggleModal();
+      }, 1500)
      
     } catch (error) {
       console.error("Error creating supplier:", error);
@@ -122,6 +132,13 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
     setValue("address.state", stateName);
     setValue("address.city", '');
   };
+
+  // Add effect to handle the create prop change
+  useEffect(() => {
+    if (create) {
+      setIsOpen(true);
+    }
+  }, [create]);
 
   return (
     <>
@@ -257,11 +274,13 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
 
                   <div>
                     <Input
-                      type="text"
+                      type="number"
                       label="Lead Time (days)"
                       className="mt-1 w-full"
                       placeholder="Enter lead time in days"
-                      {...register("lead_time")}
+                      {...register("lead_time", { 
+                        setValueAs: (v) => v === "" ? null : parseInt(v, 10)
+                      })}
                     />
                     {errors.lead_time && <p className="text-red-500 text-sm">{errors.lead_time.message}</p>}
                   </div>
@@ -379,25 +398,6 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
                       {...register("bank_details.account_name")}
                     />
                     {errors.bank_details?.account_name && <p className="text-red-500 text-sm">{errors.bank_details.account_name.message}</p>}
-                  </div>
-                  <div>
-                    <Input
-                      type="text"
-                      label="Swift Code"
-                      className="mt-1 w-full"
-                      placeholder="Swift Code"
-                      {...register("bank_details.swift_code")}
-                    />
-                    {errors.bank_details?.swift_code && <p className="text-red-500 text-sm">{errors.bank_details.swift_code.message}</p>}
-                  </div>  <div>
-                    <Input
-                      type="text"
-                      label="Bank Key"
-                      className="mt-1 w-full"
-                      placeholder="Bank key"
-                      {...register("bank_details.bank_key")}
-                    />
-                    {errors.bank_details?.bank_key && <p className="text-red-500 text-sm">{errors.bank_details.bank_key.message}</p>}
                   </div>
                 </div>
               )}

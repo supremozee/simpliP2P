@@ -20,7 +20,7 @@ const UpdateItemSchema = z.object({
 
 type UpdateItemFormData = z.infer<typeof UpdateItemSchema>;
 
-const UpdateItem = ({ id }: { id: string }) => {
+const UpdateItem = ({ id, disabled }: { id: string, disabled?:boolean }) => {
   const { currentOrg, loading} = useStore();
   const [isOpen, setIsOpen] = useState(false)
   const {updateItem} = useUpdateItem(currentOrg);
@@ -55,6 +55,7 @@ const UpdateItem = ({ id }: { id: string }) => {
     <>
       <Button
       type="button"
+        disabled={disabled}
       kind="tertiary"
         className="p-2  max-w-8 flex justify-center items-center text-[10px] bg-primary rounded-full font-[500]"
         onClick={() => {
