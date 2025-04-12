@@ -12,7 +12,7 @@ import FetchItemByPrNumber from '../organisms/FetchItemByPrNumber';
 import useFinaliseRequisition from '@/hooks/useFinaliseRequisition';
 import useNotify from '@/hooks/useNotify';
 import useSaveForLater from '@/hooks/useSaveForLater';
-import { FaPlus, FaFilePdf } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
 import LoaderSpinner from '../atoms/LoaderSpinner';
 import { Requisition } from '@/types';
@@ -36,12 +36,11 @@ const PurchaseRequisitionSchema = z.object({
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
 
 const CreateRequisitions = () => {
-  const { currentOrg, pr, isOpen, setIsOpen, setFormat } = useStore();
+  const { currentOrg, pr, isOpen, setIsOpen } = useStore();
   const { finaliseRequisition, loading: finalizeLoading, errorMessage: finalizeError } = useFinaliseRequisition();
   const { saveForLater, loading: saveForLaterLoading } = useSaveForLater();
-  const { success, error } = useNotify();
+  const { error } = useNotify();
   const [saveForLaterChecked, setSaveForLaterChecked] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const {
     savedRequisitions,
     pendingRequisitions,
@@ -56,7 +55,7 @@ const CreateRequisitions = () => {
     isDisabled,
   } = useGetRequisitions();
   
-  const { mutate: exportData, status } = useExportData({
+  const {  status } = useExportData({
     orgId: currentOrg,
     type: 'single_requisition',
     format: 'pdf',
@@ -212,27 +211,27 @@ const CreateRequisitions = () => {
     }
   };
 
-  const handleExportAsPdf = async () => {
-    if (!pr?.id) {
-      error("Cannot export: No requisition ID found");
-      return;
-    }
+  // const handleExportAsPdf = async () => {
+  //   if (!pr?.id) {
+  //     error("Cannot export: No requisition ID found");
+  //     return;
+  //   }
     
-    try {
-      setIsExporting(true);
-      setFormat('pdf'); 
-      await exportData();
-      success("Requisition exported as PDF successfully");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      error("Failed to export requisition");
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  //   try {
+  //     setIsExporting(true);
+  //     setFormat('pdf'); 
+  //     await exportData();
+  //     success("Requisition exported as PDF successfully");
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   } catch (err) {
+  //     error("Failed to export requisition");
+  //   } finally {
+  //     setIsExporting(false);
+  //   }
+  // };
 
   const isExportLoading = status === 'pending';
-  const isSubmitting = finalizeLoading || saveForLaterLoading || isExporting || isExportLoading;
+  const isSubmitting = finalizeLoading || saveForLaterLoading || isExportLoading;
 
   return (
     <div>
@@ -315,7 +314,7 @@ const CreateRequisitions = () => {
                 </Button>
 
                 <div className="flex gap-3 items-center justify-center">
-                  <Button
+                  {/* <Button
                     type='button'
                     disabled={!!isDisabled || isExporting || isExportLoading || isSubmitting}
                     className={`px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center gap-2 ${(isExporting || isExportLoading) ? 'opacity-75' : ''}`}
@@ -332,7 +331,7 @@ const CreateRequisitions = () => {
                         <span>Export as PDF</span>
                       </>
                     )}
-                  </Button>
+                  </Button> */}
                   
                   {(isDisabled?.status === "APPROVED" || isDisabled?.status === "PENDING") ? (
                     <p className='text-primary font-serif'> 
