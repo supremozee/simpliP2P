@@ -56,7 +56,7 @@ const CreateRequisitions = () => {
     isDisabled,
   } = useGetRequisitions();
   
-  const { refetch: exportData, isLoading: isExportLoading } = useExportData({
+  const { mutate: exportData, status } = useExportData({
     orgId: currentOrg,
     type: 'single_requisition',
     format: 'pdf',
@@ -231,7 +231,8 @@ const CreateRequisitions = () => {
     }
   };
 
-  const isSubmitting = finalizeLoading || saveForLaterLoading || isExporting;
+  const isExportLoading = status === 'pending';
+  const isSubmitting = finalizeLoading || saveForLaterLoading || isExporting || isExportLoading;
 
   return (
     <div>
