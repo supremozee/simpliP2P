@@ -31,16 +31,15 @@ type ActionBarTypes = {
 
 const exportFormats = [
   { value: 'csv', label: 'CSV' },
-  { value: 'pdf', label: 'PDF' },
   { value: 'excel', label: 'Excel' },
 
 ];
 
 const LoadingModal = () => (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg p-4 flex items-center gap-3 min-w-[180px] shadow-lg">
-      <AiOutlineLoading3Quarters className="w-5 h-5 text-primary animate-spin" />
-      <p className="text-sm font-medium">Exporting...</p>
+  <div className="absolute h-screen  w-full   flex items-center justify-center z-50">
+    <div className="bg-primary rounded-lg p-4 flex items-center gap-3 justify-center min-w-[180px] shadow-lg">
+      <AiOutlineLoading3Quarters className="w-5 h-5 text-white animate-spin" />
+      <p className="text-sm font-medium text-white">Exporting...</p>
     </div>
   </div>
 );
@@ -64,7 +63,8 @@ const ActionBar: React.FC<ActionBarTypes> = ({
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const { currentOrg, startDate, endDate, format, setEndDate, setStartDate, setFormat } = useStore();
-  const { refetch: exportData, isLoading: isExportLoading, isError: isExportError } = useExportData({
+  
+  const { mutate: exportData, status, isError: isExportError } = useExportData({
     orgId: currentOrg, startDate, endDate, format, type
   });
 
@@ -110,7 +110,7 @@ const ActionBar: React.FC<ActionBarTypes> = ({
 
   return (
     <>
-      {isExportLoading && <LoadingModal />}
+      { status === "pending"&& <LoadingModal />}
       
       <div className="bg-white rounded-md shadow-sm border border-gray-100 mb-4">
         <div className="flex items-center justify-between p-3 flex-wrap gap-2">
@@ -251,7 +251,7 @@ const ActionBar: React.FC<ActionBarTypes> = ({
                   radius="xs"
                   className={`border ${isExportMenuOpen ? 'border-primary' : 'border-gray-200'} text-gray-600`}
                   onClick={toggleExportMenu}
-                  disabled={isExportLoading}
+                  disabled={status === 'pending'}
                 >
                   <BsDownload className="w-3.5 h-3.5" />
                 </Button>

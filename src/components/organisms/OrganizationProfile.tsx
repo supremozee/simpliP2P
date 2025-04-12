@@ -139,8 +139,8 @@ const OrganizationProfile = () => {
 
           <Input
             type="text"
-            label="Tenant Code"
-            placeholder="Enter tenant code"
+            label="Organization Code"
+            placeholder="Enter Organization Code"
             value={organisation?.tenant_code}
             name='tenant_code'
             disabled={true}

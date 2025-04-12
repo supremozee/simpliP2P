@@ -6,9 +6,10 @@ import { ApiError, AuthError, NetworkError } from "./errors";
  * Standard API request handler with authentication and error handling
  * @param url - The API endpoint URL
  * @param init - Request initialization options
- * @returns - JSON response from the API
+ * @param responseType - The expected response type (json, blob, etc.)
+ * @returns - Response from the API
  */
-export const apiRequest = async (url: string, init: RequestInit = {}) => {
+export const apiRequest = async (url: string, init: RequestInit = {}, responseType: 'json' | 'blob' = 'json') => {
   const token = Cookies.get('accessToken');
   const { setError } = useStore.getState();
   
@@ -56,7 +57,12 @@ export const apiRequest = async (url: string, init: RequestInit = {}) => {
       }
     }
     
-    // Handle successful response
+    // Handle successful response based on expected response type
+    if (responseType === 'blob') {
+      return await response.blob();
+    }
+    
+    // Default to JSON handling
     if (contentType?.includes('application/json')) {
       return await response.json();
     }

@@ -340,11 +340,32 @@ const auth = {
     formData.append('file', image)
     return await apiRequest(USER_ENDPOINTS.FILE_MANAGER,postFormDataConfig(formData))
   },
-  export:async(orgId:string, startDate:string, endDate:string, format:string, type:string):Promise<any>=> {
-    return await apiRequest(`${ORGANIZATION_ENDPOINTS.EXPORT(orgId)}/${type}?startDate=${startDate}&endDate=${endDate}&format=${format}`, getConfig(orgId))
+  export: async (orgId: string, startDate: string, endDate: string, format: string, type: string): Promise<any> => {
+    try {
+      const url = `${ORGANIZATION_ENDPOINTS.EXPORT(orgId)}/${type}?startDate=${startDate}&endDate=${endDate}&format=${format}`;
+      
+      // Use apiRequest with blob responseType
+      const blob = await apiRequest(url, getConfig(orgId), 'blob');
+      
+      // Create object URL and trigger download
+      const url2 = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url2;
+      a.download = `export_${type}_${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xlsx' : format}`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(url2);
+      document.body.removeChild(a);
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Export error:", error);
+      throw error;
+    }
   }
-  
-  };
+};
 
 export { auth };
 
