@@ -28,7 +28,7 @@ const currencies:any = [
 const UpdateProductSchema = z.object({
   name: z.string().min(1, "Name of the product is required"),
   description: z.string().min(1, "Description of the product is required"),
-  unitPrice: z.number().min(1, "Unit price is required"),
+  unitPrice: z.number().min(0, "Unit price is required"),
   currency: z.string().min(1, "Currency is required"),
   stockQtyAlert: z.number().min(0, "Stock alert must be 0 or greater"),
   category: z.string().min(1, "Category is required"),
@@ -67,7 +67,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
     if (data?.data) {
       setValue("name", data.data.name);
       setValue("description", data.data.description);
-      setValue("unitPrice", Number(data.data.unitPrice));
+      setValue("unitPrice", data.data.unitPrice);
       setValue("stockQtyAlert", data.data.stockQtyAlert);
       setValue("category", data.data.category?.id || "");
       setValue("stockQty", data.data.stockQty);
@@ -77,6 +77,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
   const onSubmit = async (formData: UpdateProductFormData) => {
     const productData: ProductData = {
       ...formData,
+      unitPrice: Number(formData.unitPrice),
       stockQty: Number(formData.stockQty),
       stockQtyAlert: Number(formData.stockQtyAlert),
     };
@@ -121,13 +122,14 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
             </div>
 
             <div>
-              <Input
-                type="number"
-                label="Unit Price"
-                className="mt-1 w-full"
-                placeholder="Enter unit price"
-                {...register("unitPrice")}
-              />
+            <Input
+                  type="number"
+                  label="Unit Price"
+                  className="mt-1 w-full"
+                  min={0}
+                  placeholder="Enter stock quantity"
+                  {...register("unitPrice", { valueAsNumber: true })}
+                />
               {errors.unitPrice && <p className="text-red-500 text-sm">{errors.unitPrice.message}</p>}
             </div>
 

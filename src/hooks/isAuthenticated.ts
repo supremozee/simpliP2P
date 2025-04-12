@@ -19,7 +19,6 @@ export default function isAuthenticated(): boolean {
 
     const payload = JSON.parse(atob(tokenParts[1]));
     const expiryTime = payload.exp * 1000;
-    console.log(expiryTime)
     if (Date.now() >= expiryTime) {
       Cookies.remove('accessToken');
       return false;

@@ -14,8 +14,6 @@ import useUserPermissions from "@/hooks/useUserPermissions";
 import Button from "../atoms/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "@/types";
-import useGetUser from "@/hooks/useGetUser";
-import { sanitize } from "@/utils/helpers";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -34,10 +32,6 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ isOpen, toggleSi
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const router = useRouter();
 
-  const {user} = useGetUser()
-  const findOrg = user?.data?.user_organisations?.find(org => sanitize(org.name) === orgName);
-  const userPermissions = findOrg?.permissions || [];
-  console.log(userPermissions)
   const toggleCollapse = () => {
     setOnToggle(!isCollapsed);
     setIsCollapsed(!isCollapsed);
