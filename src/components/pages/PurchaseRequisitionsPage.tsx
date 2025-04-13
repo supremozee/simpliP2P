@@ -171,7 +171,7 @@ const PurchaseRequisitionsPage = () => {
   };
 
   const renderRow = (req: Requisition, index: number) => (
-     <>
+     <React.Fragment key={`row-${req.id}`}>
       <TableRow
         key={req.id}
         data={[
@@ -193,6 +193,7 @@ const PurchaseRequisitionsPage = () => {
           <span key={`date-${req.id}`} className="whitespace-nowrap">{req.needed_by_date}</span>,
           <div className="flex w-full justify-center items-center" key={`action-${req.id}`}>
             <Button 
+            key={req.id}
               onClick={() => handleViewRequisition({ pr_number: req.pr_number, id: req.id })} 
               className={cn(
                 "p-2 px-3 rounded-md transition-colors",
@@ -292,7 +293,7 @@ const PurchaseRequisitionsPage = () => {
           </td>
         </motion.tr>
       )}
-    </>
+    </React.Fragment>
   );
 
   const tabnamesToRender = tabNames.map(name =>

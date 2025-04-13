@@ -5,7 +5,7 @@ import useStore from '@/store';
 import useInitializePurchaseRequisition from "@/hooks/useInitializePurchaseRequisition";
 
 const InitializeRequisition = () => {
-  const { currentOrg, loading: initialiseLoading, setIsOpen } = useStore();
+  const { currentOrg, loading: initialiseLoading } = useStore();
   const { initializePurchaseRequisition } = useInitializePurchaseRequisition();
 
   const initialisePurchaseRequisitionData = {
@@ -14,7 +14,8 @@ const InitializeRequisition = () => {
 
   const handleInitialisePurchaseRequisition = async () => {
     await initializePurchaseRequisition(initialisePurchaseRequisitionData);
-    setIsOpen(true);
+    // The setIsOpen(true) is already called in the success handler of useInitializePurchaseRequisition hook
+    // No need to call it again here
   };
 
   return (

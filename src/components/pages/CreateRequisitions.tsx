@@ -12,12 +12,11 @@ import FetchItemByPrNumber from '../organisms/FetchItemByPrNumber';
 import useFinaliseRequisition from '@/hooks/useFinaliseRequisition';
 import useNotify from '@/hooks/useNotify';
 import useSaveForLater from '@/hooks/useSaveForLater';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus} from 'react-icons/fa';
 import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
 import LoaderSpinner from '../atoms/LoaderSpinner';
 import { Requisition } from '@/types';
 import { useGetRequisitions } from '@/hooks/useGetRequisition';
-import useExportData from '@/hooks/useExportData';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
@@ -55,14 +54,6 @@ const CreateRequisitions = () => {
     isDisabled,
   } = useGetRequisitions();
   
-  const {  status } = useExportData({
-    orgId: currentOrg,
-    type: 'single_requisition',
-    format: 'pdf',
-    startDate: new Date().toISOString(), 
-    endDate: new Date().toISOString(),   
-  });
-
   const defaultValues = {
     department_id: "",
     contact_info: "",
@@ -102,42 +93,42 @@ const CreateRequisitions = () => {
     setValue("justification", requisition.justification);
     setValue("currency", requisition.currency);
     setValue("needed_by_date", new Date(requisition.needed_by_date).toISOString().split('T')[0]);
-  },[setValue]);
+  }, [setValue]);
 
   useEffect(() => {
     if (savedRequisitions) {
       const saved = savedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (saved) setRequisitionValues(saved);
     }
-  }, [savedRequisitions, pr, setRequisitionValues]);
+  }, []);
 
   useEffect(() => {
     if (pendingRequisitions) {
       const pending = pendingRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (pending) setRequisitionValues(pending);
     }
-  }, [pendingRequisitions, pr, setRequisitionValues]);
+  }, []);
 
   useEffect(() => {
     if (approvedRequisitions) {
       const approved = approvedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (approved) setRequisitionValues(approved);
     }
-  }, [approvedRequisitions, pr, setRequisitionValues]);
+  }, []);
 
   useEffect(() => {
     if (rejectedRequisitions) {
       const rejected = rejectedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (rejected) setRequisitionValues(rejected);
     }
-  }, [rejectedRequisitions, pr, setRequisitionValues]);
+  }, []);
 
   useEffect(() => {
     if (requestRequisitions) {
       const request = requestRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (request) setRequisitionValues(request);
     }
-  }, [requestRequisitions, pr, setRequisitionValues]);
+  }, []);
 
   // Function to handle save for later
   const handleSaveForLater = async (data: PurchaseRequsitionData) => {
@@ -211,27 +202,7 @@ const CreateRequisitions = () => {
     }
   };
 
-  // const handleExportAsPdf = async () => {
-  //   if (!pr?.id) {
-  //     error("Cannot export: No requisition ID found");
-  //     return;
-  //   }
-    
-  //   try {
-  //     setIsExporting(true);
-  //     setFormat('pdf'); 
-  //     await exportData();
-  //     success("Requisition exported as PDF successfully");
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   } catch (err) {
-  //     error("Failed to export requisition");
-  //   } finally {
-  //     setIsExporting(false);
-  //   }
-  // };
-
-  const isExportLoading = status === 'pending';
-  const isSubmitting = finalizeLoading || saveForLaterLoading || isExportLoading;
+  const isSubmitting = finalizeLoading || saveForLaterLoading 
 
   return (
     <div>
@@ -314,24 +285,6 @@ const CreateRequisitions = () => {
                 </Button>
 
                 <div className="flex gap-3 items-center justify-center">
-                  {/* <Button
-                    type='button'
-                    disabled={!!isDisabled || isExporting || isExportLoading || isSubmitting}
-                    className={`px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center gap-2 ${(isExporting || isExportLoading) ? 'opacity-75' : ''}`}
-                    onClick={handleExportAsPdf}
-                  >
-                    {isExporting || isExportLoading ? (
-                      <>
-                        <span className="animate-spin">⏳</span>
-                        <span>Exporting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaFilePdf className="text-red-500" />
-                        <span>Export as PDF</span>
-                      </>
-                    )}
-                  </Button> */}
                   
                   {(isDisabled?.status === "APPROVED" || isDisabled?.status === "PENDING") ? (
                     <p className='text-primary font-serif'> 
