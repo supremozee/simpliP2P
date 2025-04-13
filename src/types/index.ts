@@ -840,3 +840,36 @@ export interface FileResponse {
   message: string;
   url: string;
 }
+
+export interface ViewPOItem {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  item_name: string;
+  unit_price: string;
+  currency: string;
+  image_url: string | null;
+  pr_quantity: number;
+  po_quantity: number | null;
+  status: string;
+}
+
+
+export interface ViewPOOrganisation {
+  name: string;
+  logo: string;
+}
+
+export interface ViewPOResponse {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    po_number: string;
+    total_amount: string;
+    currency: string;
+    status: string;
+    attachment: string | null;
+    supplier: Supplier;
+    items: ViewPOItem[];
+    organisation: ViewPOOrganisation;
+}

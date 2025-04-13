@@ -316,8 +316,8 @@ const auth = {
   fetchOrderById: async (orgId: string, orderId: string): Promise<any> => {
     return await apiRequest(ORGANIZATION_ENDPOINTS.ORDER_BY_ID(orgId, orderId), getConfig());
   },
-  viewPO: async (orderId: string): Promise<any> => {
-    return await apiRequest(ORGANIZATION_ENDPOINTS.VIEW_PO(orderId), getConfig());
+  viewPO: async (token:string, orderId: string): Promise<any> => {
+    return await apiRequest(ORGANIZATION_ENDPOINTS.VIEW_PO(orderId), getConfig("",token));
   },
   createOrder:async (orgId:string, data:PurchaseOrder ):Promise<any> => {
     return await apiRequest(`${ORGANIZATION_ENDPOINTS.ORDERS(orgId)}`, postConfig(data));
