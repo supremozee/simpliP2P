@@ -61,5 +61,5 @@ export const ORGANIZATION_ENDPOINTS = {
   SAVED_FOR_LATER: (orgId:string)=> `${BASE_URL}/organisations/${orgId}/requisitions/saved`,
   ORDERS: (orgId:string)=> `${BASE_URL}/organisations/${orgId}/orders`,
   ORDER_BY_ID: (orgId:string, id:string)=> `${BASE_URL}/organisations/${orgId}/orders/${id}`,
-  VIEW_PO:(orderId:string)=>`${BASE_URL}/purchase-orders/${orderId}/view`
+  VIEW_PO:(orderId:string)=>`${BASE_URL}/purchase-orders/${orderId}`
 };
