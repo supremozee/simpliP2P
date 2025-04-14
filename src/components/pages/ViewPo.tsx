@@ -280,12 +280,6 @@ const PurchaseOrderDetails = () => {
               <span className="text-gray-700">Subtotal:</span>
               <span className="font-medium">{format_price(totalAmount, po.currency)}</span>
             </div>
-            <div className="flex justify-between pt-2 mt-2 border-t border-gray-300">
-              <span className="font-bold text-gray-800">Total:</span>
-              <span className="font-bold text-xl text-primary">
-                {format_price(Number(po.total_amount), po.currency)}
-              </span>
-            </div>
           </div>
         </div>
       </motion.div>
