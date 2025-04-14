@@ -51,7 +51,8 @@ const CreateSupplierSchema = z.object({
 
 type SupplierFormData = z.infer<typeof CreateSupplierSchema>;
 
-const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boolean, create?:boolean }) => {
+const CreateSupplier = ({ add, custom, create, onClick }: 
+  { add?: boolean; custom?: boolean, create?:boolean, onClick?:()=>void }) => {
   const { currentOrg } = useStore();
   const { createSupplier, loading, errorMessage, successCreate } = useCreateSupplier();
   const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
@@ -60,7 +61,7 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
   const [step, setStep] = useState(1);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
-
+  
   const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<SupplierFormData>({
     resolver: zodResolver(CreateSupplierSchema),
     mode: "onChange"
@@ -79,6 +80,9 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
+    if (onClick && !isOpen) {
+      onClick();
+    }
   };
 
   const onSubmit = async (data: SupplierFormData) => {
@@ -88,7 +92,6 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
         reset();
         toggleModal();
       }, 1500)
-     
     } catch (error) {
       console.error("Error creating supplier:", error);
     }
@@ -137,7 +140,7 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
     setValue("address.city", '');
   };
 
-  // Add effect to handle the create prop change
+  // Effect to handle modal opening when create prop changes
   useEffect(() => {
     if (create) {
       setIsOpen(true);
@@ -150,16 +153,17 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
         <button
           title="Add New"
           type="button"
-          onClick={() => setIsOpen(true)}
+          onClick={toggleModal}
           className="w-[18px] h-[18px] text-white rounded-full flex justify-center text-center items-center bg-primary"
         >
           <FaPlus size={10} />
         </button>
-      ) }
-       {custom && (
+      )}
+      
+      {custom && (
         <Button
           className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3"
-          onClick={() => setIsOpen(true)}
+          onClick={toggleModal}
         >
           <span className="text-primary">
             <FaUserTie className="w-5 h-5" />
@@ -167,15 +171,17 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
           <span className="text-gray-700">Add New Supplier</span>
         </Button>
       )}
-        {create && (
+      
+      {create !== undefined && (
         <Button
-        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white rounded-lg px-3 py-2 w-[20%] transition-all"
-        onClick={() => setIsOpen(true)}
+          className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white rounded-lg px-3 py-2 transition-all"
+          onClick={toggleModal}
         >
           <FaPlus className="w-4 h-4" />
           <span className="text-white">Create Supplier</span>
         </Button>
       )}
+      
       <Modal onClose={() => {
         setIsOpen(false);
         setStep(1);

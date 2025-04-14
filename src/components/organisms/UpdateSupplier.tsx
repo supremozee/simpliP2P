@@ -370,6 +370,13 @@ const categories = categoryData?.data?.categories || [];
               )}
 
               <div className="flex justify-end items-center mt-6 space-x-4">
+                 <Button
+                    type="submit"
+                    disabled={!isValid || updateSupplierMutation.isPending}
+                    className="px-5 py-2 text-white rounded-lg bg-secondary"
+                  >
+                    {updateSupplierMutation.isPending ? "Updating..." : "Update Supplier"}
+                  </Button>
                 {step > 1 && (
                   <Button
                     type="button"
@@ -386,15 +393,6 @@ const categories = categoryData?.data?.categories || [];
                     onClick={handleNextStep}
                   >
                     Next
-                  </Button>
-                )}
-                {step === 3 && (
-                  <Button
-                    type="submit"
-                    disabled={!isValid || updateSupplierMutation.isPending}
-                    className="px-5 py-2 text-white rounded-lg"
-                  >
-                    {updateSupplierMutation.isPending ? "Updating..." : "Update Supplier"}
                   </Button>
                 )}
               </div>

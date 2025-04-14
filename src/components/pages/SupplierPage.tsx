@@ -146,7 +146,7 @@ const SupplierPage = () => {
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
   const headers = ["Supplier Number", "Name", "Date created", "Category", "Rating", "Actions"];
-  
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   // Set export type for suppliers
   useEffect(() => {
     setType('suppliers');
@@ -296,7 +296,9 @@ const SupplierPage = () => {
               Manage your suppliers and vendor information
             </p>
           </div>
-             <CreateSupplier create/>
+             <CreateSupplier
+              create ={isCreateOpen} 
+              onClick={()=>setIsCreateOpen(true)}/>
         </div>
 
         <ActionBar
