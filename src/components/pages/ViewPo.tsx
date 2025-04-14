@@ -6,7 +6,7 @@ import LoaderSpinner from '@/components/atoms/LoaderSpinner';
 import { format_price } from '@/utils/helpers';
 import { motion } from 'framer-motion';
 import Button from '@/components/atoms/Button';
-import { FaDownload, FaPrint, FaFileInvoice, FaBuilding, FaShippingFast, FaCreditCard, FaFileContract } from 'react-icons/fa';
+import { FaPrint, FaFileInvoice, FaBuilding, FaShippingFast, FaCreditCard, FaFileContract } from 'react-icons/fa';
 import Image from 'next/image';
 import TableHead from '@/components/atoms/TableHead';
 import TableBody from '@/components/atoms/TableBody';
@@ -73,9 +73,9 @@ const SectionBox = ({
 
 // Enhanced info row component with better typography for key-value pairs
 const InfoRow = ({ label, value }: { label: string, value: string }) => (
-  <div className="grid grid-cols-2 gap-1 items-center">
-    <span className="font-medium text-gray-700">{label}:</span>
-    <span className="text-gray-800 font-semibold">{value}</span>
+  <div className="flex justify-between items-center">
+    <span className="font-bold text-primary">{label}:</span>
+    <span className="text-gray-800 text-[16px] font-medium">{value}</span>
   </div>
 );
 
@@ -118,9 +118,6 @@ const PurchaseOrderDetails = () => {
     window.print();
   };
 
-  const handleDownload = () => {
-    window.print(); // This would be replaced with actual PDF generation
-  };
 
   if (isLoading || isFetchingPO) {
     return <LoaderSpinner size="lg" text="Loading purchase order details..." />;
@@ -236,7 +233,7 @@ const PurchaseOrderDetails = () => {
   const displayPaymentTerm = formatPaymentTerm(po.supplier.payment_term);
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-8 rounded-lg shadow-lg print:shadow-none print:p-0 print:max-w-none">
+    <div className=" mx-auto bg-white p-8 rounded-lg ">
       {/* Document Type Banner */}
       <div className="bg-primary/10 border-b-2 border-primary w-full text-center mb-8 pb-1 print:bg-transparent print:border-primary">
         <h1 className="text-2xl md:text-3xl font-bold text-primary tracking-wide">PURCHASE ORDER</h1>
@@ -447,20 +444,13 @@ const PurchaseOrderDetails = () => {
       </motion.div>
 
       {/* Action Buttons */}
-      <div className="flex justify-center gap-4 mt-8 print:hidden">
+      <div className="flex justify-end w-full gap-4 mt-8 print:hidden">
         <Button 
           onClick={handlePrint} 
           className="px-6 py-2.5 bg-primary text-white rounded-lg flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-sm"
         >
           <FaPrint className="w-4 h-4" />
           <span>Print</span>
-        </Button>
-        <Button 
-          onClick={handleDownload} 
-          className="px-6 py-2.5 bg-secondary text-white rounded-lg flex items-center gap-2 hover:bg-secondary/90 transition-colors shadow-sm"
-        >
-          <FaDownload className="w-4 h-4" />
-          <span>Download PDF</span>
         </Button>
       </div>
 
