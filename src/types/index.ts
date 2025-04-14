@@ -285,7 +285,7 @@ export interface Owner {
     category: string;
     rating: number;
     bank_details: BankDetails
-    lead_time:number | null;
+    lead_time:string;
     payment_term:string
   }
   export interface Supplier {

@@ -15,12 +15,10 @@ import { City, Country, State } from 'country-state-city';
 import { FaPlus, FaUserTie } from "react-icons/fa";
 
 const paymentTermOptions = [
-  { id: "net_30", name: "Net 30" },
-  { id: "net_45", name: "Net 45" },
-  { id: "net_60", name: "Net 60" },
-  { id: "immediate", name: "Immediate Payment" },
-  { id: "cod", name: "Cash on Delivery" },
-  { id: "advance", name: "Advance Payment" }
+  { id: "Line of Credit", name: "Line of Credit" },
+  { id: "Payment Immediately", name: "Payment Immediately" },
+  { id: "Cash on Delivery", name: "Cash on Delivery" },
+  { id: "Payment in Advance", name: "Payment in Advance" }
 ];
 
 const CreateSupplierSchema = z.object({
@@ -30,7 +28,7 @@ const CreateSupplierSchema = z.object({
   category: z.string().min(1, "Category is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
   payment_term: z.string().min(1, "Payment term is required"),
-  lead_time: z.number().min(0, "Lead time must be positive").nullable(),
+  lead_time: z.string().min(1, "Lead time is required"),
   address: z.object({
     street: z.string().min(1, "Street address is required"),
     city: z.string().min(1, "City is required"),
@@ -274,13 +272,11 @@ const CreateSupplier = ({ add, custom, create }: { add?: boolean; custom?: boole
 
                   <div>
                     <Input
-                      type="number"
+                      type="text"
                       label="Lead Time (days)"
                       className="mt-1 w-full"
                       placeholder="Enter lead time in days"
-                      {...register("lead_time", { 
-                        setValueAs: (v) => v === "" ? null : parseInt(v, 10)
-                      })}
+                      {...register("lead_time")}
                     />
                     {errors.lead_time && <p className="text-red-500 text-sm">{errors.lead_time.message}</p>}
                   </div>
