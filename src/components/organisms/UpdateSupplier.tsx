@@ -26,7 +26,7 @@ const UpdateSupplierSchema = z.object({
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
     country: z.string().min(1, "Country is required"),
-    zip_code: z.string().optional()
+    zip_code: z.string().max(5, "ZIP/Postal code must be at most 5 characters").optional()
   }),
   bank_details: z.object({
     account_number: z.string().min(1, "Account number is required"),
@@ -318,6 +318,7 @@ const categories = categoryData?.data?.categories || [];
                       label="ZIP/Postal Code"
                       className="mt-1 w-full"
                       placeholder="Enter postal code"
+                      maxLength={5}
                       {...register("address.zip_code")}
                     />
                     {errors.address?.zip_code && <p className="text-red-500 text-sm">{errors.address.zip_code.message}</p>}

@@ -40,7 +40,7 @@ const CreateSupplierSchema = z.object({
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
     country: z.string().min(1, "Country is required"),
-    zip_code: z.string().optional()
+    zip_code: z.string().max(5, "ZIP/Postal code must be at most 5 characters").optional(),
   }),
   bank_details: z.object({
     account_number: z.string().min(1, "Account number is required"),
@@ -365,6 +365,7 @@ const CreateSupplier = ({ add, custom, create, onClick }:
                       type="text"
                       label="ZIP/Postal Code"
                       className="mt-1 w-full"
+                      maxLength={5}
                       placeholder="Enter postal code"
                       {...register("address.zip_code")}
                     />
