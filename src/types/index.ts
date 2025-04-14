@@ -299,6 +299,7 @@ export interface Owner {
     category: Category;
     rating: string;
     bank_details: BankDetails
+    payment_term:string;
   }
   
   export interface FetchSuppliersResponse {

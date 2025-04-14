@@ -15,10 +15,16 @@ import { City, Country, State } from 'country-state-city';
 import { FaPlus, FaUserTie } from "react-icons/fa";
 
 const paymentTermOptions = [
-  { id: "Line of Credit", name: "Line of Credit" },
-  { id: "Payment Immediately", name: "Payment Immediately" },
-  { id: "Cash on Delivery", name: "Cash on Delivery" },
-  { id: "Payment in Advance", name: "Payment in Advance" }
+  { id: "pia", name: "Payment in Advance" },
+  { id: "cod", name: "Cash on Delivery" },
+  { id: "loc", name: "Line of Credit" },
+  { id: "nt00", name: "Payment Immediately" },
+  { id: "nt15", name: "15 days payment after invoice" },
+  { id: "nt30", name: "30 days payment after invoice" },
+  { id: "nt45", name: "45 days payment after invoice" },
+  { id: "nt60", name: "60 days payment after invoice" },
+  { id: "nt90", name: "90 days payment after invoice" },
+  { id: "nt120", name: "120 days payment after invoice" }
 ];
 
 const CreateSupplierSchema = z.object({

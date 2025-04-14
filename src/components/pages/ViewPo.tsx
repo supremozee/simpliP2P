@@ -6,7 +6,7 @@ import LoaderSpinner from '@/components/atoms/LoaderSpinner';
 import { format_price } from '@/utils/helpers';
 import { motion } from 'framer-motion';
 import Button from '@/components/atoms/Button';
-import { FaDownload, FaPrint, FaFileInvoice, FaShippingFast, FaCreditCard } from 'react-icons/fa';
+import { FaDownload, FaPrint } from 'react-icons/fa';
 import Image from 'next/image';
 import TableHead from '@/components/atoms/TableHead';
 import TableBody from '@/components/atoms/TableBody';
@@ -81,6 +81,7 @@ const PurchaseOrderDetails = () => {
       phone: "",
       email: "",
       bank_details: null,
+      payment_term: "",
       address: null
     },
     organisation: {
@@ -129,159 +130,107 @@ const PurchaseOrderDetails = () => {
 
   return (
     <div className="max-w-5xl mx-auto bg-white p-8 rounded-lg shadow-lg print:shadow-none print:p-0 print:max-w-none">
-      <div className="flex-shrink-0 w-full ">
-              <Image
-                src={po.organisation?.logo || "/logo-black.png"} 
-                alt="Company Logo"
-                className="object-cover bg-cover" 
-                width={120}
-                height={220}
-              />
-            </div>
-      <div className="flex justify-end gap-4 mb-6 print:hidden">
-        <Button 
-          onClick={handlePrint} 
-          className="px-4 py-2 bg-primary text-white rounded-lg flex items-center gap-2 hover:bg-primary/90 transition-colors"
-        >
-          <FaPrint />
-          <span>Print</span>
-        </Button>
-        <Button 
-          onClick={handleDownload} 
-          className="px-4 py-2 bg-secondary text-white rounded-lg flex items-center gap-2 hover:bg-secondary/90 transition-colors"
-        >
-          <FaDownload />
-          <span>Download PDF</span>
-        </Button>
-      </div>
-
-      {/* Formal Letterhead */}
-      <div className="border-b-2 border-gray-300 pb-6 mb-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start"
-        >
-          <div className="flex items-center gap-4 mb-6 md:mb-0">
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-gray-800">{po.organisation?.name || "SimpliP2P Organization"}</h1>
-              <p className="text-sm text-gray-500">123 Business Avenue, Suite 101</p>
-              <p className="text-sm text-gray-500">Business City, BZ 12345</p>
-              <p className="text-sm text-gray-500">+1 (555) 123-4567 • info@simplip2p.com</p>
-            </div>
-          </div>
-          
-          <div className="text-right">
-            <div className="inline-block bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
-              <h2 className="text-3xl font-bold text-primary mb-1">PURCHASE ORDER</h2>
-              <p className="text-xl text-gray-700 font-medium">PO #{po.po_number}</p>
-              <p className="text-sm text-gray-600">Date: {orderDate}</p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Reference and Address Block */}
+      {/* Header with Company Info and PO Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* From (Company) */}
+        {/* Left side - Company logo and info */}
         <motion.div 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
           className="text-left"
         >
-          <h3 className="text-sm uppercase font-semibold text-gray-500 mb-2">From:</h3>
-          <div className="mb-6">
-            <p className="font-medium text-gray-800">{po.organisation?.name || "SimpliP2P Organization"}</p>
-            <p className="text-gray-600">123 Business Avenue, Suite 101</p>
-            <p className="text-gray-600">Business City, BZ 12345</p>
-            <p className="text-gray-600">+1 (555) 123-4567</p>
+          <div className="flex-shrink-0 mb-4">
+            <Image
+              src={po.organisation?.logo || "/logo-black.png"} 
+              alt="Company Logo"
+              className="object-cover" 
+              width={150}
+              height={80}
+            />
           </div>
-
-          <div>
-            <h3 className="text-sm uppercase font-semibold text-gray-500 mb-2">Ship To:</h3>
-            <p className="font-medium text-gray-800">{po.organisation?.name || "SimpliP2P Organization"}</p>
-            <p className="text-gray-600">456 Warehouse Street</p>
-            <p className="text-gray-600">Receiving Dept, Floor 2</p>
-            <p className="text-gray-600">Business City, BZ 12345</p>
+          <div className="mb-2">
+            <h2 className="text-xl font-bold text-gray-800">{po.organisation?.name || "SimpliP2P Organization"}</h2>
+            <p className="text-sm text-gray-600">123 Business Avenue, Suite 101</p>
+            <p className="text-sm text-gray-600">Business City, BZ 12345</p>
+            <p className="text-sm text-gray-600">Tel: <span className="font-medium">+1 (555) 123-4567</span></p>
+            <p className="text-sm text-gray-600">Email: <span className="font-medium">info@simplip2p.com</span></p>
+            <p className="text-sm text-gray-600 mt-2"><span className="font-semibold">Payment Terms:</span> <span className="font-medium">{po.supplier.payment_term}</span></p>
           </div>
         </motion.div>
         
-        {/* Supplier Info */}
+        {/* Right side - PO Details */}
         <motion.div 
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-left"
+          className="text-right"
         >
-          <h3 className="text-sm uppercase font-semibold text-gray-500 mb-2">To (Supplier):</h3>
+          <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary inline-block">
+            <h1 className="text-3xl font-bold text-primary mb-4">PURCHASE ORDER</h1>
+            <div className="text-left space-y-2">
+              <p className="text-gray-600"><span className="font-semibold">Date:</span> <span className="font-medium">{orderDate}</span></p>
+              <p className="text-gray-600"><span className="font-semibold">PO No:</span> <span className="font-medium">{po.po_number}</span></p>
+              <p className="text-gray-600"><span className="font-semibold">Bill to Email:</span> <span className="font-medium">{po.supplier?.email || "N/A"}</span></p>
+              <p className="text-gray-600"><span className="font-semibold">Project:</span> <span className="font-medium">Standard Procurement</span></p>
+              <p className="text-gray-600"><span className="font-semibold">Status:</span> 
+                <span className={`ml-1 font-bold ${
+                  po.status === "COMPLETED" ? "text-green-600" : 
+                  po.status === "PENDING" ? "text-yellow-600" : 
+                  po.status === "CANCELLED" ? "text-red-600" : "text-blue-600"
+                }`}>
+                  {po.status}
+                </span>
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Supplier and Ship To Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Supplier Info */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+        >
+          <h3 className="text-sm uppercase font-semibold text-gray-500 mb-2">Supplier:</h3>
           <div>
-            <p className="font-medium text-gray-800">{po.supplier?.full_name || "N/A"}</p>
+            <p className="font-bold text-gray-800">{po.supplier?.full_name || "N/A"}</p>
             <p className="text-gray-600">{po.supplier?.address?.street || "N/A"}</p>
             <p className="text-gray-600">
               {po.supplier?.address?.city || "N/A"}, {po.supplier?.address?.state || "N/A"} {po.supplier?.address?.zip_code || ""}
             </p>
             <p className="text-gray-600">{po.supplier?.address?.country || "N/A"}</p>
-            <p className="text-gray-600">Email: {po.supplier?.email || "N/A"}</p>
-            <p className="text-gray-600">Phone: {po.supplier?.phone || "N/A"}</p>
+            <p className="text-gray-600"><span className="font-medium">Email:</span> {po.supplier?.email || "N/A"}</p>
+            <p className="text-gray-600"><span className="font-medium">Phone:</span> {po.supplier?.phone || "N/A"}</p>
+          </div>
+        </motion.div>
+        
+        {/* Ship To */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+        >
+          <h3 className="text-sm uppercase font-semibold text-gray-500 mb-2">Ship To:</h3>
+          <div>
+            <p className="font-bold text-gray-800">{po.organisation?.name || "SimpliP2P Organization"}</p>
+            <p className="text-gray-600">456 Warehouse Street</p>
+            <p className="text-gray-600">Receiving Dept, Floor 2</p>
+            <p className="text-gray-600">Business City, BZ 12345</p>
+            <p className="text-gray-600 mt-2"><span className="font-semibold">Delivery Terms:</span> <span className="font-medium">FOB Destination</span></p>
+            <p className="text-gray-600"><span className="font-semibold">Required By:</span> <span className="font-medium">ASAP</span></p>
           </div>
         </motion.div>
       </div>
-
-      {/* Order Details Summary */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <h3 className="flex items-center gap-2 text-sm uppercase font-semibold text-gray-500 mb-2">
-              <FaFileInvoice className="text-primary" />
-              Order Details
-            </h3>
-            <p className="text-gray-600"><span className="font-medium">PO Number:</span> {po.po_number}</p>
-            <p className="text-gray-600"><span className="font-medium">Date Issued:</span> {orderDate}</p>
-            <p className="text-gray-600"><span className="font-medium">Status:</span> 
-              <span className={`ml-1 font-medium ${
-                po.status === "COMPLETED" ? "text-green-600" : 
-                po.status === "PENDING" ? "text-yellow-600" : 
-                po.status === "CANCELLED" ? "text-red-600" : "text-blue-600"
-              }`}>
-                {po.status}
-              </span>
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="flex items-center gap-2 text-sm uppercase font-semibold text-gray-500 mb-2">
-              <FaShippingFast className="text-primary" />
-              Shipping Details
-            </h3>
-            <p className="text-gray-600"><span className="font-medium">Ship Via:</span> Best Available</p>
-            <p className="text-gray-600"><span className="font-medium">Delivery Terms:</span> FOB Destination</p>
-            <p className="text-gray-600"><span className="font-medium">Required By:</span> ASAP</p>
-          </div>
-          
-          <div>
-            <h3 className="flex items-center gap-2 text-sm uppercase font-semibold text-gray-500 mb-2">
-              <FaCreditCard className="text-primary" />
-              Payment Details
-            </h3>
-            <p className="text-gray-600"><span className="font-medium">Bank:</span> {po.supplier?.bank_details?.bank_name || "N/A"}</p>
-            <p className="text-gray-600"><span className="font-medium">Account:</span> {po.supplier?.bank_details?.account_number || "N/A"}</p>
-            <p className="text-gray-600"><span className="font-medium">Account Name:</span> {po.supplier?.bank_details?.account_name || "N/A"}</p>
-          </div>
-        </div>
-      </motion.div>
 
       {/* Items Table */}
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="mb-10"
+        className="mb-8"
       >
         <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
           Order Items
@@ -298,9 +247,9 @@ const PurchaseOrderDetails = () => {
         </div>
       </motion.div>
 
-      {/* Totals and Summary */}
-      <div className="flex flex-col md:flex-row gap-8 mb-10">
-        {/* Terms and Conditions */}
+      {/* Order Summary */}
+      <div className="flex flex-col md:flex-row gap-8 mb-8">
+        {/* Payment Details */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -308,13 +257,19 @@ const PurchaseOrderDetails = () => {
           className="flex-1 order-2 md:order-1"
         >
           <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-full">
-            <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3">Terms & Conditions</h3>
+            <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3">Bank Details</h3>
+            <div className="space-y-1 text-gray-600">
+              <p><span className="font-semibold">Bank:</span> <span className="font-medium">{po.supplier?.bank_details?.bank_name || "N/A"}</span></p>
+              <p><span className="font-semibold">Account Number:</span> <span className="font-medium">{po.supplier?.bank_details?.account_number || "N/A"}</span></p>
+              <p><span className="font-semibold">Account Name:</span> <span className="font-medium">{po.supplier?.bank_details?.account_name || "N/A"}</span></p>
+            </div>
+            
+            <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3 mt-4">Terms & Conditions</h3>
             <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
-              <li>All prices are in {po.currency || 'the specified currency'}.</li>
-              <li>Payment is due within 30 days of receipt.</li>
-              <li>Please reference PO #{po.po_number} on all invoices.</li>
+              <li>All prices are in <span className="font-medium">{po.currency || 'the specified currency'}</span>.</li>
+              <li>Payment is due within <span className="font-medium">30 days</span> of receipt.</li>
+              <li>Please reference PO #<span className="font-medium">{po.po_number}</span> on all invoices.</li>
               <li>Any changes to this purchase order must be approved in writing.</li>
-              <li>Goods must meet all specifications as outlined.</li>
             </ul>
           </div>
         </motion.div>
@@ -332,15 +287,15 @@ const PurchaseOrderDetails = () => {
             </div>
             <div className="p-4 space-y-2">
               <div className="flex justify-between text-gray-600">
-                <span>Subtotal:</span>
-                <span>{format_price(totalAmount, po.currency)}</span>
+                <span className="font-medium">Subtotal:</span>
+                <span className="font-medium">{format_price(totalAmount, po.currency)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Tax (0%):</span>
+                <span className="font-medium">Tax (0%):</span>
                 <span>{format_price(0, po.currency)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Shipping:</span>
+                <span className="font-medium">Shipping:</span>
                 <span>{format_price(0, po.currency)}</span>
               </div>
               <div className="h-[1px] bg-gray-200 my-2"></div>
@@ -361,18 +316,36 @@ const PurchaseOrderDetails = () => {
         className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 print:mb-4"
       >
         <div>
-          <div className="border-t-2 border-gray-300 pt-2 mt-10">
+          <div className="border-t-2 border-gray-300 pt-2 mt-6">
             <p className="text-gray-700 font-medium">Authorized By</p>
             <p className="text-xs text-gray-500">Procurement Manager</p>
           </div>
         </div>
         <div>
-          <div className="border-t-2 border-gray-300 pt-2 mt-10">
+          <div className="border-t-2 border-gray-300 pt-2 mt-6">
             <p className="text-gray-700 font-medium">Accepted By</p>
             <p className="text-xs text-gray-500">Supplier Signature & Date</p>
           </div>
         </div>
       </motion.div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-center gap-4 mt-8 print:hidden">
+        <Button 
+          onClick={handlePrint} 
+          className="px-6 py-2 bg-primary text-white rounded-lg flex items-center gap-2 hover:bg-primary/90 transition-colors"
+        >
+          <FaPrint />
+          <span>Print</span>
+        </Button>
+        <Button 
+          onClick={handleDownload} 
+          className="px-6 py-2 bg-secondary text-white rounded-lg flex items-center gap-2 hover:bg-secondary/90 transition-colors"
+        >
+          <FaDownload />
+          <span>Download PDF</span>
+        </Button>
+      </div>
 
       {/* Footer */}
       <div className="mt-10 text-center text-sm text-gray-500 print:mt-0 print:fixed print:bottom-4 print:left-0 print:right-0">
