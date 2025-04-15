@@ -20,6 +20,9 @@ import useFetchBudget from '@/hooks/useFetchBudget';
 import Select from '../atoms/Select';
 import { format_price } from '@/utils/helpers';
 import useFetchSuppliers from '@/hooks/useFetchSuppliers';
+import useFetchItemsByPrNumber from '@/hooks/useFetchAllItemsByPrNumber';
+import TableSkeleton from '../atoms/Skeleton/Table';
+import ErrorComponent from '../molecules/ErrorComponent';
 
 const actionTypes = [
   { id: "approve", name: "Approve Only" },
@@ -28,7 +31,7 @@ const actionTypes = [
 ];
 
 const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
-  const { isOpen, setIsOpen, currentOrg } = useStore();
+  const { isOpen, setIsOpen, currentOrg, pr } = useStore();
   const { data, isLoading, isError } = useFetchPurchaseRequisitionById(currentOrg, pr_id);
   const { data: budgets, isLoading: isBudgetLoading } = useFetchBudget(currentOrg);
   const suppliers = useFetchSuppliers(currentOrg);
@@ -40,7 +43,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
   const [selectedBudget, setSelectedBudget] = useState<string>("");
   const [selectedSupplier, setSelectedSupplier] = useState<string>("");
   const [selectedActionType, setSelectedActionType] = useState<string>("approve_and_create_po");
-
+  const { data:itemData, error, isLoading:isLoadingItem } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 100, 1);
+  const items = itemData?.data?.data
   if (isLoading) {
     return (
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="max-w-5xl">
@@ -187,25 +191,35 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                   <h3 className="font-semibold text-gray-800">Items & Costs</h3>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full border border-[#80808050]">
-                    <TableHead headers={['Item Name', 'Quantity', 'Unit Price', 'Total']} />
-                    <TableBody
-                      data={requisition?.items || []}
-                      renderRow={(item, i) => (
-                        <TableRow
-                          key={i}
-                          data={[
-                            item.item_name,
-                            item.pr_quantity,
-                            (item && format_price(item.unit_price, item?.currency)),
-                            (item && format_price(item.unit_price * item.pr_quantity, item?.currency))
-                          ]}
-                          index={i}
-                        />
-                      )}
-                      emptyMessage="No items found"
-                    />
-                  </table>
+                <div className="overflow-x-auto">
+      {error ? (
+        <ErrorComponent text='Error fetching items' />
+      ) : (
+        <table className="w-full border border-[#80808050]">
+          <TableHead headers={['Item Name', 'Quantity', 'Unit Price', 'Total']} />
+          {isLoadingItem ? (
+            <TableSkeleton />
+          ) : (
+            <TableBody
+              data={items || []}
+              renderRow={(item, i) => (
+                <TableRow
+                  key={item.id || i}
+                  data={[
+                    item.item_name || 'Unnamed Item',
+                    item.pr_quantity,
+                    (format_price(item.unit_price || 0, item?.currency)),
+                    (format_price((item.unit_price || 0) * (item.pr_quantity || 0), item?.currency))
+                  ]}
+                  index={i}
+                />
+              )}
+              emptyMessage="No items found"
+            />
+          )}
+        </table>
+      )}
+</div>
                   <div className="flex justify-end mt-4">
                     <div className="bg-gray-50 px-4 py-2 rounded-lg">
                       <span className="text-sm text-gray-500">Total Amount: </span>

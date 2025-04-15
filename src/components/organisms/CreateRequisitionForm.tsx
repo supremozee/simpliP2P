@@ -13,6 +13,9 @@ import { currencies } from "@/constants";
 import useFetchSuppliers from "@/hooks/useFetchSuppliers";
 import CreateSupplier from "./CreateSupplier";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";
+import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
+import { useEffect } from "react";
+import LoaderSpinner from "../atoms/LoaderSpinner";
 
 interface RequisitionFormType {
   department_id: string;
@@ -40,7 +43,7 @@ const today = new Date();
 
 
 const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register, errors, prNumber, watch, setValue }) => {
-  const { currentOrg } = useStore();
+  const { currentOrg, pr } = useStore();
   const { data: departmentData, isLoading: loadingData,  } = useFetchDepartment(currentOrg);
   const { data: branchData, isLoading: branchLoading,  } = useFetchBranch(currentOrg);
   const suppliers = useFetchSuppliers(currentOrg);
@@ -52,7 +55,14 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
   const selectedCurrency = watch("currency");
   const supplierId = watch("supplier_id");
   const {isDisabled} = useGetRequisitions()
-
+  const { data, isLoading } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 1000, 1);
+  const itemsLength = data?.data?.data?.find((item => item.purchase_requisition.pr_number === pr?.pr_number))?.pr_quantity || 0;
+  useEffect(()=> {
+    if (itemsLength && itemsLength > 0) {
+      setValue("quantity", itemsLength)
+    }
+  }, [itemsLength, setValue])
+  
   return (
     <div className="flex flex-col w-full justify-center z-20 relative">
       <div className="flex w-full sm:justify-end">
@@ -162,14 +172,14 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
 
               <InputField
                 label="Quantity"
-                disabled={!!isDisabled}
+                disabled
                 required
                 type="number"
                 placeholder="Input quantity"
                 {...register("quantity", { valueAsNumber: true })}
               />
               {errors.quantity && <p className="text-red-500 text-xs">{errors.quantity.message}</p>}
-
+              {isLoading && <LoaderSpinner className="absolute top-0 left-0 w-2 h-2 bg-white bg-opacity-50 z-10" />}
               <div className="flex gap-4 flex-col">
                 <div className="flex-1">
                   <InputField

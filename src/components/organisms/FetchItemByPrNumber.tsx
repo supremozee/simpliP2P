@@ -18,7 +18,7 @@ import { useGetRequisitions } from "@/hooks/useGetRequisition";
 const FetchItemByPrNumber = () => {
   const { currentOrg, pr } = useStore();
   const {isDisabled} = useGetRequisitions()
-  const { data, error, isLoading, isError } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 10, 1);
+  const { data, error, isLoading, isError } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 100, 1);
   const products = data?.data?.data || [];
   const { removeItem } = useRemoveItem();
   const handleRemove = async (id: string) => {
