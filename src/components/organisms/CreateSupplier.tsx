@@ -13,6 +13,8 @@ import CreateCategory from "./CreateCategory";
 import { useState, useEffect, useMemo } from "react";
 import { City, Country, State } from 'country-state-city';
 import { FaPlus, FaUserTie } from "react-icons/fa";
+import 'react-phone-input-2/lib/style.css'
+import PhoneInput from 'react-phone-input-2';
 
 const paymentTermOptions = [
   { id: "pia", name: "Payment in Advance" },
@@ -29,7 +31,9 @@ const paymentTermOptions = [
 
 const CreateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
-  phone: z.string().min(10, "Phone is required").regex(/^[0-9]+$/, "Phone number must contain only numbers"),
+  phone: z.string()
+  .min(6, "Phone number is too short")
+  .regex(/^\d+$/, "Phone number must contain only numbers"),
   email: z.string().email("Invalid email address"),
   category: z.string().min(1, "Category is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
@@ -61,7 +65,7 @@ const CreateSupplier = ({ add, custom, create, onClick }:
   const [step, setStep] = useState(1);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
-  
+  const [v, setV] = useState<string | undefined>(undefined)
   const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch, trigger } = useForm<SupplierFormData>({
     resolver: zodResolver(CreateSupplierSchema),
     mode: "onChange"
@@ -215,6 +219,7 @@ const CreateSupplier = ({ add, custom, create, onClick }:
                 <div className="sm:grid sm:grid-cols-2 gap-4">
                   <div>
                     <Input
+                    required
                       type="text"
                       label="Supplier Name"
                       className="mt-1 w-full"
@@ -226,6 +231,7 @@ const CreateSupplier = ({ add, custom, create, onClick }:
 
                   <div>
                     <Input
+                    required
                       type="email"
                       label="Email"
                       className="mt-1 w-full"
@@ -236,15 +242,31 @@ const CreateSupplier = ({ add, custom, create, onClick }:
                   </div>
 
                   <div>
-                    <Input
-                      type="text"
-                      label="Phone Number"
-                      className="mt-1 w-full"
-                      placeholder="Input phone number"
-                      {...register("phone")}
-                    />
-                    {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
-                  </div>
+  <label className="text-[12px] text-[#424242] font-bold">Phone Number</label>
+              <PhoneInput
+                country={"ng"}
+                value={v}
+                onChange={(value) => {
+                  setV(value);
+                  const digitsOnly = value ? value.replace(/\D/g, '') : '';
+                  setValue("phone", digitsOnly);
+                }}
+                placeholder="Enter phone number"
+                inputStyle={{
+                  width: '100%',
+                  height: '100%',
+                  padding: '0.6rem',
+                  paddingLeft: '45px',
+                  border: '1px solid #dddada',
+                  fontWeight: '400',
+                  borderRadius: '12px',
+                  fontSize: '17px',
+                  backgroundColor: 'transparent',
+                  color: '#424242',
+                }}
+              />
+              {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
+          </div>
 
                   <div className='relative'>
                     <Select
