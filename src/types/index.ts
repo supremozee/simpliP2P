@@ -667,7 +667,6 @@ interface Role {
     }
   }
   export interface UpdateData {
-    item_name: string;
     unit_price: number;
     status?: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" | "SAVED_FOR_LATER" ;
     pr_quantity?: number | undefined;

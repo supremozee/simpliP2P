@@ -11,7 +11,6 @@ import useFetchItemById from "@/hooks/useFetchItemById";
 import { MdEdit } from "react-icons/md";
 
 const UpdateItemSchema = z.object({
-  item_name: z.string().min(1, "Name of the product is required"),
   unit_price: z.preprocess((val) => parseFloat(val as string), z.number().positive().finite()),
   pr_quantity: z.preprocess((val) => parseInt(val as string, 10), z.number().optional()),
   image_url: z.string().optional(),
@@ -29,7 +28,6 @@ const UpdateItem = ({ id, disabled }: { id: string, disabled?:boolean }) => {
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<UpdateItemFormData>({
     resolver: zodResolver(UpdateItemSchema),
     defaultValues: {
-      item_name: "",
       unit_price: 0.00,
       pr_quantity: 0,
       image_url: "",
@@ -39,7 +37,6 @@ const UpdateItem = ({ id, disabled }: { id: string, disabled?:boolean }) => {
 
   useEffect(() => {
     if (item) {
-      setValue("item_name", item.item_name);
       setValue("unit_price", parseFloat(item.unit_price));
       setValue("pr_quantity", item.pr_quantity);
       setValue("image_url", item.image_url || "");
@@ -69,18 +66,6 @@ const UpdateItem = ({ id, disabled }: { id: string, disabled?:boolean }) => {
           <div className="px-4 py-6 sm:px-10">
             <h2 className="text-xl font-bold mb-4">Update Item</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Input
-                  type="text"
-                  label="Item Name"
-                  className="mt-1 w-full"
-                  value={item?.item_name}
-                  placeholder="Enter item name"
-                  {...register("item_name")}
-                />
-                {errors.item_name && <p className="text-red-500 text-sm">{errors.item_name.message}</p>}
-              </div>
-
               <div>
                 <Input
                   type="text"
