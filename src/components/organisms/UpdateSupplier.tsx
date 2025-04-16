@@ -14,10 +14,14 @@ import { City, Country, State } from 'country-state-city';
 import useUpdateSupplier from "@/hooks/useUpdateSupplier";
 import useFetchSupplierById from "@/hooks/useFetchSupplierById";
 import { cn } from "@/utils/cn";
+import PhoneInput from "react-phone-input-2";
+import 'react-phone-input-2/lib/style.css'
 
 const UpdateSupplierSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
-  phone: z.string().min(10, "Phone is required").regex(/^[0-9]+$/, "Phone number must contain only numbers"),
+  phone: z.string()
+  .min(6, "Phone number is too short")
+  .regex(/^\d+$/, "Phone number must contain only numbers"),
   email: z.string().email("Invalid email address"),
   category: z.string().min(1, "Category is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
@@ -42,7 +46,7 @@ const UpdateSupplier = () => {
   const [step, setStep] = useState(1);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
-  
+  const [v, setV] = useState<string | undefined>(undefined)
   const updateSupplierMutation = useUpdateSupplier(currentOrg);
   const { data: supplierData, isLoading: isSupplierLoading } = useFetchSupplierById(currentOrg, supplierId);
   const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
@@ -70,6 +74,7 @@ const categories = categoryData?.data?.categories || [];
       setValue("full_name", data.full_name ?? "");
       setValue("email", data.email ?? "");
       setValue("phone", data.phone ?? "");
+      setV(data.phone ?? "");
       setValue("category", data.category.id ?? "");
         setValue("address.street", data.address?.street ?? "");
         setValue("address.city", data.address?.city ?? "");
@@ -210,14 +215,30 @@ const categories = categoryData?.data?.categories || [];
                   </div>
 
                   <div>
-                    <Input
-                      type="text"
-                      label="Phone Number"
-                      className="mt-1 w-full"
-                      placeholder="Enter phone number"
-                      {...register("phone")}
-                    />
-                    {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
+                            <label className="text-[12px] text-[#424242] font-bold">
+                              Phone Number  <span className="text-red-500">*</span>
+                              </label>
+                                  <PhoneInput
+                                    value={v}
+                                    onChange={(value) => {
+                                      const digitsOnly = value ? value.replace(/\D/g, '') : '';
+                                      setValue("phone", digitsOnly);
+                                    }}
+                                    placeholder="Enter phone number"
+                                    inputStyle={{
+                                      width: '100%',
+                                      height: '100%',
+                                      padding: '0.6rem',
+                                      paddingLeft: '45px',
+                                      border: '1px solid #dddada',
+                                      fontWeight: '400',
+                                      borderRadius: '12px',
+                                      fontSize: '17px',
+                                      backgroundColor: 'transparent',
+                                      color: '#424242',
+                                    }}
+                                  />
+                                  {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
                   </div>
 
                   <div className="relative">

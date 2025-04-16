@@ -242,7 +242,9 @@ const CreateSupplier = ({ add, custom, create, onClick }:
                   </div>
 
                   <div>
-  <label className="text-[12px] text-[#424242] font-bold">Phone Number</label>
+        <label className="text-[12px] text-[#424242] font-bold">
+          Phone Number  <span className="text-red-500">*</span>
+          </label>
               <PhoneInput
                 country={"ng"}
                 value={v}
@@ -266,7 +268,7 @@ const CreateSupplier = ({ add, custom, create, onClick }:
                 }}
               />
               {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
-          </div>
+                  </div>
 
                   <div className='relative'>
                     <Select
