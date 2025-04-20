@@ -8,29 +8,27 @@ import Modal from "../atoms/Modal";
 import useCreateProduct from "@/hooks/useCreateProduct";
 import useStore from "@/store";
 import TextAreaField from "../atoms/TextArea";
-import { FaImage, FaPlus } from "react-icons/fa";
-import Image from "next/image";
-import { useRef, useState } from "react";
+import { FaPlus } from "react-icons/fa";
+import { useState } from "react";
 import { cn } from "@/utils/cn";
 import Select from "../atoms/Select";
 import CreateCategory from "./CreateCategory";
 import useFetchCategories from "@/hooks/useFetchCategories";
-import useFileManager from "@/hooks/useFileManager";
-import LoaderSpinner from "../atoms/LoaderSpinner";
 import { currencies } from "@/constants";
 import { MdAdd } from "react-icons/md";
-
-// Currency data
+import FileUpload from "../atoms/FileUpload";
 
 const CreateProductSchema = z.object({
   name: z.string().min(1, "Product Name is required"),
   description: z.string().min(1, "Description is required"),
   unitPrice: z.string().min(1, "Unit price is required"),
   currency: z.string().min(1, "Currency is required"),
+  productCode: z.string().optional(),
   stockQty: z.number().nonnegative("Stock quantity must be at least 0"),
   stockQtyAlert: z.number().optional(),
   category: z.string().min(1, "Category is required"),
   image_url: z.string().optional(),
+  unitOfMeasure: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof CreateProductSchema>;
@@ -39,7 +37,8 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
   const { currentOrg } = useStore();
   const { createProduct, loading, errorMessage, successCreate } = useCreateProduct();
   const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<ProductFormData>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
@@ -49,27 +48,14 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
     },
     mode: "onSubmit",
   });
-  const imageRef = useRef<HTMLInputElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const { uploadFile, loading: imageLoading } = useFileManager();
-
-  const handleFileUpload = async () => {
-    try {
-      const file = imageRef.current?.files?.[0];
-      if (!file) {
-        throw new Error("No file selected");
-      }
-      const response = await uploadFile(file);
-      setImagePreview(response.url);
-      setValue("image_url", response.url);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
-  };
 
   const categories = categoryData?.data?.categories || [];
-  const category = watch("category")
+  const category = watch("category");
   const selectedCurrency = watch("currency", "NGN");
+
+  const handleFileUploaded = (url: string) => {
+    setValue("image_url", url);
+  };
 
   const onSubmit = async (data: ProductFormData) => {
     const formattedData = {
@@ -78,12 +64,12 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
       stockQty: Number(data.stockQty),
       stockQtyAlert: Number(data.stockQtyAlert || 0),
     };
+    
     await createProduct(formattedData, currentOrg);
-    setTimeout(()=> {
+    setTimeout(() => {
       reset();
       setIsOpen(false);
-    }, 1500)
-    
+    }, 1500);
   };
 
   return (
@@ -108,8 +94,9 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
           <span className={cn("text-[14px] font-bold", custom && "text-[16px]")}>Create New Inventory</span>
         </Button>
       )}
+      
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
-        <div className=" py-4 sm:px-10 h-auto max-h-[90vh]">
+        <div className="py-4 sm:px-10 h-auto max-h-[90vh]">
           <h2 className="text-xl font-bold mb-4">Add Inventory Product</h2>
           <p className="text-gray-500 mb-6">
             Fill in the product information below
@@ -146,13 +133,30 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               />
               {errors.unitPrice && <p className="text-red-500 text-sm">{errors.unitPrice.message}</p>}
             </div>
-
+            <div>
+              <Input
+                type="text"
+                label="Product Code"
+                placeholder="Product Code"
+                {...register("productCode")}
+              />
+              {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
+            </div>
+            <div>
+              <Input
+                type="text"
+                label="Unit of measurement (UOM)"
+                placeholder="Input unit of measurement"
+                {...register("unitOfMeasure")}
+              />
+              {errors.unitOfMeasure && <p className="text-red-500 text-sm">{errors.unitOfMeasure.message}</p>}
+            </div>
             <div>
               <Select
                 label="Currency"
                 options={currencies}
                 {...register("currency")}
-                onChange={(selectCurrency)=> setValue("currency", selectCurrency)}
+                onChange={(selectCurrency) => setValue("currency", selectCurrency)}
                 value={selectedCurrency}
                 error={errors.currency?.message}
                 required
@@ -211,34 +215,13 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               />
             </div>
 
-            <div className="flex flex-col w-full col-span-2 mt-10">
-              <label htmlFor="image_url" className="mb-4">Upload Item Image</label>
-              {imageLoading ? <LoaderSpinner /> : (
-                <label htmlFor="image_url" className={cn("flex flex-col items-center justify-center w-full border-2 cursor-pointer border-dashed border-gray-300 rounded-lg",
-                  imagePreview ? "border-transparent h-48" : "border-gray-300 h-48"
-                )}>
-                  {imagePreview ? (
-                    <Image
-                      src={imagePreview}
-                      alt="Product Preview"
-                      width={300}
-                      height={300}
-                      className="w-full h-full object-cover bg-center"
-                    />
-                  ) : (
-                    <FaImage className="text-gray-400 text-6xl" />
-                  )}
-                  <input
-                    id="image_url"
-                    type="file"
-                    className="hidden"
-                    {...register("image_url")}
-                    onChange={handleFileUpload}
-                    ref={imageRef}
-                  />
-                </label>
-              )}
-              {errors?.image_url && <p className="text-red-500 text-sm">{errors.image_url.message}</p>}
+            <div className="col-span-2 mt-6">
+              <FileUpload
+                label="Upload Item Image"
+                onFileUploaded={handleFileUploaded}
+                error={errors?.image_url?.message}
+                id="image_url"
+              />
             </div>
 
             <div className="flex justify-end my-6 space-x-4 col-span-1 sm:col-span-2">

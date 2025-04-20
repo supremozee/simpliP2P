@@ -480,6 +480,8 @@ interface Role {
     description: string;
     unitPrice: number;
     currency?:string;
+    productCode?:string;
+    unitOfMeasure?:string;
     stockQty?: number;
     stockQtyAlert?: number;
     category: string;
@@ -516,6 +518,7 @@ interface Role {
     stockQtyAlert: number;
     category: Category;
     productCode: string | null;
+    unitOfMeasure: string | null;
     image_url: string | null;
   }
   
