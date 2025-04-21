@@ -119,20 +119,20 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
             <div>
               <Input
                 type="text"
-                label="Product Name"
-                placeholder="Input product name"
-                {...register("name")}
-              />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-            </div>
-            <div>
-              <Input
-                type="text"
                 label="Product Code"
                 placeholder="Product Code"
                 {...register("productCode")}
               />
               {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
+            </div>
+            <div>
+              <Input
+                type="text"
+                label="Product Name"
+                placeholder="Input product name"
+                {...register("name")}
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
             <div className="col-span-2">
               <TextAreaField
@@ -184,7 +184,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
             </div>
             <div>
               <Select
-                label="Unit of Measure"
+                label="UOM"
                 options={UOM}
                 {...register("unitOfMeasure")}
                 onChange={(selectCurrency) => setValue("unitOfMeasure", selectCurrency)}
