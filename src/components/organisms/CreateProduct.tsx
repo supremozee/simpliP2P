@@ -55,6 +55,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
     { id: "g", name: "g" },
     { id: "l", name: "l" },
     { id: "ml", name: "ml" },
+    { id: "ltr", name: "ltr" },
     { id: "pcs", name: "pcs" },
     { id: "box", name: "box" },
     { id: "bottle", name: "bottle" },
