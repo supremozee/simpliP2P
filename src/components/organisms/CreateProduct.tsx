@@ -51,17 +51,17 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
 
   const categories = categoryData?.data?.categories || [];
   const UOM = [
-    { id: "kg", name: "Kilogram" },
-    { id: "g", name: "Gram" },
-    { id: "l", name: "Litre" },
-    { id: "ml", name: "Millilitre" },
-    { id: "pcs", name: "Pieces" },
-    { id: "box", name: "Box" },
-    { id: "bottle", name: "Bottle" },
-    { id: "roll", name: "Roll" },
-    { id: "mtr", name: "Metre" },
-    { id: "yds", name: "Yard" },
-    { id: "ft", name: "Feet" },
+    { id: "kg", name: "kg" },
+    { id: "g", name: "g" },
+    { id: "l", name: "l" },
+    { id: "ml", name: "ml" },
+    { id: "pcs", name: "pcs" },
+    { id: "box", name: "box" },
+    { id: "bottle", name: "bottle" },
+    { id: "roll", name: "roll" },
+    { id: "mtr", name: "mtr" },
+    { id: "yds", name: "yds" },
+    { id: "ft", name: "ft" },
   ];
   const category = watch("category");
   const selectedCurrency = watch("currency", "NGN");
