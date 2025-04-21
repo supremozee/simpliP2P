@@ -50,9 +50,22 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
   });
 
   const categories = categoryData?.data?.categories || [];
+  const UOM = [
+    { id: "kg", name: "Kilogram" },
+    { id: "g", name: "Gram" },
+    { id: "l", name: "Litre" },
+    { id: "ml", name: "Millilitre" },
+    { id: "pcs", name: "Pieces" },
+    { id: "box", name: "Box" },
+    { id: "bottle", name: "Bottle" },
+    { id: "roll", name: "Roll" },
+    { id: "mtr", name: "Metre" },
+    { id: "yds", name: "Yard" },
+    { id: "ft", name: "Feet" },
+  ];
   const category = watch("category");
   const selectedCurrency = watch("currency", "NGN");
-
+  const selectedUOM = watch("unitOfMeasure", "kg");
   const handleFileUploaded = (url: string) => {
     setValue("image_url", url);
   };
@@ -112,7 +125,15 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
-
+            <div>
+              <Input
+                type="text"
+                label="Product Code"
+                placeholder="Product Code"
+                {...register("productCode")}
+              />
+              {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
+            </div>
             <div className="col-span-2">
               <TextAreaField
                 label="Description"
@@ -134,24 +155,6 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               {errors.unitPrice && <p className="text-red-500 text-sm">{errors.unitPrice.message}</p>}
             </div>
             <div>
-              <Input
-                type="text"
-                label="Product Code"
-                placeholder="Product Code"
-                {...register("productCode")}
-              />
-              {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
-            </div>
-            <div>
-              <Input
-                type="text"
-                label="Unit of measurement (UOM)"
-                placeholder="Input unit of measurement"
-                {...register("unitOfMeasure")}
-              />
-              {errors.unitOfMeasure && <p className="text-red-500 text-sm">{errors.unitOfMeasure.message}</p>}
-            </div>
-            <div>
               <Select
                 label="Currency"
                 options={currencies}
@@ -163,7 +166,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 placeholder="Select currency"
               />
             </div>
-
+            
             <div>
               <div className="flex flex-col">
                 <Input
@@ -179,7 +182,18 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               </div>
               {errors.stockQty && <p className="text-red-500 text-sm">{errors.stockQty.message}</p>}
             </div>
-
+            <div>
+              <Select
+                label="Unit of Measure"
+                options={UOM}
+                {...register("unitOfMeasure")}
+                onChange={(selectCurrency) => setValue("unitOfMeasure", selectCurrency)}
+                value={selectedUOM}
+                error={errors.unitOfMeasure?.message}
+                required
+                placeholder="Select unit of measure"
+              />
+            </div>
             <div>
               <div className="flex flex-col">
                 <Input
@@ -195,7 +209,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               </div>
               {errors.stockQtyAlert && <p className="text-red-500 text-sm">{errors.stockQtyAlert.message}</p>}
             </div>
-
+            
             <div onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -214,8 +228,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 }
               />
             </div>
-
-            <div className="col-span-2 mt-6">
+        <div className="col-span-2 mt-6">
               <FileUpload
                 label="Upload Item Image"
                 onFileUploaded={handleFileUploaded}

@@ -4,7 +4,7 @@ import LoaderSpinner from './LoaderSpinner';
 import { IoChevronDownSharp, IoClose, IoSearch } from 'react-icons/io5';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
-type Option = Branch | Department | Requisition | Supplier | { id: string; name: string; value?: string };
+type Option = Branch | Department | Requisition | Supplier | { id: string; name: string; value?: string } ;
 
 interface SelectProps {
   label: string;
