@@ -17,6 +17,20 @@ export const currencies = [
   { id: "INR", name: "INR - Indian Rupee" },
   { id: "BRL", name: "BRL - Brazilian Real" }
 ];
+export const UOM = [
+  { id: "kg", name: "kg" },
+  { id: "g", name: "g" },
+  { id: "l", name: "l" },
+  { id: "ml", name: "ml" },
+  { id: "ltr", name: "ltr" },
+  { id: "pcs", name: "pcs" },
+  { id: "box", name: "box" },
+  { id: "bottle", name: "bottle" },
+  { id: "roll", name: "roll" },
+  { id: "mtr", name: "mtr" },
+  { id: "yds", name: "yds" },
+  { id: "ft", name: "ft" },
+];
 export const paymentTermOptions = [
   { id: "Payment in Advance", name: "Payment in Advance" },
   { id: "Cash on Delivery", name: "Cash on Delivery" },

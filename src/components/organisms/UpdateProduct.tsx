@@ -13,6 +13,7 @@ import useFetchProductById from "@/hooks/useFetchProductById";
 import Select from "../atoms/Select";
 import useFetchCategories from "@/hooks/useFetchCategories";
 import CreateCategory from "./CreateCategory";
+import { UOM } from "@/constants";
 
 const currencies:any = [
   { id: "NGN", name: "NGN - Nigerian Naira" },
@@ -30,9 +31,11 @@ const UpdateProductSchema = z.object({
   description: z.string().min(1, "Description of the product is required"),
   unitPrice: z.number().min(0, "Unit price is required"),
   currency: z.string().min(1, "Currency is required"),
+  productCode: z.string().optional(),
   stockQtyAlert: z.number().min(0, "Stock alert must be 0 or greater"),
   category: z.string().min(1, "Category is required"),
   stockQty: z.number().min(0, "Stock quantity must be 0 or greater"),
+   unitOfMeasure: z.string().optional(),
 });
 
 type UpdateProductFormData = z.infer<typeof UpdateProductSchema>;
@@ -57,11 +60,14 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
       stockQtyAlert: 0,
       category: "",
       stockQty: 0,
+      productCode: "",
+      unitOfMeasure: "",
     },
   });
 
   const categories = categoryData?.data?.categories || [];
   const selectedCategory = watch("category");
+  const selectedUOM = watch("unitOfMeasure", "kg");
 
   useEffect(() => {
     if (data?.data) {
@@ -71,6 +77,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
       setValue("stockQtyAlert", data.data.stockQtyAlert);
       setValue("category", data.data.category?.id || "");
       setValue("stockQty", data.data.stockQty);
+      setValue("currency", data.data.currency || "");
+      setValue("productCode", data.data.productCode || "");
+      setValue("unitOfMeasure", data.data.unitOfMeasure || "");
     }
   }, [data, setValue]);
 
@@ -99,6 +108,15 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
           <p>Loading...</p>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                  <Input
+                    type="text"
+                    label="Product Code"
+                    placeholder="Product Code"
+                    {...register("productCode")}
+                  />
+                  {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
+                </div>
             <div>
               <Input
                 type="text"
@@ -162,7 +180,18 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
               </div>
               {errors.stockQty && <p className="text-red-500 text-sm">{errors.stockQty.message}</p>}
             </div>
-
+            <div>
+              <Select
+                label="UOM"
+                options={UOM}
+                {...register("unitOfMeasure")}
+                onChange={(selectedUOM) => setValue("unitOfMeasure", selectedUOM)}
+                value={selectedUOM}
+                error={errors.unitOfMeasure?.message}
+                required
+                placeholder="Select unit of measure"
+              />
+            </div>
             <div>
               <div className="flex flex-col">
                 <Input

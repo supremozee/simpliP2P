@@ -14,7 +14,7 @@ import { cn } from "@/utils/cn";
 import Select from "../atoms/Select";
 import CreateCategory from "./CreateCategory";
 import useFetchCategories from "@/hooks/useFetchCategories";
-import { currencies } from "@/constants";
+import { currencies, UOM } from "@/constants";
 import { MdAdd } from "react-icons/md";
 import FileUpload from "../atoms/FileUpload";
 
@@ -50,20 +50,6 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
   });
 
   const categories = categoryData?.data?.categories || [];
-  const UOM = [
-    { id: "kg", name: "kg" },
-    { id: "g", name: "g" },
-    { id: "l", name: "l" },
-    { id: "ml", name: "ml" },
-    { id: "ltr", name: "ltr" },
-    { id: "pcs", name: "pcs" },
-    { id: "box", name: "box" },
-    { id: "bottle", name: "bottle" },
-    { id: "roll", name: "roll" },
-    { id: "mtr", name: "mtr" },
-    { id: "yds", name: "yds" },
-    { id: "ft", name: "ft" },
-  ];
   const category = watch("category");
   const selectedCurrency = watch("currency", "NGN");
   const selectedUOM = watch("unitOfMeasure", "kg");
@@ -188,7 +174,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 label="UOM"
                 options={UOM}
                 {...register("unitOfMeasure")}
-                onChange={(selectCurrency) => setValue("unitOfMeasure", selectCurrency)}
+                onChange={(selectedUOM) => setValue("unitOfMeasure", selectedUOM)}
                 value={selectedUOM}
                 error={errors.unitOfMeasure?.message}
                 required

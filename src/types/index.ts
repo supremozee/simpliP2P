@@ -499,6 +499,8 @@ interface Role {
       stockQtyAlert: number;
       category: Category;
       productCode: string | null;
+      unitOfMeasure?:string;
+      currency?:string
       id: string;
       created_at: string;
       updated_at: string;
