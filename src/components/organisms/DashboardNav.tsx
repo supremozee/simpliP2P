@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import Search from '../atoms/Search'
+// import Search from '../atoms/Search'
 import Notifications from '../atoms/Notifications'
 import Profile from '../molecules/Profile'
 import { usePathname } from 'next/navigation'
@@ -18,9 +18,9 @@ const DashboardNav = () => {
           </h2>
         </div>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center">
           <div className="flex items-center gap-6">
-            <Search />
+            {/* <Search /> */}
             <Notifications />
           </div>
             <Profile />

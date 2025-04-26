@@ -16,6 +16,7 @@ import { FetchProduct } from '@/types';
 import { format_price } from '@/utils/helpers';
 import Image from 'next/image';
 import Pagination from '../molecules/Pagination';
+import ActionBar from '../molecules/ActionBar';
 
 const InventoryManagement = () => {
   const { currentOrg, setProductId, productId } = useStore();
@@ -26,7 +27,17 @@ const InventoryManagement = () => {
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [openUpdateProductModal, setOpenUpdateProductModal] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const getProducts = data?.data || [];
+  const handleSearch = (search: string) => {
+    setSearchQuery(search);
+  }
+    const filterProduct = getProducts.filter(prod => {
+        return !searchQuery || 
+          prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prod.productCode?.toLowerCase().includes(searchQuery.toLowerCase()) 
+      }
+    );
   const handleDelete = (productId: string) => {
     deleteProduct(currentOrg, productId);
     setOpenConfirmDeleteModal(false);
@@ -48,7 +59,7 @@ const InventoryManagement = () => {
   if (isLoading) return <TableSkeleton />;
   if (isError) return <ErrorComponent text="No Inventory found" />;
 
-  const products = data?.data || [];
+  const products = filterProduct || [];
   const totalItems = data?.metadata?.total || products.length;
   const tableHeaders = [
     'Product Image',
@@ -146,11 +157,20 @@ const InventoryManagement = () => {
         />
       )}
       
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
-          <MdInventory className="mr-2" size={24} /> Inventory Management
-        </h1>
-        <p className="text-gray-600">Manage your product inventory, stock levels, and pricing</p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+              <MdInventory className="mr-2" size={24} /> Inventory Management
+            </h1>
+            <p className="text-gray-600">Manage your product inventory, stock levels, and pricing</p>
+        </div>
+        <div className='mt-10'>
+          <ActionBar
+              type='product'
+              showDate
+              onSearch={(search) => handleSearch(search)}
+              />
+        </div>
       </div>
       
       <div className="mb-6 flex justify-between items-center">
