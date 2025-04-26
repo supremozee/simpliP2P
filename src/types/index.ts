@@ -513,6 +513,7 @@ interface Role {
     created_at: string;
     updated_at: string;
     name: string;
+    inv_number: string,
     description: string;
     currency:string
     unitPrice: number;

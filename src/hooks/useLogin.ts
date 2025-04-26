@@ -6,8 +6,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import useNotify from './useNotify';
 import { useRouter, usePathname } from 'next/navigation';
-import useStore from '@/store';
-import { sanitize } from '@/utils/helpers';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -16,13 +14,8 @@ const useLogin = () => {
   const { success: notifySuccess, error: notifyError } = useNotify();
 const router = useRouter()
 const pathname = usePathname();
- const {
-  currentOrg, setCurrentOrg, setOrgName
-} 
-  = useStore()
 useEffect(() => {
   if (!['/login', '/register', '/reset-password', '/forgot-password', '/verify-email'].includes(pathname)) {
-    // setPreviousRoute(pathname);
   }
 }, [pathname]);
   const { mutateAsync: loginMutation } = useMutation({
@@ -38,28 +31,7 @@ useEffect(() => {
       if (response?.status === 'success') {
         notifySuccess("Successfully logged in");
         setLoginRespone(response?.data?.user)
-        const adminOrg = response?.data?.user?.user_organisations?.find(o => o.is_creator);
-        if (adminOrg?.is_creator === true) {
-          const sanitizedOrgName = sanitize(adminOrg?.name)
-          setOrgName(sanitizedOrgName);
-          setCurrentOrg(adminOrg.org_id);
-          router.push(`/${sanitizedOrgName}/dashboard`);
-        } else {
-          const userOrgs = response?.data?.user?.user_organisations?.filter(o => !o.is_creator);
-          if (userOrgs && userOrgs.length > 0) {
-            if(currentOrg) {
-               router.push(`/${response.data.user.id}`);
-            } 
-            else {
-              router.push(`${response?.data?.user?.id}`);
-            }
-          } else {
-            router.push(`${response?.data?.user?.id}`);
-          }
-        }
-      } else {
-        setErrorMessage(response?.message || 'Login failed');
-        notifyError(response?.message || 'Login failed');
+         router.push(`/${response.data.user.id}`);
       }
     },
     onError: (err: any) => {
@@ -67,7 +39,6 @@ useEffect(() => {
       const message = err.response?.data?.message || err.message || 'An error occurred during login. Please try again.';
       setErrorMessage(message);
       notifyError(message);
-      console.error("Login error:", err);
     },
     onSettled: () => {
       setLoading(false);

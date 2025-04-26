@@ -62,9 +62,9 @@ const InventoryManagement = () => {
   const products = filterProduct || [];
   const totalItems = data?.metadata?.total || products.length;
   const tableHeaders = [
+    "Product No.",
     'Product Image',
     'Product Name',
-    'Description',
     "Product Code",
     'Unit of Measure',
     'Currency',
@@ -83,6 +83,7 @@ const InventoryManagement = () => {
         : 'text-green-600 font-medium';
 
     const rowData = [
+      <div key={`product-no-${product.id}`} className="text-sm text-gray-600">{product.inv_number}</div>,
       <div 
         key={product.id}
         className='flex items-center justify-center'>
@@ -99,7 +100,6 @@ const InventoryManagement = () => {
         />
       </div>,
       <div key={`name-${product.id}`} className="font-medium text-gray-800">{product?.name}</div>,
-      <div key={`desc-${product.id}`} className="text-sm text-gray-600 max-w-xs truncate">{product.description}</div>,
       <div key={`code-${product.id}`} className="text-sm text-gray-600">{product.productCode}</div>,
       <div key={`uom-${product.id}`} className="text-sm text-gray-600">{product.unitOfMeasure}</div>,
       <div key={`curr-${product.id}`} className="text-sm text-gray-600">{product.currency}</div>,

@@ -117,7 +117,7 @@ const OrganizationsPage: React.FC = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="w-full max-w-5xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        className="w-full max-w-8xl flex flex-wrap gap-6 justify-center"
       >
         <motion.div variants={item}>
           <Card
