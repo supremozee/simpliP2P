@@ -29,15 +29,17 @@ const InventoryManagement = () => {
   const [openUpdateProductModal, setOpenUpdateProductModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const getProducts = data?.data || [];
+  
   const handleSearch = (search: string) => {
     setSearchQuery(search);
-  }
-    const filterProduct = getProducts.filter(prod => {
-        return !searchQuery || 
-          prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          prod.productCode?.toLowerCase().includes(searchQuery.toLowerCase()) 
-      }
-    );
+  };
+  
+  const filterProduct = getProducts.filter(prod => {
+    return !searchQuery || 
+      prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prod.productCode?.toLowerCase().includes(searchQuery.toLowerCase()) 
+  });
+  
   const handleDelete = (productId: string) => {
     deleteProduct(currentOrg, productId);
     setOpenConfirmDeleteModal(false);
@@ -56,11 +58,13 @@ const InventoryManagement = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+  
   if (isLoading) return <TableSkeleton />;
   if (isError) return <ErrorComponent text="No Inventory found" />;
 
   const products = filterProduct || [];
   const totalItems = data?.metadata?.total || products.length;
+  
   const tableHeaders = [
     "Product No.",
     'Product Image',
@@ -81,7 +85,7 @@ const InventoryManagement = () => {
       : product.stockQty <= product.stockQtyAlert * 2 
         ? 'text-amber-600 font-medium' 
         : 'text-green-600 font-medium';
-
+    
     const rowData = [
       <div key={`product-no-${product.id}`} className="text-sm text-gray-600">{product.inv_number}</div>,
       <div 
@@ -116,17 +120,17 @@ const InventoryManagement = () => {
         index={index}
         className="hover:bg-gray-50 transition-colors"
       >
-        <div className='flex items-center justify-center gap-3'>
+        <div className='flex items-center justify-center gap-2 sm:gap-3'>
           <button
             onClick={() => handleOpenUpdateProductModal(product.id)}
-            className="flex justify-center items-center w-8 h-8 text-white px-0 py-0 rounded-full bg-primary hover:bg-primary/80 transition-colors shadow-sm"
+            className="flex justify-center items-center w-7 h-7 sm:w-8 sm:h-8 text-white px-0 py-0 rounded-full bg-primary hover:bg-primary/80 transition-colors shadow-sm"
             title="Edit product"
           >
             <MdEdit size={14} />
           </button>
           <button
             onClick={() => handleOpenConfirmDeleteModal(product.id)}
-            className="text-white px-0 py-0 rounded-full flex justify-center items-center w-8 h-8 bg-red-600 hover:bg-red-700 transition-colors shadow-sm"
+            className="text-white px-0 py-0 rounded-full flex justify-center items-center w-7 h-7 sm:w-8 sm:h-8 bg-red-600 hover:bg-red-700 transition-colors shadow-sm"
             title="Delete product"
           >
             <MdDeleteOutline size={14} />
@@ -157,42 +161,44 @@ const InventoryManagement = () => {
         />
       )}
       
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 flex items-center">
               <MdInventory className="mr-2" size={24} /> Inventory Management
             </h1>
-            <p className="text-gray-600">Manage your product inventory, stock levels, and pricing</p>
+            <p className="text-sm sm:text-base text-gray-600">Manage your product inventory, stock levels, and pricing</p>
         </div>
-        <div className='mt-10'>
+        <div className='w-full sm:w-auto'>
           <ActionBar
               type='product'
               showDate
               onSearch={(search) => handleSearch(search)}
-              />
+          />
         </div>
       </div>
       
-      <div className="mb-6 flex justify-between items-center">
-        <div className="flex items-center">
-          <div className="bg-white rounded-lg shadow-sm p-2 flex items-center mr-4">
-            <span className="text-sm font-medium mr-2">Total Products:</span>
-            <span className="bg-primary text-white px-2 py-1 rounded-md text-sm">{products.length}</span>
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex flex-wrap gap-2">
+          <div className="bg-white rounded-lg shadow-sm p-2 flex items-center">
+            <span className="text-xs sm:text-sm font-medium mr-2">Total Products:</span>
+            <span className="bg-primary text-white px-2 py-1 rounded-md text-xs sm:text-sm">{products.length}</span>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-2 flex items-center">
-            <span className="text-sm font-medium mr-2">Low Stock Items:</span>
-            <span className="bg-red-500 text-white px-2 py-1 rounded-md text-sm">
+            <span className="text-xs sm:text-sm font-medium mr-2">Low Stock Items:</span>
+            <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs sm:text-sm">
               {products.filter(p => p.stockQty <= p.stockQtyAlert).length}
             </span>
           </div>
         </div>
+        <div className="w-full sm:w-auto">
           <CreateProduct />
+        </div>
       </div>
       
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <div className="overflow-auto max-h-[600px]">
-          <table className="w-full border-collapse border border-[#808080] border-opacity-50">
-            <TableHead headers={tableHeaders}  />
+      <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm">
+        <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <table className="w-full border-collapse border border-[#808080] border-opacity-50 min-w-[900px]">
+            <TableHead headers={tableHeaders} />
             <TableBody
               data={products}
               renderRow={renderRow}
@@ -201,17 +207,18 @@ const InventoryManagement = () => {
           </table>
         </div>
         
-        <div className="mt-6 flex justify-between items-center">
-          <div className="text-sm text-gray-500">
+        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
+          <div className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1 w-[20%] border text-end ">
             Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
           </div>
-          
-          <Pagination
-            currentPage={currentPage}
-            totalItems={totalItems}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-          />
+          <div className="w-full items-center">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       </div>
     </>
