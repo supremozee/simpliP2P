@@ -12,8 +12,8 @@ import LoginWithGoogle from '../molecules/LoginWithGoogle';
 const LoginPage = () => {
   const { login, loading, errorMessage } = useLogin();
   const LoginSchema = z.object({
-    email: z.string().email('Invalid email address').nonempty('Email is required'),
-    password: z.string().min(6, 'Password must be at least 6 characters long').nonempty('Password is required'),
+    email: z.string().nonempty('Email is required').email('Invalid email address'),
+    password: z.string().nonempty('Password is required').min(6, 'Password must be at least 6 characters long'),
   });
   type LoginFormData = z.infer<typeof LoginSchema>;
   const {register, handleSubmit, formState: {errors}} = useForm<LoginFormData>({
