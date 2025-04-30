@@ -1,4 +1,4 @@
-import CreateRequisitionPage from '@/components/pages/CreateRequisitions'
+import CreateRequisitionPage from '@/components/pages/CreateRequisitionsModal'
 import React from 'react'
 
 const page = () => {

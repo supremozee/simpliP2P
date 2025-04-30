@@ -11,7 +11,7 @@ import TableSkeleton from "../atoms/Skeleton/Table";
 import Button from "../atoms/Button";
 import useNotify from "@/hooks/useNotify";
 import InitializeRequisition from "../molecules/InitializeRequisition";
-import CreateRequisitions from "./CreateRequisitions";
+import CreateRequisitions from "./CreateRequisitionsModal";
 import { format_price } from "@/utils/helpers";
 import { cn } from "@/utils/cn";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";

@@ -3,9 +3,13 @@ import useStore from '@/store'
 import { InitializePurchaseRequisition, InitializeRequisitionResponse } from '@/types'
 import { useMutation } from '@tanstack/react-query'
 import useNotify from './useNotify'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 const useInitializePurchaseRequisition = () => {
-    const {setLoading, setErrorMessage, setPr, setIsOpen} = useStore()
+    const {setLoading} = useStore();
+    const [errorMessage, setErrorMessage] = useState("")
+    const router = useRouter()
     const {success, error:notifyError} = useNotify()
     const {mutateAsync:initializePurchaseRequisitionMutation} = useMutation({
         onMutate: ()=> {
@@ -16,15 +20,13 @@ const useInitializePurchaseRequisition = () => {
         onSuccess:(response:InitializeRequisitionResponse) => {
             if(response?.status === "success") {
                 setLoading(false)
-                setIsOpen(true) 
-                setPr(response?.data)
+                router.push(`/initialize-requisition/${response?.data.pr_number}`)
                 success(response?.message)
             }      
         },
         onError: (error) => {
             setLoading(false)
             setErrorMessage(error?.message )
-            setIsOpen(true) 
             notifyError(error?.message )
         },
         onSettled: ()=> {
@@ -36,6 +38,7 @@ const useInitializePurchaseRequisition = () => {
     }
     return {
           initializePurchaseRequisition,
+          errorMessage
     }
 }
 
