@@ -35,7 +35,7 @@ const PurchaseRequisitionSchema = z.object({
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
 
 const CreateRequisitions = () => {
-  const { currentOrg, pr, isOpen, setIsOpen } = useStore();
+  const { currentOrg, pr, isOpen, setIsOpen, hideCreatePrText } = useStore();
   const { finaliseRequisition, loading: finalizeLoading, errorMessage: finalizeError } = useFinaliseRequisition();
   const { saveForLater, loading: saveForLaterLoading } = useSaveForLater();
   const { error } = useNotify();
@@ -210,7 +210,7 @@ const CreateRequisitions = () => {
         <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="overflow-y-scroll w-full max-h-[600px] sm:px-10 sm:pb-10">
           <div className="flex flex-col sm:gap-4 gap-2">
             <div className="bg-primary/5 sm:p-4 rounded-lg sm:mb-4">
-              <h1 className="sm:text-xl text-sm font-semibold text-gray-800">Create Purchase Requisition</h1>
+              <h1 className="sm:text-xl text-sm font-semibold text-gray-800">{ hideCreatePrText !== "" ? hideCreatePrText: "Create Purchase Requisition"}</h1>
               <p className="sm:text-sm text-[12px] text-gray-600">PR Number: {pr?.pr_number}</p>
             </div>
 

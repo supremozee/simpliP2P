@@ -17,7 +17,8 @@ const LoginPage = () => {
   });
   type LoginFormData = z.infer<typeof LoginSchema>;
   const {register, handleSubmit, formState: {errors}} = useForm<LoginFormData>({
-     resolver: zodResolver(LoginSchema)
+     resolver: zodResolver(LoginSchema),
+     mode: 'onBlur',
   })
   const onSubmit = async(data: LoginFormData) =>{
     await login(data)

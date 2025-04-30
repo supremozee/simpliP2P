@@ -24,7 +24,7 @@ const FileUpload = ({
   defaultImage = null,
   label = "Upload Image",
   height = "h-48",
-  accept = "image/*",
+  accept = "image/png,image/svg+xml",
   error,
   id = "file-upload",
   size = 10 * 1024 * 1024,

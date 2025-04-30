@@ -55,7 +55,7 @@ const PurchaseRequisitionsPage = () => {
     "SAVED APPROVAL",
   ];
   
-  const {setPr, setIsOpen, isOpen } = useStore();
+  const {setPr, setIsOpen, setHidePrText, isOpen } = useStore();
   const { error } = useNotify();
   
   const {
@@ -74,22 +74,24 @@ const PurchaseRequisitionsPage = () => {
   } = useGetRequisitions();
   
   const headers = [
-    "PR Number",
-    "PR Date",
-    "Department",
+    "PR No.",
+    "PR date",
+    "Supplier",
+    "Department", 
     "Requestor",
-    "Description",
-    "Quantity",
+    "Total Qty",
     "Estimated Cost",
-    "Status",
     "Needed By",
+    "Status",
     "Action",
     "Line Items",
   ];
 
   const handleViewRequisition = ({ pr_number, id }: CompletionProps) => {
     if (pr_number && id) {
+      setHidePrText(`You are viewing requisition ID: ${id}`)
       setPr({ pr_number, id });
+
       setIsOpen(true);
     } else {
       error("Invalid PR Number or ID");
@@ -175,22 +177,20 @@ const PurchaseRequisitionsPage = () => {
       <TableRow
         key={req.id}
         data={[
-          `${req.pr_number?.split("-")[0] ?? []}-${req.pr_number?.split("-").pop() ?? ""}`,
+          `${req.pr_number}`,
          new Date(req.created_at.split("T")[0]).toLocaleDateString('en-US', {year:'numeric', month: 'short', day: 'numeric'}),
+          req.supplier?.full_name,
           req.department?.name,
           req.requestor_name,
-          <div key={`desc-${req.id}`} className="max-w-xs truncate">
-            {req.request_description}
-          </div>,
           req.quantity,
-          format_price(Number(req.estimated_cost), req.currency),
+          format_price(Number(req.estimated_cost), req.currency, "currency"),
+          <span key={`date-${req.id}`} className="whitespace-nowrap">{req.needed_by_date}</span>,
           <span 
             key={`status-${req.id}`} 
             className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${getStatusStyle(req.status)}`}
           >
             {req.status}
           </span>,
-          <span key={`date-${req.id}`} className="whitespace-nowrap">{req.needed_by_date}</span>,
           <div className="flex w-full justify-center items-center" key={`action-${req.id}`}>
             <Button 
             key={req.id}

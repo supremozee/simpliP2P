@@ -7,6 +7,8 @@ interface PrData {
   id: string;
 }
 interface SimpliP2PStore {
+  hideCreatePrText: string;
+  setHidePrText:(hide:string)=> void;
   upload: string,
   setUpload: (file: string) => void;
   isOpen: boolean;
@@ -55,6 +57,10 @@ const useStore = create<SimpliP2PStore>()(
   devtools(
     persist(
     (set) => ({
+      hideCreatePrText: "",
+      setHidePrText: (hide:string)=> {
+        set({hideCreatePrText: hide})
+      },
       upload:'',
       setUpload: (file: string) => {
         set({ upload: file });

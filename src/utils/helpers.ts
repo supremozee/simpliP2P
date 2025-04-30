@@ -13,9 +13,9 @@ export function useFetchData<T, E = Error>(
     ...options,
   });
 }
-export function format_price(price: number, currency?: string) {
+export function format_price(price: number, currency?: string, show?:string) {
   return new Intl.NumberFormat('en-US', {
-    style: 'currency',
+    style: show as 'decimal' | 'currency' | 'percent' | undefined,
     currency: currency,
     minimumFractionDigits: 0
   }).format(price);

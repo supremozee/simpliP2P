@@ -106,6 +106,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
             <div>
               <Input
                 type="text"
+                required
                 label="Product Code"
                 placeholder="Product Code"
                 {...register("productCode")}
@@ -114,6 +115,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
             </div>
             <div>
               <Input
+              required
                 type="text"
                 label="Product Name"
                 placeholder="Input product name"
@@ -123,6 +125,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
             </div>
             <div className="col-span-2">
               <TextAreaField
+                required
                 label="Description"
                 className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Product description"
@@ -136,6 +139,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
               <Input
                 type="text"
                 label="Unit Price"
+                required
                 placeholder="Input unit price"
                 {...register("unitPrice")}
               />

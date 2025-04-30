@@ -66,13 +66,13 @@ const InventoryManagement = () => {
   const totalItems = data?.metadata?.total || products.length;
   
   const tableHeaders = [
-    "Product No.",
     'Product Image',
+    "Product ID.",
     'Product Name',
     "Product Code",
     'Unit of Measure',
-    'Currency',
     'Unit Price',
+    'Currency',
     'Quantity',
     'Stock Alert Level',
     'Category',
@@ -87,27 +87,23 @@ const InventoryManagement = () => {
         : 'text-green-600 font-medium';
     
     const rowData = [
-      <div key={`product-no-${product.id}`} className="text-sm text-gray-600">{product.inv_number}</div>,
       <div 
         key={product.id}
         className='flex items-center justify-center'>
         <Image
-          className="rounded-full w-[40px] h-[40px] object-cover border-2 border-gray-200"
+          className="rounded-full w-[40px] h-[40px] border-2 border-gray-200"
           src={product?.image_url || "/logo-black.png"}
           alt={product?.name}
           width={40}
           height={40}
-          style={{
-            borderRadius: "50%",
-            objectFit: "cover",
-          }}
         />
       </div>,
+      <div key={`product-no-${product.id}`} className="text-sm text-gray-600">{product.inv_number}</div>,
       <div key={`name-${product.id}`} className="font-medium text-gray-800">{product?.name}</div>,
       <div key={`code-${product.id}`} className="text-sm text-gray-600">{product.productCode}</div>,
       <div key={`uom-${product.id}`} className="text-sm text-gray-600">{product.unitOfMeasure}</div>,
+      <div key={`price-${product.id}`} className="font-medium text-primary">{format_price(Number(product.unitPrice))}</div>,
       <div key={`curr-${product.id}`} className="text-sm text-gray-600">{product.currency}</div>,
-      <div key={`price-${product.id}`} className="font-medium text-primary">{format_price(Number(product.unitPrice), product.currency)}</div>,
       <div key={`qty-${product.id}`} className={stockStatus}>{product.stockQty}</div>,
       product.stockQtyAlert,
       <div key={`cat-${product.id}`} className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs inline-block">{product.category?.name ?? "Uncategorized"}</div>
@@ -170,7 +166,7 @@ const InventoryManagement = () => {
         </div>
         <div className='w-full sm:w-auto'>
           <ActionBar
-              type='product'
+              type='products'
               showDate
               onSearch={(search) => handleSearch(search)}
           />
@@ -208,7 +204,7 @@ const InventoryManagement = () => {
         </div>
         
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
-          <div className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1 w-[20%] border text-end ">
+          <div className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1 w-[20%] text-end ">
             Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
           </div>
           <div className="w-full items-center">
