@@ -211,7 +211,6 @@ const CreateRequisitions = () => {
           <div className="flex flex-col sm:gap-4 gap-2">
             <div className="bg-primary/5 sm:p-4 rounded-lg sm:mb-4">
               <h1 className="sm:text-xl text-sm font-semibold text-gray-800">{ hideCreatePrText !== "" ? hideCreatePrText: "Create Purchase Requisition"}</h1>
-              <p className="sm:text-sm text-[12px] text-gray-600">PR Number: {pr?.pr_number}</p>
             </div>
 
             <ol className="list-decimal list-inside bg-white h-auto py-4 flex flex-col justify-center gap-5 items-center rounded-sm">

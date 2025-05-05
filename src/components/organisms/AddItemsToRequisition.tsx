@@ -1,7 +1,6 @@
 import React from 'react'
 import { PiInfoFill } from "react-icons/pi";
 import OpenInventory from './OpenInventory';
-import AddNewItem from './AddNewItem';
 const AddItemsToRequisition = () => {
   return (
     <section className='flex justify-between w-full sm:px-4 py-3  bg-white rounded-[10px] border border-[#808080]'>
@@ -11,7 +10,7 @@ const AddItemsToRequisition = () => {
         </div>
         <div className='flex sm:gap-4 text-white'>
             <OpenInventory/>
-            <AddNewItem/>
+            {/* <AddNewItem/> */}
         </div>
     </section>
   )

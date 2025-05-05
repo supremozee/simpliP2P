@@ -112,7 +112,7 @@ const ActionBar: React.FC<ActionBarTypes> = ({
     <>
       { status === "pending"&& <LoadingModal />}
       
-      <div className="bg-white rounded-md shadow-sm border border-gray-100 mb-4">
+      <div className=" mb-4">
         <div className="flex items-center justify-between p-3 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-grow lg:flex-grow-0">
             {/* Left side with action button and search */}
@@ -243,7 +243,7 @@ const ActionBar: React.FC<ActionBarTypes> = ({
               </div>
             )}
 
-            <div className="relative">
+           { showDate&& <div className="relative">
               <Tooltip content="Export">
                 <Button
                   kind="white"
@@ -275,7 +275,7 @@ const ActionBar: React.FC<ActionBarTypes> = ({
                   ))}
                 </div>
               )}
-            </div>
+            </div>}
 
             {viewMode && (
               <Tooltip content={view === "grid" ? "List View" : "Grid View"}>

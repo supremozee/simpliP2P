@@ -11,6 +11,7 @@ import TableBody from '../atoms/TableBody';
 import { AuditLog } from '@/types';
 import TableRow from '../molecules/TableRow';
 import ActionBar from '../molecules/ActionBar';
+import TableShadowWrapper from '../atoms/TableShadowWrapper';
 
 const AuditLogsPage = () => {
   const { currentOrg } = useStore();
@@ -62,12 +63,14 @@ const AuditLogsPage = () => {
         showDate
         type='logs'
         />
+        <TableShadowWrapper maxHeight='100vh'>
         <table className="w-full border overflow-x-auto">
           <TableHead headers={headers} />
           <TableBody data={matchesLog}
            renderRow={renderRow}
             emptyMessage="No logs found." />
         </table>
+        </TableShadowWrapper>
       </div>
     </div>
   );

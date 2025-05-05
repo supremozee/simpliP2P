@@ -7,7 +7,7 @@ import ErrorComponent from "../molecules/ErrorComponent";
 import { AllItems } from "@/types";
 import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
 import useRemoveItem from "@/hooks/useRemoveItems";
-import UpdateItem from "./UpdateItem";
+// import UpdateItem from "./UpdateItem";
 import TableCell from "../atoms/TableCell";
 import TableHead from "../atoms/TableHead";
 import Image from "next/image";
@@ -49,9 +49,9 @@ const FetchItemByPrNumber = () => {
               <TableCell>{format_price(item.unit_price, item.currency)}</TableCell>
               <TableCell>{item.pr_quantity}</TableCell>
               <TableCell className="flex gap-2 justify-center">
-                <UpdateItem id={item.id}
+                {/* <UpdateItem id={item.id}
                 disabled={!!isDisabled}
-                />
+                /> */}
                 <Button 
                     type="button"
                     disabled={!!isDisabled}

@@ -879,3 +879,9 @@ export interface ViewPOResponse {
     items: ViewPOItem[];
     organisation: ViewPOOrganisation;
 }
+
+export interface ExportSelected {
+  entity: string, 
+  format: "excel" | "csv", 
+  ids: string[]
+}

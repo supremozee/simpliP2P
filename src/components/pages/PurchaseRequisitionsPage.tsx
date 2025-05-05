@@ -18,6 +18,7 @@ import { useGetRequisitions } from "@/hooks/useGetRequisition";
 import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import ActionBar from "../molecules/ActionBar";
+import TableShadowWrapper from "../atoms/TableShadowWrapper";
 
 interface CompletionProps {
   id: string;
@@ -196,7 +197,7 @@ const PurchaseRequisitionsPage = () => {
             key={req.id}
               onClick={() => handleViewRequisition({ pr_number: req.pr_number, id: req.id })} 
               className={cn(
-                "p-2 px-3 rounded-md transition-colors",
+                "p-2 px-3 rounded-md transition-colors z-20",
                 activeTab === "SAVED APPROVAL" || req.status === "SAVED_FOR_LATER" 
                   ? 'bg-blue-600 hover:bg-blue-700'
                   : req.status === "PENDING" 
@@ -388,17 +389,16 @@ const PurchaseRequisitionsPage = () => {
         setActive={setActiveTab}
         counts={tabCounts}
       />
-      
-      <div className="overflow-x-auto relative z-10 bg-white rounded-lg shadow">
-        <table className="w-full table-auto border-collapse">
-          <TableHead headers={headers} />
-          <TableBody
-            data={renderRequisitions()}
-            renderRow={renderRow}
-            emptyMessage="No requisitions found for this status."
-          />
-        </table>
-      </div>
+      <TableShadowWrapper>
+          <table className="w-full table-auto border-collapse">
+                <TableHead headers={headers} />
+                <TableBody
+                  data={renderRequisitions()}
+                  renderRow={renderRow}
+                  emptyMessage="No requisitions found for this status."
+                />
+              </table>
+      </TableShadowWrapper>
       
       {isOpen && <CreateRequisitions />}
     </>

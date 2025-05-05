@@ -48,7 +48,8 @@ import { forgotData,
                          updateRequisitionStatus,
                          Comment,
                          updateOrderStatus,
-                         CreateBudget} 
+                         CreateBudget,
+                         ExportSelected} 
                          from "@/types"
 import { apiRequest } from "./apiRequest"
 import { setCookies } from "@/utils/setCookies"
@@ -346,27 +347,39 @@ const auth = {
   export: async (orgId: string, startDate: string, endDate: string, format: string, type: string): Promise<any> => {
     try {
       const url = `${ORGANIZATION_ENDPOINTS.EXPORT(orgId)}/${type}?startDate=${startDate}&endDate=${endDate}&format=${format}`;
-      
-      // Use apiRequest with blob responseType
       const blob = await apiRequest(url, getConfig(orgId), 'blob');
-      
-      // Create object URL and trigger download
       const url2 = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url2;
       a.download = `export_${type}_${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xlsx' : format}`;
       document.body.appendChild(a);
       a.click();
-      
-      // Clean up
       window.URL.revokeObjectURL(url2);
       document.body.removeChild(a);
-      
       return { success: true };
     } catch (error) {
       console.error("Export error:", error);
       throw error;
     }
+  },
+  exportSelected: async(orgId:string, exportData:ExportSelected):Promise<any>=> {
+    try
+    {
+    const url = `${ORGANIZATION_ENDPOINTS.EXPORT_SELECTED(orgId)}`;
+    const blob = await apiRequest(url, postConfig(exportData), 'blob');
+    const url2 = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url2;  
+    a.download = `export_${new Date().toISOString().split('T')[0]}.${exportData.format === 'excel' ? 'xlsx' : exportData.format}`;
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url2);
+    document.body.removeChild(a);
+    return { success: true };
+  } catch (error) {
+    console.error("Export error:", error);
+    throw error;
+  }
   }
 };
 

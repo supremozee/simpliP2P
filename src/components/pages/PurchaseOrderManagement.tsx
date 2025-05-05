@@ -1,27 +1,58 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Tabs from "../molecules/Tabs";
 import TableSkeleton from "../atoms/Skeleton/Table";
 import Pagination from "../molecules/Pagination";
 import useFetchAllOrders from "@/hooks/useFetchAllOrders";
 import useStore from "@/store";
 import ActionBar from "../molecules/ActionBar";
-import TableRow from "../molecules/TableRow";
-import TableHead from "../atoms/TableHead";
-import TableBody from "../atoms/TableBody";
 import CreatePurchaseOrder from "../organisms/CreatePurchaseOrder";
 import { Order } from "@/types";
+import TableShadowWrapper from "../atoms/TableShadowWrapper";
+import useExportSelected from "@/hooks/useExportSelected";
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdFileDownload, MdExpandMore } from 'react-icons/md';
+import { FiCheck } from 'react-icons/fi';
+import Button from "../atoms/Button";
 
 const PurchaseOrdersManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("ALL");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const exportDropdownRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 10;
-  const { currentOrg, setIsOpen, isOpen } = useStore();
-  const headers = ["PO Number", "Supplier", "Date Created", "Total Cost", "Status"];
+  const { currentOrg, setIsOpen, isOpen, setType } = useStore();
   const { data, isLoading } = useFetchAllOrders(currentOrg);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  
+  const { 
+    selectedItems, 
+    isExporting, 
+    toggleSelectItem, 
+    selectAll, 
+    deselectAll, 
+    isSelected, 
+    exportSelectedItems 
+  } = useExportSelected();
+  
+  // Set export type for orders
+  useEffect(() => {
+    setType('orders');
+  }, [setType]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target as Node)) {
+        setShowExportDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Generate filter options based on available data
   const filterOptions = useMemo(() => {
@@ -111,6 +142,17 @@ const PurchaseOrdersManagement: React.FC = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handleSelectAll = () => {
+    if (currentOrders && currentOrders.length > 0) {
+      if (selectedItems.length === currentOrders.length) {
+        deselectAll();
+      } else {
+        selectAll(currentOrders.map(order => order.id));
+      }
+    }
   };
 
   const totalItems = filteredOrders.length;
@@ -161,25 +203,60 @@ const PurchaseOrdersManagement: React.FC = () => {
         </span>
       );
     };
-    
+
     return (
-      <TableRow
-        key={order.po_number}
-        data={[
-            `${order.po_number?.split("-")[0]}-${order.po_number?.split("-").pop()}`,
-           order.supplier.full_name,
-         new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
-         formattedAmount,
-          getStatusBadge(order.status),
-        ]}
-        index={index}
-      />
+      <tr 
+        key={order.id} 
+        className={`hover:bg-gray-50 transition-colors border-b ${
+          isSelected(order.id) ? 'bg-blue-50 hover:bg-blue-100' : index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+        }`}
+      >
+        <td className="px-4 py-3">
+          <button 
+            onClick={() => toggleSelectItem(order.id)}
+            className="flex items-center justify-center w-5 h-5 focus:outline-none"
+            aria-label={isSelected(order.id) ? "Deselect order" : "Select order"}
+          >
+            {isSelected(order.id) ? (
+              <MdCheckBox size={20} className="text-primary" />
+            ) : (
+              <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+            )}
+          </button>
+        </td>
+        <td className="px-4 py-3">{`${order.po_number?.split("-")[0]}-${order.po_number?.split("-").pop()}`}</td>
+        <td className="px-4 py-3">{order.supplier.full_name}</td>
+        <td className="px-4 py-3">{new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+        <td className="px-4 py-3">{formattedAmount}</td>
+        <td className="px-4 py-3">{getStatusBadge(order.status)}</td>
+      </tr>
     );
   };
 
   const tabCounts = tabNames.map(getTabCount);
   
   if (isLoading) return <TableSkeleton />;
+
+  const headers = [
+    <div key="select-all" className="flex items-center justify-center">
+      <button 
+        onClick={handleSelectAll}
+        className="flex items-center justify-center w-5 h-5 focus:outline-none"
+        aria-label={selectedItems.length === currentOrders.length ? "Deselect all orders" : "Select all orders"}
+      >
+        {selectedItems.length > 0 && selectedItems.length === currentOrders.length ? (
+          <MdCheckBox size={20} className="text-primary" />
+        ) : (
+          <MdCheckBoxOutlineBlank size={20} className="text-gray-400" />
+        )}
+      </button>
+    </div>,
+    "PO Number", 
+    "Supplier", 
+    "Date Created", 
+    "Total Cost", 
+    "Status"
+  ];
 
   return (
     <>
@@ -193,7 +270,7 @@ const PurchaseOrdersManagement: React.FC = () => {
         />
       </div>
       <div className="rounded-[5px] bg-white pb-4">
-        <div className="p-2">
+        <div className="p-2 flex justify-between items-center">
           <ActionBar
             buttonName="Create New Purchase Order"
             onClick={() => setIsOpen(true)}
@@ -203,19 +280,95 @@ const PurchaseOrdersManagement: React.FC = () => {
             filterOptions={filterOptions}
             onFilter={handleFilter}
           />
+          
+          {selectedItems.length > 0 && (
+            <div className="flex items-center relative ml-2" ref={exportDropdownRef}>
+              <button
+                onClick={() => setShowExportDropdown(!showExportDropdown)}
+                className="inline-flex justify-center items-center gap-1 bg-primary text-white rounded-md px-3 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
+                disabled={isExporting}
+              >
+                <MdFileDownload size={18} />
+                Export {selectedItems.length} {selectedItems.length === 1 ? 'order' : 'orders'}
+                <MdExpandMore size={18} />
+              </button>
+              
+              {showExportDropdown && (
+                <div className="absolute right-0 mt-2 w-40 top-10 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        exportSelectedItems('excel', 'orders');
+                        setShowExportDropdown(false);
+                      }}
+                      className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
+                      disabled={isExporting}
+                    >
+                      <FiCheck className="text-green-500 mr-2" />
+                      Excel
+                    </button>
+                    <button
+                      onClick={() => {
+                        exportSelectedItems('csv', 'orders');
+                        setShowExportDropdown(false);
+                      }}
+                      className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
+                      disabled={isExporting}
+                    >
+                      <FiCheck className="text-green-500 mr-2" />
+                      CSV
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        <table className="w-full border-collapse border border-[#80808050]">
-          <TableHead headers={headers} />
-          <TableBody
-            data={currentOrders}
-            renderRow={renderRow}
-            emptyMessage={
-              searchQuery || Object.keys(activeFilters).length > 0
-                ? "No purchase orders found matching your criteria."
-                : "No purchase orders found."
-            }
-          />
-        </table>
+        
+        {selectedItems.length > 0 && (
+          <div className="mx-2 bg-blue-50 border border-blue-200 p-3 mb-4 rounded-md text-sm flex items-center justify-between">
+            <div className="flex items-center">
+              <MdCheckBox size={18} className="text-primary mr-2" />
+              <span className="text-gray-800">
+                <span className="font-medium">{selectedItems.length}</span> of <span className="font-medium">{filteredOrders.length}</span> orders selected
+              </span>
+            </div>
+            <Button
+              onClick={deselectAll}
+              className="text-xs bg-white text-gray-700 hover:bg-gray-100"
+              padding="xxs"
+            >
+              Clear selection
+            </Button>
+          </div>
+        )}
+        
+        <TableShadowWrapper maxHeight="calc(100vh - 320px)">
+          <table className="w-full border-collapse border border-[#80808050]">
+            <thead className="bg-gray-100">
+              <tr>
+                {headers.map((header, index) => (
+                  <th key={index} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {currentOrders.length > 0 ? (
+                currentOrders.map((order, index) => renderRow(order, index))
+              ) : (
+                <tr>
+                  <td colSpan={headers.length} className="px-4 py-8 text-center text-gray-500">
+                    {searchQuery || Object.keys(activeFilters).length > 0
+                      ? "No purchase orders found matching your criteria."
+                      : "No purchase orders found."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </TableShadowWrapper>
         <div className="flex justify-center mt-4">
           <Pagination
             currentPage={currentPage}

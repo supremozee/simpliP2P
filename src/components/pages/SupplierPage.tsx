@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useFetchSuppliers from '@/hooks/useFetchSuppliers';
 import useStore from '@/store';
 import Loader from '../molecules/Loader';
@@ -7,16 +8,18 @@ import Pagination from '../molecules/Pagination';
 import ActionBar from '../molecules/ActionBar';
 import TableHead from '../atoms/TableHead';
 import TableBody from '../atoms/TableBody';
-import TableRowWithActions from '../organisms/AdminitrativeManagement/TableRowWithAction';
 import ConfirmDelete from '../molecules/ConfirmDelete';
 import useDeleteSupplier from '@/hooks/useDeleteSupplier';
 import Card from '../atoms/Card';
 import Button from '../atoms/Button';
-import {  BsTruck, BsTelephone, BsEnvelope, BsGlobe, BsShield, BsStarFill, BsStarHalf } from 'react-icons/bs';
-import { MdLocationPin } from 'react-icons/md';
+import { BsTruck, BsTelephone, BsEnvelope, BsGlobe, BsShield, BsStarFill, BsStarHalf } from 'react-icons/bs';
+import { MdLocationPin, MdCheckBox, MdCheckBoxOutlineBlank, MdFileDownload, MdExpandMore } from 'react-icons/md';
+import { FiCheck } from 'react-icons/fi';
 import { Supplier } from '@/types';
 import CreateSupplier from '../organisms/CreateSupplier';
 import UpdateSupplier from '../organisms/UpdateSupplier';
+import TableShadowWrapper from '../atoms/TableShadowWrapper';
+import useExportSelected from '@/hooks/useExportSelected';
 
 interface FilteredSupplier extends Supplier {
   category: {
@@ -42,26 +45,469 @@ const RatingStars = ({ rating = 0 }: { rating: number }) => {
   return <div className="flex items-center">{stars}</div>;
 };
 
-const SupplierCard = ({ 
+const SupplierPage = () => {
+  const { currentOrg, setSupplierId, setIsUpdateSupplierOpen, setType, startDate, endDate } = useStore();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [view, setView] = useState<'grid' | 'list'>('list');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [ratingFilter, setRatingFilter] = useState('all');
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const exportDropdownRef = useRef<HTMLDivElement>(null);
+  const itemsPerPage = 8;
+  const { data, isLoading, isError, error } = useFetchSuppliers(currentOrg, currentPage, itemsPerPage);
+  const { mutateAsync: deleteSupplier } = useDeleteSupplier(currentOrg);
+  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const { 
+    selectedItems, 
+    isExporting, 
+    toggleSelectItem, 
+    selectAll, 
+    deselectAll, 
+    isSelected, 
+    exportSelectedItems 
+  } = useExportSelected();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target as Node)) {
+        setShowExportDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  
+  // Set export type for suppliers
+  useEffect(() => {
+    setType('suppliers');
+  }, [setType]);
+
+  const toggleView = () => {
+    setView(prev => prev === 'list' ? 'grid' : 'list');
+  };
+
+  const handleEdit = (id: string) => {
+    setSupplierId(id);
+    setIsUpdateSupplierOpen(true);
+  };
+
+  const handleOpenConfirmDeleteModal = (supplierId: string) => {
+    setSelectedSupplierId(supplierId);
+    setOpenConfirmDeleteModal(true);
+  };
+
+  const handleDelete = async (supplierId: string) => {
+    try {
+      await deleteSupplier({ supplierId });
+      setOpenConfirmDeleteModal(false);
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handleFilter = (filterType: string, value: string) => {
+    if (filterType === 'category') {
+      setCategoryFilter(value);
+    } else if (filterType === 'rating') {
+      setRatingFilter(value);
+    }
+    setCurrentPage(1);
+  };
+
+  const handleSelectAll = () => {
+    if (suppliers && suppliers.length > 0) {
+      if (selectedItems.length === suppliers.length) {
+        deselectAll();
+      } else {
+        selectAll(suppliers.map(supplier => supplier.id));
+      }
+    }
+  };
+
+  const filterSuppliers = (suppliers: FilteredSupplier[]) => {
+    return suppliers.filter(supplier => {
+      // Text search filter
+      const matchesSearch = !searchQuery || 
+        supplier.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        supplier.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        supplier.category.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Category filter
+      const matchesCategory = categoryFilter === 'all' || 
+        supplier.category.name.toLowerCase() === categoryFilter.toLowerCase();
+
+      // Rating filter
+      let matchesRating = true;
+      if (ratingFilter !== 'all') {
+        const rating = Number(supplier.rating) || 0;
+        switch(ratingFilter) {
+          case '4+':
+            matchesRating = rating >= 4;
+            break;
+          case '3+':
+            matchesRating = rating >= 3;
+            break;
+          case '2+':
+            matchesRating = rating >= 2;
+            break;
+          default:
+            matchesRating = true;
+        }
+      }
+
+      // Date range filter
+      let matchesDateRange = true;
+      if (startDate || endDate) {
+        const createdDate = new Date(supplier.created_at);
+        
+        if (startDate) {
+          const filterStartDate = new Date(startDate);
+          matchesDateRange = matchesDateRange && createdDate >= filterStartDate;
+        }
+        
+        if (endDate) {
+          const filterEndDate = new Date(endDate);
+          // Set time to end of day for end date
+          filterEndDate.setHours(23, 59, 59, 999);
+          matchesDateRange = matchesDateRange && createdDate <= filterEndDate;
+        }
+      }
+
+      return matchesSearch && matchesCategory && matchesRating && matchesDateRange;
+    });
+  };
+
+  const suppliers = data?.data ? filterSuppliers(data.data) : [];
+
+  if (isLoading) return <Loader />;
+  if (isError) return <p className="text-red-500">{error.message}</p>;
+
+  const headers:string[] | any = [
+    <div key="select-all" className="flex items-center justify-center">
+      <button 
+        onClick={handleSelectAll}
+        className="flex items-center justify-center w-5 h-5 focus:outline-none"
+        aria-label={selectedItems.length === suppliers.length ? "Deselect all suppliers" : "Select all suppliers"}
+      >
+        {selectedItems.length > 0 && selectedItems.length === suppliers.length ? (
+          <MdCheckBox size={20} className="text-primary" />
+        ) : (
+          <MdCheckBoxOutlineBlank size={20} className="text-gray-400" />
+        )}
+      </button>
+    </div>,
+    "Supplier Number", 
+    "Name", 
+    "Date created", 
+    "Category", 
+    "Rating", 
+    "Actions"
+  ];
+
+  const filterOptions = [
+    { 
+      label: "Category", 
+      value: "category", 
+      options: [
+        { label: "All", value: "all" },
+        { label: "Manufacturers", value: "manufacturer" },
+        { label: "Distributors", value: "distributor" },
+        { label: "Service Providers", value: "service" }
+      ] 
+    },
+    { 
+      label: "Rating", 
+      value: "rating", 
+      options: [
+        { label: "All Ratings", value: "all" },
+        { label: "4+ Stars", value: "4+" },
+        { label: "3+ Stars", value: "3+" },
+        { label: "2+ Stars", value: "2+" }
+      ] 
+    }
+  ];
+
+  return (
+    <>
+      <UpdateSupplier />
+      {openConfirmDeleteModal && selectedSupplierId && (
+        <ConfirmDelete
+          isOpen={openConfirmDeleteModal}
+          onClose={() => setOpenConfirmDeleteModal(false)}
+          product={{ id: selectedSupplierId, name: suppliers.find(supplier => supplier.id === selectedSupplierId)?.full_name || 'Supplier' }}
+          handleConfirm={() => handleDelete(selectedSupplierId)}
+        />
+      )}
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-800 flex items-center">
+              <BsTruck className="mr-2" /> Supplier Management
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Manage your suppliers and vendor information
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {selectedItems.length > 0 && (
+              <div className="flex items-center relative" ref={exportDropdownRef}>
+                <button
+                  onClick={() => setShowExportDropdown(!showExportDropdown)}
+                  className="inline-flex justify-center items-center gap-1 bg-primary text-white rounded-md px-3 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
+                  disabled={isExporting}
+                >
+                  <MdFileDownload size={18} />
+                  Export {selectedItems.length} {selectedItems.length === 1 ? 'supplier' : 'suppliers'}
+                  <MdExpandMore size={18} />
+                </button>
+                
+                {showExportDropdown && (
+                  <div className="absolute right-0 mt-2 w-40 top-10 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          exportSelectedItems('excel', 'suppliers');
+                          setShowExportDropdown(false);
+                        }}
+                        className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
+                        disabled={isExporting}
+                      >
+                        <FiCheck className="text-green-500 mr-2" />
+                        Excel
+                      </button>
+                      <button
+                        onClick={() => {
+                          exportSelectedItems('csv', 'suppliers');
+                          setShowExportDropdown(false);
+                        }}
+                        className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
+                        disabled={isExporting}
+                      >
+                        <FiCheck className="text-green-500 mr-2" />
+                        CSV
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  onClick={deselectAll} 
+                  className="ml-2 px-2 py-1 text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
+            <CreateSupplier create={isCreateOpen} onClick={() => setIsCreateOpen(true)}/>
+          </div>
+        </div>
+
+        <ActionBar
+          onSearch={handleSearch}
+          showDate
+          viewMode
+          toggleView={toggleView}
+          view={view}
+          type="suppliers"
+          filterOptions={filterOptions}
+          onFilter={handleFilter}
+        />
+
+        {selectedItems.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 p-3 rounded-md text-sm flex items-center justify-between">
+            <div className="flex items-center">
+              <MdCheckBox size={18} className="text-primary mr-2" />
+              <span className="text-gray-800">
+                <span className="font-medium">{selectedItems.length}</span> of <span className="font-medium">{suppliers.length}</span> suppliers selected
+              </span>
+            </div>
+            <Button
+              onClick={deselectAll}
+              className="text-xs bg-white text-gray-700 hover:bg-gray-100"
+              padding="xxs"
+            >
+              Clear selection
+            </Button>
+          </div>
+        )}
+
+        <div className="bg-white rounded-lg shadow-sm">
+          {view === 'list' ? (
+             <TableShadowWrapper maxHeight="calc(100vh - 320px)">
+              <table className="min-w-full bg-white border-collapse table-auto">
+                <TableHead headers={headers} />
+                <TableBody
+                  data={suppliers}
+                  renderRow={(supplier, i) => (
+                    <TableRowWithSelectionActions
+                      key={supplier.id}
+                      item={supplier}
+                      index={i}
+                      onEdit={handleEdit}
+                      onDelete={handleOpenConfirmDeleteModal}
+                      isSelected={isSelected}
+                      toggleSelectItem={toggleSelectItem}
+                    />
+                  )}
+                  emptyMessage="No suppliers found."
+                />
+              </table>
+           </TableShadowWrapper>
+          ) : (
+            <div className="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[calc(100vh-320px)] overflow-y-auto">
+              {suppliers.length > 0 ? suppliers.map((supplier) => (
+                <SupplierCardWithSelection 
+                  key={supplier.id}
+                  supplier={supplier}
+                  onEdit={handleEdit}
+                  onDelete={handleOpenConfirmDeleteModal}
+                  isSelected={isSelected(supplier.id)}
+                  toggleSelect={() => toggleSelectItem(supplier.id)}
+                />
+              )) : (
+                <div className="col-span-full flex flex-col items-center justify-center py-12">
+                  <BsShield className="w-12 h-12 text-gray-300 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-700">No suppliers found</h3>
+                  <p className="text-gray-500 mt-1">Try adjusting your search or filters</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {data?.metadata && data.metadata.totalPages > 1 && (
+            <div className="p-4 border-t border-gray-100 flex justify-center">
+              <Pagination
+                currentPage={data.metadata.page}
+                totalItems={data.metadata.total}
+                pageSize={data.metadata.pageSize}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+// New component for table row with selection
+const TableRowWithSelectionActions = ({ 
+  item, 
+  index, 
+  onEdit, 
+  onDelete,
+  isSelected,
+  toggleSelectItem
+}: { 
+  item: any; 
+  index: number; 
+  onEdit: (id: string) => void; 
+  onDelete: (id: string) => void;
+  isSelected: (id: string) => boolean;
+  toggleSelectItem: (id: string) => void;
+}) => {
+  const rowData = [
+    <div key={`select-${item.id}`} className="flex items-center justify-center">
+      <button 
+        onClick={() => toggleSelectItem(item.id)}
+        className="flex items-center justify-center w-5 h-5 focus:outline-none"
+        aria-label={isSelected(item.id) ? "Deselect supplier" : "Select supplier"}
+      >
+        {isSelected(item.id) ? (
+          <MdCheckBox size={20} className="text-primary" />
+        ) : (
+          <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+        )}
+      </button>
+    </div>,
+    item.supplier_no,
+    item.full_name,
+    new Date(item.created_at).toLocaleDateString(),
+    item.category.name,
+    <div key={`rating-${item.id}`} className="flex items-center">
+      <RatingStars rating={Number(item.rating) || 0} />
+      <span className="ml-2 text-xs text-gray-500">{item.rating || 0}/5</span>
+    </div>,
+    <div key={`actions-${item.id}`} className="flex justify-center items-center space-x-2">
+      <button
+        onClick={() => onEdit(item.id)}
+        className="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/80 transition-colors"
+      >
+        Edit
+      </button>
+      <button
+        onClick={() => onDelete(item.id)}
+        className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+      >
+        Delete
+      </button>
+    </div>,
+  ];
+
+  return (
+    <tr className={`border-b border-gray-200 transition-colors ${isSelected(item.id) ? 'bg-blue-50 hover:bg-blue-100' : index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}`}>
+      {rowData.map((cell, i) => (
+        <td key={`cell-${i}`} className="px-4 py-3 text-sm">
+          {cell}
+        </td>
+      ))}
+    </tr>
+  );
+};
+
+// Enhanced SupplierCard with selection functionality
+const SupplierCardWithSelection = ({ 
   supplier, 
   onEdit, 
-  onDelete 
+  onDelete,
+  isSelected,
+  toggleSelect
 }: { 
   supplier: FilteredSupplier, 
   onEdit: (id: string) => void, 
-  onDelete: (id: string) => void 
+  onDelete: (id: string) => void,
+  isSelected: boolean,
+  toggleSelect: () => void
 }) => {
   return (
-    <Card className="flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden h-auto">
+    <Card className={`flex flex-col bg-white rounded-lg shadow-sm border transition-all duration-200 overflow-hidden h-auto ${isSelected ? 'border-primary bg-blue-50' : 'border-gray-200 hover:shadow-md'}`}>
       <div className="p-4 flex-1">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-medium text-gray-800 truncate">
-              {supplier.full_name}
-            </h3>
-            <div className="flex items-center mt-1">
-              <RatingStars rating={Number(supplier.rating) || 0} />
-              <span className="text-xs text-gray-500 ml-2">{supplier.rating || 0}/5</span>
+          <div className="flex items-center">
+            <button
+              onClick={toggleSelect}
+              className="mr-2 flex items-center justify-center focus:outline-none"
+            >
+              {isSelected ? (
+                <MdCheckBox size={20} className="text-primary" />
+              ) : (
+                <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+              )}
+            </button>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-medium text-gray-800 truncate">
+                {supplier.full_name}
+              </h3>
+              <div className="flex items-center mt-1">
+                <RatingStars rating={Number(supplier.rating) || 0} />
+                <span className="text-xs text-gray-500 ml-2">{supplier.rating || 0}/5</span>
+              </div>
             </div>
           </div>
           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
@@ -130,240 +576,6 @@ const SupplierCard = ({
         </Button>
       </div>
     </Card>
-  );
-};
-
-const SupplierPage = () => {
-  const { currentOrg, setSupplierId, setIsUpdateSupplierOpen, setType, startDate, endDate } = useStore();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [view, setView] = useState<'grid' | 'list'>('list');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [ratingFilter, setRatingFilter] = useState('all');
-  const itemsPerPage = 8;
-  const { data, isLoading, isError, error } = useFetchSuppliers(currentOrg, currentPage, itemsPerPage);
-  const { mutateAsync: deleteSupplier } = useDeleteSupplier(currentOrg);
-  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
-  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
-  const headers = ["Supplier Number", "Name", "Date created", "Category", "Rating", "Actions"];
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  // Set export type for suppliers
-  useEffect(() => {
-    setType('suppliers');
-  }, [setType]);
-
-  const toggleView = () => {
-    setView(prev => prev === 'list' ? 'grid' : 'list');
-  };
-
-  const handleEdit = (id: string) => {
-    setSupplierId(id);
-    setIsUpdateSupplierOpen(true);
-  };
-
-  const handleOpenConfirmDeleteModal = (supplierId: string) => {
-    setSelectedSupplierId(supplierId);
-    setOpenConfirmDeleteModal(true);
-  };
-
-  const handleDelete = async (supplierId: string) => {
-    try {
-      await deleteSupplier({ supplierId });
-      setOpenConfirmDeleteModal(false);
-    } catch (error) {
-      console.error('Error deleting supplier:', error);
-    }
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
-
-  const handleFilter = (filterType: string, value: string) => {
-    if (filterType === 'category') {
-      setCategoryFilter(value);
-    } else if (filterType === 'rating') {
-      setRatingFilter(value);
-    }
-    setCurrentPage(1);
-  };
-
-  const filterSuppliers = (suppliers: FilteredSupplier[]) => {
-    return suppliers.filter(supplier => {
-      // Text search filter
-      const matchesSearch = !searchQuery || 
-        supplier.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        supplier.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        supplier.category.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Category filter
-      const matchesCategory = categoryFilter === 'all' || 
-        supplier.category.name.toLowerCase() === categoryFilter.toLowerCase();
-
-      // Rating filter
-      let matchesRating = true;
-      if (ratingFilter !== 'all') {
-        const rating = Number(supplier.rating) || 0;
-        switch(ratingFilter) {
-          case '4+':
-            matchesRating = rating >= 4;
-            break;
-          case '3+':
-            matchesRating = rating >= 3;
-            break;
-          case '2+':
-            matchesRating = rating >= 2;
-            break;
-          default:
-            matchesRating = true;
-        }
-      }
-
-      // Date range filter
-      let matchesDateRange = true;
-      if (startDate || endDate) {
-        const createdDate = new Date(supplier.created_at);
-        
-        if (startDate) {
-          const filterStartDate = new Date(startDate);
-          matchesDateRange = matchesDateRange && createdDate >= filterStartDate;
-        }
-        
-        if (endDate) {
-          const filterEndDate = new Date(endDate);
-          // Set time to end of day for end date
-          filterEndDate.setHours(23, 59, 59, 999);
-          matchesDateRange = matchesDateRange && createdDate <= filterEndDate;
-        }
-      }
-
-      return matchesSearch && matchesCategory && matchesRating && matchesDateRange;
-    });
-  };
-
-  const suppliers = data?.data ? filterSuppliers(data.data) : [];
-
-  if (isLoading) return <Loader />;
-  if (isError) return <p className="text-red-500">{error.message}</p>;
-
-  const filterOptions = [
-    { 
-      label: "Category", 
-      value: "category", 
-      options: [
-        { label: "All", value: "all" },
-        { label: "Manufacturers", value: "manufacturer" },
-        { label: "Distributors", value: "distributor" },
-        { label: "Service Providers", value: "service" }
-      ] 
-    },
-    { 
-      label: "Rating", 
-      value: "rating", 
-      options: [
-        { label: "All Ratings", value: "all" },
-        { label: "4+ Stars", value: "4+" },
-        { label: "3+ Stars", value: "3+" },
-        { label: "2+ Stars", value: "2+" }
-      ] 
-    }
-  ];
-
-  return (
-    <>
-      <UpdateSupplier />
-      {openConfirmDeleteModal && selectedSupplierId && (
-        <ConfirmDelete
-          isOpen={openConfirmDeleteModal}
-          onClose={() => setOpenConfirmDeleteModal(false)}
-          product={{ id: selectedSupplierId, name: suppliers.find(supplier => supplier.id === selectedSupplierId)?.full_name || 'Supplier' }}
-          handleConfirm={() => handleDelete(selectedSupplierId)}
-        />
-      )}
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-800 flex items-center">
-              <BsTruck className="mr-2" /> Supplier Management
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Manage your suppliers and vendor information
-            </p>
-          </div>
-             <CreateSupplier
-              create ={isCreateOpen} 
-              onClick={()=>setIsCreateOpen(true)}/>
-        </div>
-
-        <ActionBar
-          onSearch={handleSearch}
-          showDate
-          viewMode
-          toggleView={toggleView}
-          view={view}
-          type="suppliers"
-          filterOptions={filterOptions}
-          onFilter={handleFilter}
-        />
-
-        <div className="bg-white rounded-lg shadow-sm">
-          {view === 'list' ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border-collapse">
-                <TableHead headers={headers}  />
-                <TableBody
-                  data={suppliers}
-                  renderRow={(supplier, i) => (
-                    <TableRowWithActions
-                      key={supplier.id}
-                      item={supplier}
-                      index={i}
-                      onEdit={handleEdit}
-                      onDelete={handleOpenConfirmDeleteModal}
-                    />
-                  )}
-                  emptyMessage="No suppliers found."
-                />
-              </table>
-            </div>
-          ) : (
-            <div className="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {suppliers.length > 0 ? suppliers.map((supplier) => (
-                <SupplierCard 
-                  key={supplier.id}
-                  supplier={supplier}
-                  onEdit={handleEdit}
-                  onDelete={handleOpenConfirmDeleteModal}
-                />
-              )) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-12">
-                  <BsShield className="w-12 h-12 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-700">No suppliers found</h3>
-                  <p className="text-gray-500 mt-1">Try adjusting your search or filters</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {data?.metadata && data.metadata.totalPages > 1 && (
-            <div className="p-4 border-t border-gray-100 flex justify-center">
-              <Pagination
-                currentPage={data.metadata.page}
-                totalItems={data.metadata.total}
-                pageSize={data.metadata.pageSize}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </>
   );
 };
 

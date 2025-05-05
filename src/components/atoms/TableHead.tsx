@@ -6,10 +6,13 @@ interface TableHeadProps {
 
 const TableHead: React.FC<TableHeadProps> = ({ headers }) => {
   return (
-    <thead>
-      <tr className="bg-gray-100">
+    <thead className="sticky top-0 z-50">
+      <tr className="bg-gradient-to-r from-gray-50 to-gray-100 shadow-sm">
         {headers.map((header) => (
-          <th key={header} className="border border-gray-300 px-4 py-2 text-center text-[10px] ">
+          <th 
+            key={header} 
+            className="border-b border-gray-200 px-4 py-3 text-center font-semibold text-xs text-gray-700 uppercase tracking-wider "
+          >
             {header}
           </th>
         ))}
