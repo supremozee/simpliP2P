@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Tabs from "../molecules/Tabs";
 import TableSkeleton from "../atoms/Skeleton/Table";
 import Pagination from "../molecules/Pagination";
@@ -10,17 +10,15 @@ import CreatePurchaseOrder from "../organisms/CreatePurchaseOrder";
 import { Order } from "@/types";
 import TableShadowWrapper from "../atoms/TableShadowWrapper";
 import useExportSelected from "@/hooks/useExportSelected";
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdFileDownload, MdExpandMore } from 'react-icons/md';
-import { FiCheck } from 'react-icons/fi';
-import Button from "../atoms/Button";
+import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import SelectedItemForExport from "../organisms/SelectedItemForExport";
+import ExportCheckBox from "../molecules/ExportCheckBox";
 
 const PurchaseOrdersManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("ALL");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
-  const [showExportDropdown, setShowExportDropdown] = useState(false);
-  const exportDropdownRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 10;
   const { currentOrg, setIsOpen, isOpen, setType } = useStore();
   const { data, isLoading } = useFetchAllOrders(currentOrg);
@@ -28,31 +26,16 @@ const PurchaseOrdersManagement: React.FC = () => {
   
   const { 
     selectedItems, 
-    isExporting, 
     toggleSelectItem, 
     selectAll, 
     deselectAll, 
-    isSelected, 
-    exportSelectedItems 
+    isSelected
   } = useExportSelected();
   
   // Set export type for orders
   useEffect(() => {
     setType('orders');
   }, [setType]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target as Node)) {
-        setShowExportDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   // Generate filter options based on available data
   const filterOptions = useMemo(() => {
@@ -238,19 +221,12 @@ const PurchaseOrdersManagement: React.FC = () => {
   if (isLoading) return <TableSkeleton />;
 
   const headers = [
-    <div key="select-all" className="flex items-center justify-center">
-      <button 
-        onClick={handleSelectAll}
-        className="flex items-center justify-center w-5 h-5 focus:outline-none"
-        aria-label={selectedItems.length === currentOrders.length ? "Deselect all orders" : "Select all orders"}
-      >
-        {selectedItems.length > 0 && selectedItems.length === currentOrders.length ? (
-          <MdCheckBox size={20} className="text-primary" />
-        ) : (
-          <MdCheckBoxOutlineBlank size={20} className="text-gray-400" />
-        )}
-      </button>
-    </div>,
+    <ExportCheckBox
+     handleSelectAll={handleSelectAll}
+     selectedItems={selectedItems}
+      items={filteredOrders}
+      key={"export-checkbox"}
+    />,
     "PO Number", 
     "Supplier", 
     "Date Created", 
@@ -280,66 +256,16 @@ const PurchaseOrdersManagement: React.FC = () => {
             filterOptions={filterOptions}
             onFilter={handleFilter}
           />
-          
-          {selectedItems.length > 0 && (
-            <div className="flex items-center relative ml-2" ref={exportDropdownRef}>
-              <button
-                onClick={() => setShowExportDropdown(!showExportDropdown)}
-                className="inline-flex justify-center items-center gap-1 bg-primary text-white rounded-md px-3 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
-                disabled={isExporting}
-              >
-                <MdFileDownload size={18} />
-                Export {selectedItems.length} {selectedItems.length === 1 ? 'order' : 'orders'}
-                <MdExpandMore size={18} />
-              </button>
-              
-              {showExportDropdown && (
-                <div className="absolute right-0 mt-2 w-40 top-10 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        exportSelectedItems('excel', 'orders');
-                        setShowExportDropdown(false);
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
-                      disabled={isExporting}
-                    >
-                      <FiCheck className="text-green-500 mr-2" />
-                      Excel
-                    </button>
-                    <button
-                      onClick={() => {
-                        exportSelectedItems('csv', 'orders');
-                        setShowExportDropdown(false);
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
-                      disabled={isExporting}
-                    >
-                      <FiCheck className="text-green-500 mr-2" />
-                      CSV
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
         
         {selectedItems.length > 0 && (
-          <div className="mx-2 bg-blue-50 border border-blue-200 p-3 mb-4 rounded-md text-sm flex items-center justify-between">
-            <div className="flex items-center">
-              <MdCheckBox size={18} className="text-primary mr-2" />
-              <span className="text-gray-800">
-                <span className="font-medium">{selectedItems.length}</span> of <span className="font-medium">{filteredOrders.length}</span> orders selected
-              </span>
-            </div>
-            <Button
-              onClick={deselectAll}
-              className="text-xs bg-white text-gray-700 hover:bg-gray-100"
-              padding="xxs"
-            >
-              Clear selection
-            </Button>
+          <div className="mx-2">
+            <SelectedItemForExport 
+              selectedItems={selectedItems}
+              items={filteredOrders}
+              deselectAll={deselectAll}
+              entityType="orders"
+            />
           </div>
         )}
         

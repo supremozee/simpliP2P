@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -17,8 +18,12 @@ import { cn } from "@/utils/cn";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";
 import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
+import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
 import ActionBar from "../molecules/ActionBar";
 import TableShadowWrapper from "../atoms/TableShadowWrapper";
+import useExportSelected from "@/hooks/useExportSelected";
+import SelectedItemForExport from "../organisms/SelectedItemForExport";
+import ExportCheckBox from "../molecules/ExportCheckBox";
 
 interface CompletionProps {
   id: string;
@@ -73,21 +78,13 @@ const PurchaseRequisitionsPage = () => {
     isRequestLoading,
     isAllRequisitionsLoading,
   } = useGetRequisitions();
-  
-  const headers = [
-    "PR No.",
-    "PR date",
-    "Supplier",
-    "Department", 
-    "Requestor",
-    "Total Qty",
-    "Estimated Cost",
-    "Needed By",
-    "Status",
-    "Action",
-    "Line Items",
-  ];
-
+  const {
+    selectedItems,
+    toggleSelectItem,
+    selectAll,
+    deselectAll,
+    isSelected,
+  } = useExportSelected();
   const handleViewRequisition = ({ pr_number, id }: CompletionProps) => {
     if (pr_number && id) {
       setHidePrText(`You are viewing requisition ID: ${id}`)
@@ -121,9 +118,26 @@ const PurchaseRequisitionsPage = () => {
     // Add other filter type handlers as needed
   };
 
-  const filterRequisitions = (requisitions: Requisition[]) => {
+  const filterRequisitions = () => {
+    const requisitions = (() => {
+      switch (activeTab)  {
+        case "ALL":
+          return allRequisitions;
+        case "PENDING":
+          return pendingRequisitions;
+        case "APPROVED":
+          return approvedRequisitions;
+        case "REJECTED":
+          return rejectedRequisitions;
+        case "REQUEST_MODIFICATION":
+          return requestRequisitions;
+        case "SAVED APPROVAL":
+          return savedRequisitions;
+        default:
+          return [];
+      }
+    })();
     return requisitions.filter(req => {
-      // Text search filter
       const matchesSearch = !searchQuery || 
         req.pr_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
         req.department?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -172,14 +186,54 @@ const PurchaseRequisitionsPage = () => {
         return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
+  const handleSelectAll = () => {
+    const filteredReqs = filterRequisitions();
+    if (selectedItems.length === filteredReqs.length) {
+      deselectAll();
+    } else {
+      selectAll(filteredReqs.map(req => req.id));
+    }
+  };
+  const headers:string | any = [
+    <ExportCheckBox
+    handleSelectAll={handleSelectAll}
+    selectedItems={selectedItems}
+    items={filterRequisitions()}
+    key="select-all"
+    />,
+    "PR No.",
+    "PR date",
+    "Supplier",
+    "Department", 
+    "Requestor",
+    "Total Qty",
+    "Estimated Cost",
+    "Needed By",
+    "Status",
+    "Action",
+    "Line Items",
+  ];
 
   const renderRow = (req: Requisition, index: number) => (
-     <React.Fragment key={`row-${req.id}`}>
+    <React.Fragment key={`row-${req.id}`}>
       <TableRow
         key={req.id}
         data={[
+          <div key={`select-${req.id}`} className="flex items-center justify-center">
+            <button 
+              onClick={() => toggleSelectItem(req.id)}
+              className="flex items-center justify-center w-5 h-5 focus:outline-none"
+              aria-label={isSelected(req.id) ? "Deselect requisition" : "Select requisition"}
+            >
+              {isSelected(req.id) ? (
+                <MdCheckBox size={20} className="text-primary" />
+              ) : (
+                <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+              )}
+            </button>
+          </div>,
           `${req.pr_number}`,
-         new Date(req.created_at.split("T")[0]).toLocaleDateString('en-US', {year:'numeric', month: 'short', day: 'numeric'}),
+          new Date(req.created_at.split("T")[0]).toLocaleDateString('en-US', {year:'numeric', month: 'short', day: 'numeric'}),
           req.supplier?.full_name,
           req.department?.name,
           req.requestor_name,
@@ -194,7 +248,7 @@ const PurchaseRequisitionsPage = () => {
           </span>,
           <div className="flex w-full justify-center items-center" key={`action-${req.id}`}>
             <Button 
-            key={req.id}
+              key={req.id}
               onClick={() => handleViewRequisition({ pr_number: req.pr_number, id: req.id })} 
               className={cn(
                 "p-2 px-3 rounded-md transition-colors z-20",
@@ -235,7 +289,7 @@ const PurchaseRequisitionsPage = () => {
             </Button>
           </div>,
         ]}
-        className={expandedRows.includes(req.pr_number) ? "border-b-0" : ""}
+        className={`${expandedRows.includes(req.pr_number) ? "border-b-0" : ""} ${isSelected(req.id) ? 'bg-blue-50' : ''}`}
         index={index}
       />
       {expandedRows.includes(req.pr_number) && (
@@ -319,29 +373,6 @@ const PurchaseRequisitionsPage = () => {
         return 0;
     }
   };
-  
-  const renderRequisitions = () => {
-    const requisitions = (() => {
-      switch (activeTab)  {
-        case "ALL":
-          return allRequisitions;
-        case "PENDING":
-          return pendingRequisitions;
-        case "APPROVED":
-          return approvedRequisitions;
-        case "REJECTED":
-          return rejectedRequisitions;
-        case "REQUEST_MODIFICATION":
-          return requestRequisitions;
-        case "SAVED APPROVAL":
-          return savedRequisitions;
-        default:
-          return [];
-      }
-    })();
-
-    return filterRequisitions(requisitions);
-  };
 
   const tabCounts = tabNames.map(getTabCount);
 
@@ -389,15 +420,27 @@ const PurchaseRequisitionsPage = () => {
         setActive={setActiveTab}
         counts={tabCounts}
       />
+      
+      {selectedItems.length > 0 && (
+        <div className="mb-4 mt-4">
+          <SelectedItemForExport 
+            selectedItems={selectedItems}
+            items={filterRequisitions()}
+            deselectAll={deselectAll}
+            entityType="requisitions"
+          />
+        </div>
+      )}
+      
       <TableShadowWrapper>
-          <table className="w-full table-auto border-collapse">
-                <TableHead headers={headers} />
-                <TableBody
-                  data={renderRequisitions()}
-                  renderRow={renderRow}
-                  emptyMessage="No requisitions found for this status."
-                />
-              </table>
+        <table className="w-full table-auto border-collapse">
+          <TableHead headers={headers} />
+          <TableBody
+            data={filterRequisitions()}
+            renderRow={renderRow}
+            emptyMessage="No requisitions found for this status."
+          />
+        </table>
       </TableShadowWrapper>
       
       {isOpen && <CreateRequisitions />}
