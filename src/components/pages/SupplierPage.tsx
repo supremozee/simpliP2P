@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import useFetchSuppliers from '@/hooks/useFetchSuppliers';
 import useStore from '@/store';
 import Loader from '../molecules/Loader';
@@ -13,13 +13,14 @@ import useDeleteSupplier from '@/hooks/useDeleteSupplier';
 import Card from '../atoms/Card';
 import Button from '../atoms/Button';
 import { BsTruck, BsTelephone, BsEnvelope, BsGlobe, BsShield, BsStarFill, BsStarHalf } from 'react-icons/bs';
-import { MdLocationPin, MdCheckBox, MdCheckBoxOutlineBlank, MdFileDownload, MdExpandMore } from 'react-icons/md';
-import { FiCheck } from 'react-icons/fi';
+import { MdLocationPin, MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
 import { Supplier } from '@/types';
 import CreateSupplier from '../organisms/CreateSupplier';
 import UpdateSupplier from '../organisms/UpdateSupplier';
 import TableShadowWrapper from '../atoms/TableShadowWrapper';
 import useExportSelected from '@/hooks/useExportSelected';
+import SelectedItemForExport from '../organisms/SelectedItemForExport';
+import ExportCheckBox from '../molecules/ExportCheckBox';
 
 interface FilteredSupplier extends Supplier {
   category: {
@@ -52,38 +53,20 @@ const SupplierPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [ratingFilter, setRatingFilter] = useState('all');
-  const [showExportDropdown, setShowExportDropdown] = useState(false);
-  const exportDropdownRef = useRef<HTMLDivElement>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const itemsPerPage = 8;
   const { data, isLoading, isError, error } = useFetchSuppliers(currentOrg, currentPage, itemsPerPage);
   const { mutateAsync: deleteSupplier } = useDeleteSupplier(currentOrg);
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const { 
     selectedItems, 
-    isExporting, 
     toggleSelectItem, 
     selectAll, 
     deselectAll, 
     isSelected, 
-    exportSelectedItems 
   } = useExportSelected();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target as Node)) {
-        setShowExportDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-  
-  // Set export type for suppliers
   useEffect(() => {
     setType('suppliers');
   }, [setType]);
@@ -197,20 +180,13 @@ const SupplierPage = () => {
   if (isLoading) return <Loader />;
   if (isError) return <p className="text-red-500">{error.message}</p>;
 
-  const headers:string[] | any = [
-    <div key="select-all" className="flex items-center justify-center">
-      <button 
-        onClick={handleSelectAll}
-        className="flex items-center justify-center w-5 h-5 focus:outline-none"
-        aria-label={selectedItems.length === suppliers.length ? "Deselect all suppliers" : "Select all suppliers"}
-      >
-        {selectedItems.length > 0 && selectedItems.length === suppliers.length ? (
-          <MdCheckBox size={20} className="text-primary" />
-        ) : (
-          <MdCheckBoxOutlineBlank size={20} className="text-gray-400" />
-        )}
-      </button>
-    </div>,
+  const headers: string[] | any = [
+    <ExportCheckBox
+      handleSelectAll={handleSelectAll}
+      items={suppliers}
+      selectedItems={selectedItems}
+      key={`select-all-${suppliers.length}`}
+    />,
     "Supplier Number", 
     "Name", 
     "Date created", 
@@ -255,7 +231,7 @@ const SupplierPage = () => {
       )}
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-xl font-semibold text-gray-800 flex items-center">
               <BsTruck className="mr-2" /> Supplier Management
@@ -264,87 +240,31 @@ const SupplierPage = () => {
               Manage your suppliers and vendor information
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {selectedItems.length > 0 && (
-              <div className="flex items-center relative" ref={exportDropdownRef}>
-                <button
-                  onClick={() => setShowExportDropdown(!showExportDropdown)}
-                  className="inline-flex justify-center items-center gap-1 bg-primary text-white rounded-md px-3 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
-                  disabled={isExporting}
-                >
-                  <MdFileDownload size={18} />
-                  Export {selectedItems.length} {selectedItems.length === 1 ? 'supplier' : 'suppliers'}
-                  <MdExpandMore size={18} />
-                </button>
-                
-                {showExportDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 top-10 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          exportSelectedItems('excel', 'suppliers');
-                          setShowExportDropdown(false);
-                        }}
-                        className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
-                        disabled={isExporting}
-                      >
-                        <FiCheck className="text-green-500 mr-2" />
-                        Excel
-                      </button>
-                      <button
-                        onClick={() => {
-                          exportSelectedItems('csv', 'suppliers');
-                          setShowExportDropdown(false);
-                        }}
-                        className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
-                        disabled={isExporting}
-                      >
-                        <FiCheck className="text-green-500 mr-2" />
-                        CSV
-                      </button>
-                    </div>
-                  </div>
-                )}
+           <CreateSupplier create={isCreateOpen} onClick={() => setIsCreateOpen(true)}/>
+        </div>
 
-                <Button
-                  onClick={deselectAll} 
-                  className="ml-2 px-2 py-1 text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
-                >
-                  Clear
-                </Button>
-              </div>
-            )}
-            <CreateSupplier create={isCreateOpen} onClick={() => setIsCreateOpen(true)}/>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="w-full">
+            <ActionBar
+              onSearch={handleSearch}
+              showDate
+              viewMode
+              toggleView={toggleView}
+              view={view}
+              type="suppliers"
+              filterOptions={filterOptions}
+              onFilter={handleFilter}
+            />
           </div>
         </div>
 
-        <ActionBar
-          onSearch={handleSearch}
-          showDate
-          viewMode
-          toggleView={toggleView}
-          view={view}
-          type="suppliers"
-          filterOptions={filterOptions}
-          onFilter={handleFilter}
-        />
-
         {selectedItems.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 p-3 rounded-md text-sm flex items-center justify-between">
-            <div className="flex items-center">
-              <MdCheckBox size={18} className="text-primary mr-2" />
-              <span className="text-gray-800">
-                <span className="font-medium">{selectedItems.length}</span> of <span className="font-medium">{suppliers.length}</span> suppliers selected
-              </span>
-            </div>
-            <Button
-              onClick={deselectAll}
-              className="text-xs bg-white text-gray-700 hover:bg-gray-100"
-              padding="xxs"
-            >
-              Clear selection
-            </Button>
-          </div>
+          <SelectedItemForExport
+            selectedItems={selectedItems}
+            items={suppliers}
+            deselectAll={deselectAll}
+            entityType="suppliers"
+          />
         )}
 
         <div className="bg-white rounded-lg shadow-sm">
@@ -539,9 +459,9 @@ const SupplierCardWithSelection = ({
                 {[
                   supplier.address.street,
                   supplier.address.city,
-                  supplier.address.zip_code && supplier.address.zip_code ? 
-                    `${supplier.address.zip_code}, ${supplier.address.zip_code}` : 
-                    (supplier.address.zip_code || supplier.address.zip_code)
+                  supplier.address.zip_code && supplier.address.state ? 
+                    `${supplier.address.zip_code}, ${supplier.address.state}` : 
+                    (supplier.address.zip_code || supplier.address.state)
                 ].filter(Boolean).join(', ')}
               </span>
             </div>
