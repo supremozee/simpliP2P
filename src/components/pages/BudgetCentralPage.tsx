@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import BudgetTable from '../organisms/BudgetTable';
 import ActionBar from '../molecules/ActionBar';
 import CreateBudgetModal from '../organisms/CreateBudgetModal';
@@ -10,9 +10,8 @@ import TableSkeleton from '../atoms/Skeleton/Table';
 import BudgetSummarySkeleton from '../atoms/Skeleton/Budget';
 import { format_price } from '@/utils/helpers';
 import useExportSelected from '@/hooks/useExportSelected';
-import { MdCheckBox,  MdFileDownload, MdExpandMore } from 'react-icons/md';
-import { FiCheck } from 'react-icons/fi';
 import Button from '../atoms/Button';
+import SelectedItemForExport from '../organisms/SelectedItemForExport';
 
 type FilterType = {
   currency?: string;
@@ -25,34 +24,20 @@ const BudgetCentralPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<FilterType>({});
-  const [showExportDropdown, setShowExportDropdown] = useState(false);
-  const exportDropdownRef = useRef<HTMLDivElement>(null);
-  const { currentOrg } = useStore();
+  const { currentOrg, setType } = useStore();
   const { data, isLoading } = useFetchBudget(currentOrg);
   const { 
     selectedItems, 
-    isExporting, 
     toggleSelectItem, 
     selectAll, 
     deselectAll, 
     isSelected, 
-    exportSelectedItems 
   } = useExportSelected();
-
-
-
+  
+  // Set export type for budgets
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target as Node)) {
-        setShowExportDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    setType('budgets');
+  }, [setType]);
 
   // Filter options for the ActionBar
   const filterOptions = useMemo(() => {
@@ -239,63 +224,12 @@ const BudgetCentralPage = () => {
             All your organization&apos;s budgets in one space.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {selectedItems.length > 0 && (
-            <div className="flex items-center relative" ref={exportDropdownRef}>
-              <button
-                onClick={() => setShowExportDropdown(!showExportDropdown)}
-                className="inline-flex justify-center items-center gap-1 bg-primary text-white rounded-md px-3 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
-                disabled={isExporting}
-              >
-                <MdFileDownload size={18} />
-                Export {selectedItems.length} {selectedItems.length === 1 ? 'budget' : 'budgets'}
-                <MdExpandMore size={18} />
-              </button>
-              
-              {showExportDropdown && (
-                <div className="absolute right-0 mt-2 w-40 top-10 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        exportSelectedItems('excel', 'budgets');
-                        setShowExportDropdown(false);
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
-                      disabled={isExporting}
-                    >
-                      <FiCheck className="text-green-500 mr-2" />
-                      Excel
-                    </button>
-                    <button
-                      onClick={() => {
-                        exportSelectedItems('csv', 'budgets');
-                        setShowExportDropdown(false);
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-900 hover:bg-primary hover:text-white"
-                      disabled={isExporting}
-                    >
-                      <FiCheck className="text-green-500 mr-2" />
-                      CSV
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <Button
-                onClick={deselectAll} 
-                className="ml-2 px-2 py-1 text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
-              >
-                Clear
-              </Button>
-            </div>
-          )}
-          <Button
-            onClick={handleOpenModal}
-            className="bg-primary hover:bg-primary/90 text-white"
-          >
-            Create Budget
-          </Button>
-        </div>
+        <Button
+          onClick={handleOpenModal}
+          className="bg-primary hover:bg-primary/90 text-white"
+        >
+          Create Budget
+        </Button>
       </div>
 
       <ActionBar 
@@ -307,20 +241,13 @@ const BudgetCentralPage = () => {
       />
 
       {selectedItems.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 p-3 mb-4 rounded-md text-sm flex items-center justify-between">
-          <div className="flex items-center">
-            <MdCheckBox size={18} className="text-primary mr-2" />
-            <span className="text-gray-800">
-              <span className="font-medium">{selectedItems.length}</span> of <span className="font-medium">{filteredBudgets.length}</span> budgets selected
-            </span>
-          </div>
-          <Button
-            onClick={deselectAll}
-            className="text-xs bg-white text-gray-700 hover:bg-gray-100"
-            padding="xxs"
-          >
-            Clear selection
-          </Button>
+        <div className="mb-4">
+          <SelectedItemForExport
+            selectedItems={selectedItems}
+            items={filteredBudgets}
+            deselectAll={deselectAll}
+            entityType="budgets"
+          />
         </div>
       )}
 
@@ -343,8 +270,8 @@ const BudgetCentralPage = () => {
                {format_price(budget.allocated, budget.currency)}
             </h2>
             <div className="flex justify-between text-sm text-gray-500 mt-2">
-              <span>Available Balance: {budget.balance}</span>
-              <span>Reserved: {budget.reserved}</span>
+              <span>Available: {format_price(budget.available, budget.currency)}</span>
+              <span>Reserved: {format_price(budget.reserved, budget.currency)}</span>
             </div>
             <div className="relative pt-2">
               <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-100">
