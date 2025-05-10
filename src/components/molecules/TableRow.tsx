@@ -13,7 +13,7 @@ interface TableRowProps {
 const TableRow: React.FC<TableRowProps> = ({ data, index = 0, className, children, hasActions = true }) => {
   return (
     <tr className={cn(
-      "group transition-all duration-200 ease-in-out border-b", 
+      "group transition-all duration-200 text-center ease-in-out border-b", 
       index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50',
       "hover:bg-blue-50/30",
       className

@@ -433,7 +433,7 @@ const PurchaseRequisitionsPage = () => {
       )}
       
       <TableShadowWrapper>
-        <table className="w-full table-auto border-collapse">
+        <table className="w-full table-auto text-center border-collapse">
           <TableHead headers={headers} />
           <TableBody
             data={filterRequisitions()}
