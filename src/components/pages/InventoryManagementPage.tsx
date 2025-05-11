@@ -5,7 +5,7 @@ import useFetchProducts from '@/hooks/useFetchProducts';
 import useStore from '@/store';
 import TableSkeleton from '../atoms/Skeleton/Table';
 import ErrorComponent from '../molecules/ErrorComponent';
-import { MdEdit, MdDeleteOutline, MdInventory, MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import { MdEdit, MdDeleteOutline, MdInventory, MdCheckBox, MdCheckBoxOutlineBlank, MdUpload } from 'react-icons/md';
 import useDeleteProduct from '@/hooks/useDeleteProduct';
 import ConfirmDelete from '../molecules/ConfirmDelete';
 import CreateProduct from '../organisms/CreateProduct';
@@ -22,6 +22,8 @@ import TableShadowWrapper from '../atoms/TableShadowWrapper';
 import useExportSelected from '@/hooks/useExportSelected';
 import SelectedItemForExport from '../organisms/SelectedItemForExport';
 import ExportCheckBox from '../molecules/ExportCheckBox';
+import BulkUploadModal from '../organisms/BulkUploadModal';
+import Button from '../atoms/Button';
 
 const InventoryManagement = () => {
   const { currentOrg, setProductId, productId } = useStore();
@@ -33,6 +35,7 @@ const InventoryManagement = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [openUpdateProductModal, setOpenUpdateProductModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [openBulkUploadModal, setOpenBulkUploadModal] = useState(false);
   const getProducts = data?.data || [];
   
   const { 
@@ -196,6 +199,10 @@ const InventoryManagement = () => {
           handleConfirm={() => handleDelete(selectedProductId)}
         />
       )}
+       <BulkUploadModal
+        isOpen={openBulkUploadModal} 
+        onClose={() => setOpenBulkUploadModal(false)} 
+      />
       
       <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
@@ -226,6 +233,14 @@ const InventoryManagement = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setOpenBulkUploadModal(true)}
+            kind="white"
+            className="flex items-center border border-gray-200 hover:bg-gray-50"
+          >
+            <MdUpload className="mr-1" /> 
+            <span className='text-[12px]'>Bulk Upload</span>
+          </Button>
           <div>
             <CreateProduct />
           </div>

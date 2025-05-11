@@ -31,6 +31,7 @@ export const ORGANIZATION_ENDPOINTS = {
   ORGANIZATIONS: `${BASE_URL}/organisations`,
   EXPORT: (orgId:string)=> `${BASE_URL}/organisations/${orgId}/export`,
   EXPORT_SELECTED: (orgId:string)=> `${BASE_URL}/organisations/${orgId}/export/selected`,
+  BULK_UPLOAD: (orgId:string)=> `${BASE_URL}/organisations/${orgId}/products/upload/bulk`,
   DASHBOARD: (orgId: string) => `${BASE_URL}/organisations/${orgId}/dashboard`,
   INVITE_MEMBER: (orgId: string) => `${BASE_URL}/organisations/${orgId}/invite-member`,
   ACCEPT_INVITATION: (orgId: string) => `${BASE_URL}/organisations/${orgId}/accept-invitation`,

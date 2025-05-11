@@ -1,6 +1,5 @@
 "use client";
 import { useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
-
 export function useFetchData<T, E = Error>(
   queryKey: (string | number | undefined)[],
   queryFn: () => Promise<T>,

@@ -65,7 +65,11 @@ export const deleteConfig = (oid?:string) => {
   };
 }
   
-export const postFormDataConfig = (formData: FormData) => ({
+export const postFormDataConfig = (file: FormData) => ({
   method: "POST" as const ,
-  body: formData,
+  body: file,
+});
+export const postFileDataConfig = (file:File) => ({
+  method: "POST" as const ,
+  body: file,
 });

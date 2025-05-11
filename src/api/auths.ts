@@ -54,7 +54,8 @@ import { forgotData,
 import { apiRequest } from "./apiRequest"
 import { setCookies } from "@/utils/setCookies"
 import { AUTH_ENDPOINTS, ORGANIZATION_ENDPOINTS, USER_ENDPOINTS } from "./route";
-import { deleteConfig, getConfig, patchConfig, postConfig, postFormDataConfig, putConfig } from "./apiUtils";
+import { deleteConfig, getConfig, patchConfig, postConfig, putConfig } from "./apiUtils";
+import Cookies from "js-cookie";
 const auth = {
   register: async (registerData: RegisterFormData): Promise<RegisterResponse> => {
     return apiRequest(AUTH_ENDPOINTS.SIGNUP,postConfig(registerData));
@@ -99,15 +100,43 @@ const auth = {
   },
 
   uploadProfilePicture: async (image: File): Promise<any> => {
+    const token = Cookies.get('accessToken');
     const formData = new FormData();
     formData.append("file", image);
-    return apiRequest(USER_ENDPOINTS.PROFILE_PICTURE,  postFormDataConfig(formData));
+    const response = await fetch(USER_ENDPOINTS.PROFILE_PICTURE, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Do NOT add Content-Type - browser will set it with boundary for FormData
+      },
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+  
+    return await response.json();
   },
-
+  
   uploadOrganizationLogo: async (image: File, orgId: string): Promise<any> => {
+    const token = Cookies.get('accessToken');
     const formData = new FormData();
     formData.append("file", image);
-    return apiRequest(`${ORGANIZATION_ENDPOINTS.ORGANIZATIONS}/${orgId}/logo`, postFormDataConfig(formData));
+    const response = await fetch(`${ORGANIZATION_ENDPOINTS.ORGANIZATIONS}/${orgId}/logo`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Do NOT add Content-Type - browser will set it with boundary for FormData
+      },
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+  
+    return await response.json();
   },
 
   getUserDetails: async (): Promise<UserProfileResponse> => {
@@ -339,10 +368,24 @@ const auth = {
   fetchBudgetById:async(orgId:string, id:string):Promise<any> => {
     return await apiRequest(`${USER_ENDPOINTS.BUDGETS}/${id}`, getConfig(orgId))
   },
-  fileManager: async (image:File):Promise<any>=> {
+  fileManager:async (image: File) => {
+    const token = Cookies.get('accessToken');
     const formData = new FormData();
-    formData.append('file', image)
-    return await apiRequest(USER_ENDPOINTS.FILE_MANAGER,postFormDataConfig(formData))
+    formData.append("file", image);
+    const response = await fetch(USER_ENDPOINTS.FILE_MANAGER, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // <-- include the token here
+        // Do NOT add Content-Type
+      },
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+  
+    return await response.json();
   },
   export: async (orgId: string, startDate: string, endDate: string, format: string, type: string): Promise<any> => {
     try {
@@ -380,6 +423,25 @@ const auth = {
     console.error("Export error:", error);
     throw error;
   }
+  },
+  bulkUpload:async (orgId: string,file: File) => {
+    const token = Cookies.get('accessToken');
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`https://api-simplip2p.onrender.com/organisations/${orgId}/products/upload/bulk`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // <-- include the token here
+        // Do NOT add Content-Type
+      },
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+  
+    return await response.json();
   }
 };
 
