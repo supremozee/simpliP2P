@@ -66,8 +66,11 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
   const downloadTemplate = () => {
     // Create a simple CSV template
     const template = `name,description,unitPrice,currency,stockQty,stockQtyAlert,unitOfMeasure,category,productCode,image_url
-Sample Product 1,Product description here,1000,NGN,50,10,pcs,Electronics,PROD-001,https://example.com/image.jpg
-Sample Product 2,Another product description,2500,NGN,100,20,pcs,Office Supplies,PROD-002,`;
+Sample Product 1,Product description here,1000,NGN,50,10,pcs,Wholesalers,PROD-001,'/logo-black.png'
+Sample Product 2,Product description here,1000,NGN,50,10,pcs,Wholesalers,PROD-004,'/logo-black.png'
+Sample Product 3,Product description here,1000,NGN,50,10,pcs,Wholesalers,PROD-003,'/logo-black.png'
+Sample Product 4,Product description here,1000,NGN,50,10,pcs,Wholesalers,PROD-002,'/logo-black.png'
+Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PROD-006,`;
 
     const blob = new Blob([template], { type: 'text/xlsx' });
     const url = URL.createObjectURL(blob);
