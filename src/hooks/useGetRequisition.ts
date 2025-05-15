@@ -20,6 +20,8 @@ export const useGetRequisitions = () => {
   const rejectedRequisitions = rejectedRequisitionsData?.data?.requisitions || [];
   const requestRequisitions = requestRequisitionsData?.data?.requisitions || [];
 
+  const showForSavedOnly = savedRequisitions.find((req)=>req.pr_number === pr?.pr_number)
+
 
   const isDisabled =
     approvedRequisitions.find((req) => req.pr_number === pr?.pr_number) ||
@@ -39,6 +41,7 @@ export const useGetRequisitions = () => {
     isRejectedLoading,
     isRequestLoading,
     isAllRequisitionsLoading,
+    showForSavedOnly,
     isDisabled,
   };
 };

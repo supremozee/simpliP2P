@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const useInitializePurchaseRequisition = () => {
-    const {setLoading} = useStore();
+    const {setLoading, setPr} = useStore();
     const [errorMessage, setErrorMessage] = useState("")
     const router = useRouter()
     const {success, error:notifyError} = useNotify()
@@ -21,6 +21,10 @@ const useInitializePurchaseRequisition = () => {
             if(response?.status === "success") {
                 setLoading(false)
                 router.push(`/initialize-requisition/${response?.data.pr_number}`)
+                setPr({
+                    pr_number: response?.data?.pr_number,
+                    id: response?.data?.id
+                })
                 success(response?.message)
             }      
         },

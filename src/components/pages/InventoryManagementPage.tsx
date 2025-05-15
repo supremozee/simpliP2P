@@ -115,7 +115,7 @@ const InventoryManagement = () => {
       : product.stockQty <= product.stockQtyAlert * 2 
         ? 'text-amber-600 font-medium' 
         : 'text-green-600 font-medium';
-    
+    const image_url = product?.image_url === "https://example.com/image.jpg" ? "/logo-black.png" : product?.image_url;
     const rowData = [
       <div key={`select-${product.id}`} className="flex items-center justify-center">
         <button 
@@ -135,7 +135,7 @@ const InventoryManagement = () => {
         className='flex items-center justify-center'>
         <Image
           className="rounded-full w-[40px] h-[40px] border-2 border-gray-200 bg-cover"
-          src={product?.image_url || "/logo-black.png"}
+          src={image_url || "/logo-black.png"}
           alt={product?.name}
           width={40}
           height={40}

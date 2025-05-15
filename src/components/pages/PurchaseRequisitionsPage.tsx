@@ -12,7 +12,6 @@ import TableSkeleton from "../atoms/Skeleton/Table";
 import Button from "../atoms/Button";
 import useNotify from "@/hooks/useNotify";
 import InitializeRequisition from "../molecules/InitializeRequisition";
-import CreateRequisitions from "./CreateRequisitionsModal";
 import { format_price } from "@/utils/helpers";
 import { cn } from "@/utils/cn";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";
@@ -24,6 +23,7 @@ import TableShadowWrapper from "../atoms/TableShadowWrapper";
 import useExportSelected from "@/hooks/useExportSelected";
 import SelectedItemForExport from "../organisms/SelectedItemForExport";
 import ExportCheckBox from "../molecules/ExportCheckBox";
+import ViewRequisitions from "./ViewRequisitionDetailsModal";
 
 interface CompletionProps {
   id: string;
@@ -316,10 +316,10 @@ const PurchaseRequisitionsPage = () => {
               ) : lineItems && lineItems.length > 0 ? (
                 <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm">
                   <table className="w-full table-auto">
-                    <thead className="bg-gray-100">
+                    <thead className="bg-gray-100 ">
                       <tr>
                         {expandedHeading.map((header, i) => (
-                          <th key={`header-${i}`} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">
+                          <th key={`header-${i}`} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase text-center">
                             {header}
                           </th>
                         ))}
@@ -443,7 +443,7 @@ const PurchaseRequisitionsPage = () => {
         </table>
       </TableShadowWrapper>
       
-      {isOpen && <CreateRequisitions />}
+      {isOpen && <ViewRequisitions />}
     </>
   );
 };

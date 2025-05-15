@@ -13,7 +13,7 @@ import useNotify from '@/hooks/useNotify';
 import useSaveForLater from '@/hooks/useSaveForLater';
 import { FaPlus} from 'react-icons/fa';
 import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
-import { useParams, useRouter} from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import { Requisition } from '@/types';
 import { useGetRequisitions } from '@/hooks/useGetRequisition';
 
@@ -24,8 +24,6 @@ const PurchaseRequisitionSchema = z.object({
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
   supplier_id: z.string().min(1, "Supplier is required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
-  estimated_cost: z.number().min(1, "Estimated cost must be at least 1"),
   currency: z.string().min(1, "Currency is required"),
   justification: z.string().min(1, "Justification is required"),
   needed_by_date: z.string().min(1, "Needed by date must be in the future"),
@@ -34,22 +32,14 @@ const PurchaseRequisitionSchema = z.object({
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
 
 const CreateRequisitionsPage = () => {
-  const { currentOrg, hideCreatePrText, orgName } = useStore();
-  const params = useParams()
+  const { currentOrg, orgName, pr } = useStore();
   const router = useRouter();
-  const pr = params.pr as string[];
-  let pr_number = "";
-  if(pr && pr.length == 1) {
-   pr_number = pr[0];
-  } else {
-    router.push(`/${orgName}/purchase-requisitions`);
-  }
   const { finaliseRequisition, loading: finalizeLoading, errorMessage: finalizeError } = useFinaliseRequisition();
   const { saveForLater, loading: saveForLaterLoading } = useSaveForLater();
   const { error } = useNotify();
   const [saveForLaterChecked, setSaveForLaterChecked] = useState(false);
   const {
-    savedRequisitions
+    savedRequisitions,
   } = useGetRequisitions()
   const defaultValues = {
     department_id: "",
@@ -58,8 +48,6 @@ const CreateRequisitionsPage = () => {
     request_description: "",
     branch_id: "",
     supplier_id: "",
-    quantity: 0,
-    estimated_cost: 0,
     currency: "NGN",
     justification: "",
     needed_by_date: "",
@@ -85,8 +73,6 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
     setValue("request_description", requisition.request_description);
     setValue("branch_id", requisition?.branch?.id);
     setValue("supplier_id", requisition?.supplier?.id);
-    setValue("quantity", requisition.quantity);
-    setValue("estimated_cost", requisition.estimated_cost);
     setValue("justification", requisition.justification);
     setValue("currency", requisition.currency);
     setValue("needed_by_date", new Date(requisition.needed_by_date).toISOString().split('T')[0]);
@@ -94,7 +80,7 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
 
   useEffect(() => {
     if (savedRequisitions) {
-      const saved = savedRequisitions.find((req) => req?.pr_number === pr_number);
+      const saved = savedRequisitions.find((req) => req?.pr_number === pr?.pr_number);
       if (saved) setRequisitionValues(saved);
     }
   }, []);
@@ -108,15 +94,13 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
 
     try {
       const submissionData = {
-        pr_number: pr_number,
+        pr_number: pr?.pr_number,
         department_id: data.department_id,
         supplier_id: data.supplier_id,
         contact_info: data.contact_info,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
-        quantity: data.quantity,
-        estimated_cost: data.estimated_cost,
         currency: data.currency,
         justification: data.justification,
         needed_by_date: data.needed_by_date,
@@ -139,15 +123,13 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
 
     try {
       const submissionData = {
-        pr_number: pr_number,
+        pr_number: pr?.pr_number,
         department_id: data.department_id,
         supplier_id: data.supplier_id,
         contact_info: data.contact_info,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
-        quantity: data.quantity,
-        estimated_cost: data.estimated_cost,
         currency: data.currency,
         justification: data.justification,
         needed_by_date: data.needed_by_date,
@@ -174,7 +156,7 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
   return (
     <div className='bg-secondary bg-opacity-10'>
        <div className="bg-primary/5 sm:p-8 sm:mb-4 sticky top-0  flex items-center justify-between p-3 bg-primary bg-opacity-50 z-50">
-              <h1 className="sm:text-[24px] text-sm font-semibold text-white">{ hideCreatePrText !== "" ? hideCreatePrText: "Create Purchase Requisition"}</h1>
+              <h1 className="sm:text-[24px] text-sm font-semibold text-white">{"Create Purchase Requisition"}</h1>
               <Button className='bg-white'
                 onClick={() => router.push(`/${orgName}/purchase-requisitions`)}
                 >
@@ -194,26 +176,28 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
                     <CreateRequisitionForm
                       register={register}
                       errors={errors}
-                      prNumber={pr_number ?? ""}
+                      prNumber={pr?.pr_number ?? ""}
                       watch={watch}
                       setValue={setValue}
                     />
                   </NumberedListItem>
 
-                  <NumberedListItem
-                    number={2}
-                    title="Item Selection"
-                    description="Add items from inventory or create new items"
-                  >
-                    <AddItemsToRequisition />
-                  </NumberedListItem>
+              
+                <NumberedListItem
+                  number={2}
+                  title="Item Selection"
+                  description="Add items from inventory or create new items"
+                >
+                  <AddItemsToRequisition />
+                </NumberedListItem>
 
                   <NumberedListItem
                     number={3}
                     title="Review Items"
                     description="Review and confirm selected items"
                   >
-                    <FetchItemByPrNumber />
+                    <FetchItemByPrNumber
+                    />
                   </NumberedListItem>
                 </>
             </ol>

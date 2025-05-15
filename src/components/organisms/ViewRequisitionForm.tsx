@@ -13,6 +13,9 @@ import { currencies } from "@/constants";
 import useFetchSuppliers from "@/hooks/useFetchSuppliers";
 import CreateSupplier from "./CreateSupplier";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";
+import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
+import { useEffect, useState } from "react";
+import LoaderSpinner from "../atoms/LoaderSpinner";
 
 interface RequisitionFormType {
   department_id: string;
@@ -26,7 +29,7 @@ interface RequisitionFormType {
   needed_by_date: string;
 }
 
-interface CreateRequisitionFormProps {
+interface ViewRequisitionFormProps {
   register: UseFormRegister<RequisitionFormType>;
   errors: FieldErrors<RequisitionFormType>;
   prNumber: string;
@@ -37,8 +40,8 @@ interface CreateRequisitionFormProps {
 const today = new Date();
 
 
-const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register, errors, prNumber, watch, setValue }) => {
-  const { currentOrg } = useStore();
+const ViewRequisitionForm: React.FC<ViewRequisitionFormProps> = ({ register, errors, prNumber, watch, setValue }) => {
+  const { currentOrg, pr } = useStore();
   const { data: departmentData, isLoading: loadingData,  } = useFetchDepartment(currentOrg);
   const { data: branchData, isLoading: branchLoading,  } = useFetchBranch(currentOrg);
   const suppliers = useFetchSuppliers(currentOrg);
@@ -49,8 +52,20 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
   const branchId = watch("branch_id");
   const selectedCurrency = watch("currency");
   const supplierId = watch("supplier_id");
-  const {isDisabled} = useGetRequisitions()
-
+  const {isDisabled, showForSavedOnly} = useGetRequisitions()
+  const hideQtyAndEstCost = showForSavedOnly?.status === "INITIALIZED" || showForSavedOnly?.status === "SAVED_FOR_LATER"
+   const [quantity, setQuantity] = useState(0);
+    const [estimatedCost, setEstimatedCost] = useState(0);
+  const { data, isLoading } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 1000, 1);
+  const totalQuantity = data?.data?.data?.reduce((acc, item) => acc + item.pr_quantity, 0) || 0;
+  const totalEstimatedCost = data?.data?.data?.reduce((acc, item) => acc + (item.pr_quantity * item.unit_price), 0) || 0;
+  useEffect(()=> {
+    if (totalQuantity && totalEstimatedCost) {
+      setQuantity(totalQuantity)
+      setEstimatedCost(totalEstimatedCost)
+    }
+  }, [totalQuantity, totalEstimatedCost])
+  
   return (
     <div className="flex flex-col w-full justify-center z-20 relative">
       <div className="flex w-full sm:justify-end">
@@ -156,7 +171,31 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 className="h-40"
                 {...register("request_description")}
               />
-             <div className="flex gap-4 flex-col">
+              {errors.request_description && <p className="text-red-500 text-xs">{errors.request_description.message}</p>}
+             {!hideQtyAndEstCost && <InputField
+                label="Quantity"
+                name="quantity"
+                disabled
+                required
+                type="number"
+                placeholder="Input quantity"
+                value={String(quantity)}
+              />}
+              {isLoading && <LoaderSpinner className="absolute top-0 left-0 w-2 h-2 bg-white bg-opacity-50 z-10" />}
+              <div className="flex gap-4 flex-col">
+                {!hideQtyAndEstCost&&<div className="flex-1">
+                  <InputField
+                  disabled
+                    label="Estimated Cost"
+                    name="estimated_cost"
+                    required
+                    type="number"
+                    placeholder="Estimated Cost"
+                    value={String(estimatedCost)}
+
+                  />
+                </div>}
+
                 <div className="w-full">
                   <Select
                     label="Currency"
@@ -189,4 +228,4 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
   );
 }
 
-export default CreateRequisitionForm;
+export default ViewRequisitionForm;

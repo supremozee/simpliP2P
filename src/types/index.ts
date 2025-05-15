@@ -381,7 +381,7 @@ export interface Owner {
     unit_price: number
     image_url?:string;
     currency?:string;
-    status?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | "SAVED_FOR_LATER"
+    status?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | "SAVED_FOR_LATER" | "INITIALIZED"
   }
   export interface Requisition {
     department: {
@@ -409,7 +409,7 @@ export interface Owner {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-    status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | 'SAVED_FOR_LATER'
+    status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | 'SAVED_FOR_LATER' | 'INITIALIZED'
     items: RequisitionItems[];
   }
   export interface CreatePurchaseRequisitionData {
@@ -736,8 +736,6 @@ interface Role {
     contact_info: string;
     requestor_name: string;
     request_description: string;
-    quantity: number;
-    estimated_cost: number;
     justification: string;
     needed_by_date: string; 
   }

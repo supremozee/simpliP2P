@@ -381,7 +381,7 @@ const TableRowWithSelectionActions = ({
   ];
 
   return (
-    <tr className={`border-b border-gray-200 transition-colors ${isSelected(item.id) ? 'bg-blue-50 hover:bg-blue-100' : index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}`}>
+    <tr className={`border-b border-gray-200 text-center transition-colors ${isSelected(item.id) ? 'bg-blue-50 hover:bg-blue-100' : index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}`}>
       {rowData.map((cell, i) => (
         <td key={`cell-${i}`} className="px-4 py-3 text-sm">
           {cell}

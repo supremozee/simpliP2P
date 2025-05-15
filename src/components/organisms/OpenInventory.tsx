@@ -15,6 +15,7 @@ import useRemoveItem from "@/hooks/useRemoveItems";
 import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";
+import { format_price } from "@/utils/helpers";
 
 const OpenInventory = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +31,7 @@ const OpenInventory = () => {
   const headers = [
     "Name",
     "Description",
+    "Currency",
     "Unit Price",
     "Category",
     "Stock Qty",
@@ -92,6 +94,7 @@ const OpenInventory = () => {
           isOpen={isOpen}
           title="Select Items from Catalog"
           contentClassName="max-w-5xl"
+          domId="modal-initialize"
         >
           <div className="p-6">
             {isLoading ? (
@@ -108,7 +111,7 @@ const OpenInventory = () => {
                   </p>
                 </div>
 
-                <div className="overflow-hidden border border-gray-200 rounded-lg">
+                <div className="overflow-x-scroll border border-gray-200 rounded-lg">
                   <table className="w-full">
                     <TableHead headers={headers} />
                     <TableBody
@@ -119,10 +122,8 @@ const OpenInventory = () => {
                           data={[
                             prod?.name,
                             prod?.description || "No description",
-                            new Intl.NumberFormat('en-US', {
-                              style: 'currency',
-                              currency: 'USD'
-                            }).format(prod?.unitPrice),
+                            prod?.currency,
+                           format_price (prod?.unitPrice, prod?.currency),
                             prod?.category?.name,
                             prod?.stockQty,
                             <div key="checkbox" className="flex justify-center">

@@ -34,7 +34,7 @@ const Layout = ({children}:{children:React.ReactNode}) => {
   const savedPr=  savedData?.data.requisitions.find((pr) => pr.pr_number === pr_number)
     
     useEffect(() => {
-        if(findPr && !savedPr ) {
+        if(findPr && savedPr?.status !== "SAVED_FOR_LATER" && findPr.status !== "INITIALIZED") {
             setExistingPR(true)
         }
     }, [findPr, savedPr])
@@ -153,7 +153,7 @@ const Layout = ({children}:{children:React.ReactNode}) => {
         )
     }
     return (
-        <div>
+        <div id='modal-initialize'>
             {children}
         </div>
     )

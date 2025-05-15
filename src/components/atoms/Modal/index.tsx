@@ -12,6 +12,7 @@ interface ModalProps {
   contentClassName?: string;
   title?: string;
   showCloseIcon?: boolean;
+  domId?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({ 
@@ -22,6 +23,7 @@ const Modal: React.FC<ModalProps> = ({
   height = 'auto', 
   contentClassName,
   title,
+  domId = 'modal-root',
   showCloseIcon = true
 }) => {
   useEffect(() => {
@@ -101,7 +103,7 @@ const Modal: React.FC<ModalProps> = ({
         }
       `}</style>
     </div>,
-    document.getElementById('modal-root') as HTMLElement
+    document.getElementById(domId) as HTMLElement
   );
 };
 

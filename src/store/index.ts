@@ -14,7 +14,7 @@ interface SimpliP2PStore {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   pr:PrData |  null;
-  setPr:(pr: PrData)=>void;
+  setPr:(pr: PrData | null)=>void;
   errorMessage:string;
   setErrorMessage:(error:string)=>void;
   deactivated: boolean;
@@ -70,7 +70,7 @@ const useStore = create<SimpliP2PStore>()(
         set({ isOpen: value });
       },
       pr: null,
-      setPr: (pr:PrData) => {
+      setPr: (pr: PrData | null) => {
         set({ pr: pr });
       },
       deactivated: false,

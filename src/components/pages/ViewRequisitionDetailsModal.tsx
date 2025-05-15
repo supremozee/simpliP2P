@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
-import CreateRequisitionForm from "../organisms/CreateRequisitionForm";
 import NumberedListItem from "../atoms/NumberedListItem";
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -17,6 +16,7 @@ import AddItemsToRequisition from '../organisms/AddItemsToRequisition';
 import LoaderSpinner from '../atoms/LoaderSpinner';
 import { Requisition } from '@/types';
 import { useGetRequisitions } from '@/hooks/useGetRequisition';
+import ViewRequisitionForm from '../organisms/ViewRequisitionForm';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
@@ -25,8 +25,6 @@ const PurchaseRequisitionSchema = z.object({
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
   supplier_id: z.string().min(1, "Supplier is required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
-  estimated_cost: z.number().min(1, "Estimated cost must be at least 1"),
   currency: z.string().min(1, "Currency is required"),
   justification: z.string().min(1, "Justification is required"),
   needed_by_date: z.string().min(1, "Needed by date must be in the future"),
@@ -34,7 +32,7 @@ const PurchaseRequisitionSchema = z.object({
 
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
 
-const CreateRequisitions = () => {
+const ViewRequisitions = () => {
   const { currentOrg, pr, isOpen, setIsOpen, hideCreatePrText } = useStore();
   const { finaliseRequisition, loading: finalizeLoading, errorMessage: finalizeError } = useFinaliseRequisition();
   const { saveForLater, loading: saveForLaterLoading } = useSaveForLater();
@@ -52,6 +50,7 @@ const CreateRequisitions = () => {
     isRejectedLoading,
     isRequestLoading,
     isDisabled,
+    showForSavedOnly
   } = useGetRequisitions();
   
   const defaultValues = {
@@ -61,8 +60,6 @@ const CreateRequisitions = () => {
     request_description: "",
     branch_id: "",
     supplier_id: "",
-    quantity: 0,
-    estimated_cost: 0,
     currency: "NGN",
     justification: "",
     needed_by_date: "",
@@ -88,8 +85,6 @@ const CreateRequisitions = () => {
     setValue("request_description", requisition.request_description);
     setValue("branch_id", requisition?.branch?.id);
     setValue("supplier_id", requisition?.supplier?.id);
-    setValue("quantity", requisition.quantity);
-    setValue("estimated_cost", requisition.estimated_cost);
     setValue("justification", requisition.justification);
     setValue("currency", requisition.currency);
     setValue("needed_by_date", new Date(requisition.needed_by_date).toISOString().split('T')[0]);
@@ -146,8 +141,6 @@ const CreateRequisitions = () => {
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
-        quantity: data.quantity,
-        estimated_cost: data.estimated_cost,
         currency: data.currency,
         justification: data.justification,
         needed_by_date: data.needed_by_date,
@@ -178,8 +171,6 @@ const CreateRequisitions = () => {
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
-        quantity: data.quantity,
-        estimated_cost: data.estimated_cost,
         currency: data.currency,
         justification: data.justification,
         needed_by_date: data.needed_by_date,
@@ -203,7 +194,6 @@ const CreateRequisitions = () => {
   };
 
   const isSubmitting = finalizeLoading || saveForLaterLoading 
-
   return (
     <div>
       {isOpen && (
@@ -223,7 +213,7 @@ const CreateRequisitions = () => {
                     title="Basic Information"
                     description="Enter requisition details and specifications"
                   >
-                    <CreateRequisitionForm
+                    <ViewRequisitionForm
                       register={register}
                       errors={errors}
                       prNumber={pr?.pr_number ?? ""}
@@ -232,13 +222,13 @@ const CreateRequisitions = () => {
                     />
                   </NumberedListItem>
 
-                  <NumberedListItem
+                  {showForSavedOnly&&<NumberedListItem
                     number={2}
                     title="Item Selection"
                     description="Add items from inventory or create new items"
                   >
                     <AddItemsToRequisition />
-                  </NumberedListItem>
+                  </NumberedListItem>}
 
                   <NumberedListItem
                     number={3}
@@ -251,7 +241,8 @@ const CreateRequisitions = () => {
               )}
             </ol>
 
-            <div className="flex flex-col gap-4 mt-4 bg-white p-4 rounded-lg">
+           {showForSavedOnly&&
+           ( <div className="flex flex-col gap-4 mt-4 bg-white p-4 rounded-lg">
               <div className="flex items-center justify-between border-b pb-4">
                 <div className="flex items-center gap-2">
                   <Button
@@ -308,7 +299,7 @@ const CreateRequisitions = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </div>)}
 
             {finalizeError && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -322,4 +313,4 @@ const CreateRequisitions = () => {
   );
 };
 
-export default CreateRequisitions;
+export default ViewRequisitions;
