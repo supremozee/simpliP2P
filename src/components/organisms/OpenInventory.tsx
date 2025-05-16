@@ -17,7 +17,7 @@ import LoaderSpinner from "../atoms/LoaderSpinner";
 import { useGetRequisitions } from "@/hooks/useGetRequisition";
 import { format_price } from "@/utils/helpers";
 
-const OpenInventory = () => {
+const OpenInventory = ({dom}:{dom:string}) => {
   const [isOpen, setIsOpen] = useState(false);
   const { currentOrg, pr, loading } = useStore();
   const fetchItemByPrNumber = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 10, 1);
@@ -94,7 +94,7 @@ const OpenInventory = () => {
           isOpen={isOpen}
           title="Select Items from Catalog"
           contentClassName="max-w-5xl"
-          domId="modal-initialize"
+          domId={dom}
         >
           <div className="p-6">
             {isLoading ? (
