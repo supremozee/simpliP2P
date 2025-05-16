@@ -84,7 +84,7 @@ const RegisterPage = () => {
   return (
     <div className='flex h-auto w-full font-roboto'>
       {loading && <Loader/>}
-      <div className="bg-[url('/african-woman-manager-looking-camera-smiling-holding-clipboard-while-diverse-coworkers-talking-background.png')] w-full sm:w-1/2 h-1/3 sm:h-auto object-cover bg-cover sm:flex hidden flex-col justify-center items-center pt-10">
+      <div className="bg-[url('//loginImage.png')] w-full sm:w-1/2 h-1/3 sm:h-auto object-cover bg-cover sm:flex hidden flex-col justify-center items-center pt-10">
         <p className='w-[90%] sm:w-[600px] mt-10 sm:mt-28 text-primary font-bold text-[14px] sm:text-[16px] text-center sm:text-left'>
           Create a new account by providing your company name, role, and contact information
         </p>
