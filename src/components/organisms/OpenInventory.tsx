@@ -35,8 +35,9 @@ const OpenInventory = ({dom}:{dom:string}) => {
     "Currency",
     "Unit Price",
     "Category",
-    "Stock Qty",
-    "Select"
+    "Stock Quantity",
+    " Quantity",
+     "Select"
   ];
 
   useEffect(() => {
@@ -132,10 +133,14 @@ const OpenInventory = ({dom}:{dom:string}) => {
                           key={prod?.id}
                           data={[
                             prod?.name,
-                            prod?.description || "No description",
+                            `${prod?.description.substring(0, 20)}...` || "No description",
                             prod?.currency,
                            format_price (prod?.unitPrice, prod?.currency),
                             prod?.category?.name,
+                            <span 
+                            key={prod.id}
+                            className={`text-center ${prod?.stockQty === 0 ? 'text-red-500' : 'text-green-500'}`}
+                            >{prod?.stockQty}</span> ,
                             <input
                               key={prod.id}
                               type="number"

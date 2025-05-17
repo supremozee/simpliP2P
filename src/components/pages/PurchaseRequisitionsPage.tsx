@@ -87,7 +87,7 @@ const PurchaseRequisitionsPage = () => {
   } = useExportSelected();
   const handleViewRequisition = ({ pr_number, id }: CompletionProps) => {
     if (pr_number && id) {
-      setHidePrText(`You are viewing requisition ID: ${id}`)
+      setHidePrText(`You are viewing requisition: ${pr_number}`);  
       setPr({ pr_number, id });
 
       setIsOpen(true);
