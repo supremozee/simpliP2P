@@ -193,7 +193,7 @@ const auth = {
     return apiRequest(ORGANIZATION_ENDPOINTS.SUPPLIERS(orgId), postConfig(data));
   },
 
-  fetchSuppliers: async (orgId: string, page?: number, pageSize?: number): Promise<FetchSuppliersResponse> => {
+  fetchSuppliers: async (orgId: string, page?: number, pageSize?: 100): Promise<FetchSuppliersResponse> => {
     return apiRequest(`${ORGANIZATION_ENDPOINTS.SUPPLIERS(orgId)}?page=${page}&pageSize=${pageSize}`, getConfig());
   },
 
@@ -263,8 +263,8 @@ const auth = {
   createCategory: async (data: CreateCategory, orgId: string): Promise<any> => {
     return apiRequest(ORGANIZATION_ENDPOINTS.CATEGORY(orgId), postConfig(data))
   },
-  fetchCategory: async (orgId: string): Promise<any> => {
-    return apiRequest(ORGANIZATION_ENDPOINTS.CATEGORY(orgId), getConfig());
+  fetchCategory: async (orgId: string, page: number = 1, pageSize: number = 100): Promise<any> => {
+    return apiRequest(`${ORGANIZATION_ENDPOINTS.CATEGORY(orgId)}?page=${page}&pageSize=${pageSize}`, getConfig());
   },
 
   fetchCategoryById: async (orgId: string, categoryId: string): Promise<any> => {

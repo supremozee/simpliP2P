@@ -49,7 +49,7 @@ const PurchaseRequisitionsPage = () => {
     "Item",
     "Quantity",
     "Unit Price",
-    "Total Cost",
+    "Estimated Cost",
   ];
   
   const tabNames = [

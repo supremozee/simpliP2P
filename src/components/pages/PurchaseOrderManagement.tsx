@@ -230,7 +230,7 @@ const PurchaseOrdersManagement: React.FC = () => {
     "PO Number", 
     "Supplier", 
     "Date Created", 
-    "Total Cost", 
+    "Estimated Cost", 
     "Status"
   ];
 

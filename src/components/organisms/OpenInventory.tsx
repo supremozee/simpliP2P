@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../atoms/Modal";
 import Button from "../atoms/Button";
 import TableHead from "../atoms/TableHead";
@@ -23,6 +23,7 @@ const OpenInventory = ({dom}:{dom:string}) => {
   const fetchItemByPrNumber = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 10, 1);
   const itemsByPrNumber = fetchItemByPrNumber?.data?.data?.data;
   const [selectedItems, setSelectedItems] = useState<AllItems[]>([]);
+  const [productQuantities, setProductQuantities] = useState<Record<string, number>>({});
   const { data, error, isLoading, isError } = useFetchProducts(currentOrg, 1, 10);
   const { addItemsToRequisition } = useAddItemsToRequistion();
   const { removeItem } = useRemoveItem();
@@ -61,14 +62,24 @@ const OpenInventory = ({dom}:{dom:string}) => {
       setSelectedItems(prevItems => prevItems.filter(item => item?.id !== itemToRemove?.id));
     }
   };
+  const handleQuantityChange = (e:React.ChangeEvent, product:FetchProduct)=> {
+    const newValue = Number((e.target as HTMLInputElement).value);
+    if (newValue > 1 ) {
+      setProductQuantities(prev=> ({
+        ...prev,
+        [product.id]: newValue
+      }))
+    }
+  }
 
   const addItem = async (product: FetchProduct) => {
+    const quantity = productQuantities[product.id] ||  1
     const response = await addItemsToRequisition(
       {
         pr_id: pr?.id || "",
         product_id: product?.id,
         item_name: product?.name,
-        pr_quantity: product?.stockQty,
+        pr_quantity: quantity,
         unit_price: Number(product?.unitPrice),
         image_url: product?.image_url || "",
       },
@@ -125,7 +136,14 @@ const OpenInventory = ({dom}:{dom:string}) => {
                             prod?.currency,
                            format_price (prod?.unitPrice, prod?.currency),
                             prod?.category?.name,
-                            prod?.stockQty,
+                            <input
+                              key={prod.id}
+                              type="number"
+                              className="w-16 h-8 border border-gray-300 rounded text-center"
+                              onChange={(e) => handleQuantityChange(e, prod)}
+                              value={productQuantities[prod.id] || 1}
+                              min={1}
+                            />,
                             <div key="checkbox" className="flex justify-center">
                               <input
                                 type="checkbox"

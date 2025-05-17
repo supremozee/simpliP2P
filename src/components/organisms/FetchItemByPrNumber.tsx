@@ -106,7 +106,7 @@ const FetchItemByPrNumber = () => {
             </div>
             
             <div className="flex items-center">
-              <span className="text-gray-600 font-medium mr-2">Total Cost:</span>
+              <span className="text-gray-600 font-medium mr-2">Estimated Cost:</span>
               <span className="font-bold text-primary">
                 {format_price(totals.cost, totals.currency)}
               </span>
