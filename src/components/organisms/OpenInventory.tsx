@@ -139,7 +139,7 @@ const OpenInventory = ({dom}:{dom:string}) => {
                             prod?.category?.name,
                             <span 
                             key={prod.id}
-                            className={`text-center ${prod?.stockQty === 0 ? 'text-red-500' : 'text-green-500'}`}
+                            className={`text-center flex justify-center items-center ${prod?.stockQty === 0 ? 'text-red-500' : 'text-green-500'}`}
                             >{prod?.stockQty}</span> ,
                             <input
                               key={prod.id}
