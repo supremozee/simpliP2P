@@ -35,7 +35,6 @@ const OpenInventory = ({dom}:{dom:string}) => {
     "Currency",
     "Unit Price",
     "Category",
-    "Stock Quantity",
     " Quantity",
      "Select"
   ];
@@ -136,11 +135,7 @@ const OpenInventory = ({dom}:{dom:string}) => {
                             `${prod?.description.substring(0, 20)}...` || "No description",
                             prod?.currency,
                            format_price (prod?.unitPrice, prod?.currency),
-                            prod?.category?.name,
-                            <span 
-                            key={prod.id}
-                            className={`text-center flex justify-center items-center ${prod?.stockQty === 0 ? 'text-red-500' : 'text-green-500'}`}
-                            >{prod?.stockQty}</span> ,
+                            prod.category,
                             <input
                               key={prod.id}
                               type="number"
