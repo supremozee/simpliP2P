@@ -12,7 +12,7 @@ const TableHead: React.FC<TableHeadProps> = ({ headers, index }) => {
         {headers.map((header, idx) => (
           <th 
             key={idx}
-            className="border-b border-gray-200 px-4 py-3 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider "
+            className="border-b border-gray-200 px-4 py-3 text-center font-semibold text-xs text-gray-700 uppercase tracking-wider "
           >
             {header}
           </th>

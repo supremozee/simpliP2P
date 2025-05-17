@@ -135,7 +135,7 @@ const OpenInventory = ({dom}:{dom:string}) => {
                             `${prod?.description.substring(0, 20)}...` || "No description",
                             prod?.currency,
                            format_price (prod?.unitPrice, prod?.currency),
-                            prod.category,
+                            prod?.category?.name || "No category",
                             <input
                               key={prod.id}
                               type="number"
