@@ -193,8 +193,8 @@ const auth = {
     return apiRequest(ORGANIZATION_ENDPOINTS.SUPPLIERS(orgId), postConfig(data));
   },
 
-  fetchSuppliers: async (orgId: string, page?: number, pageSize?: 100): Promise<FetchSuppliersResponse> => {
-    return apiRequest(`${ORGANIZATION_ENDPOINTS.SUPPLIERS(orgId)}?page=${page}&pageSize=${pageSize}`, getConfig());
+  fetchSuppliers: async (orgId: string, page?: number, pageSize?: number): Promise<FetchSuppliersResponse> => {
+    return apiRequest(`${ORGANIZATION_ENDPOINTS.SUPPLIERS(orgId)}?page=${page}&pageSize=${pageSize || 100}`, getConfig());
   },
 
   updateSupplier: async (orgId: string, supplierId: string, data: UpdateSupplierData): Promise<UpdateSupplierResponse> => {
