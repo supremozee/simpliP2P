@@ -275,7 +275,7 @@ const CreatePurchaseOrder = () => {
                         <div>
                           <p className="text-sm text-gray-500">Contact Information</p>
                           <p className="text-sm font-medium text-gray-700 mt-1">
-                            {filteredRequisitions[currentIndex]?.contact_info}
+                            {filteredRequisitions[currentIndex]?.requestor_phone}
                           </p>
                         </div>
                         <div>

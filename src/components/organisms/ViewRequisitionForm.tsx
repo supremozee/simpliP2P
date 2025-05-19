@@ -19,7 +19,7 @@ import LoaderSpinner from "../atoms/LoaderSpinner";
 
 interface RequisitionFormType {
   department_id: string;
-  contact_info: string;
+  requestor_phone: string;
   requestor_name: string;
   requestor_email: string;
   request_description: string;
@@ -129,14 +129,14 @@ const ViewRequisitionForm: React.FC<ViewRequisitionFormProps> = ({ register, err
                 />
               </div>
               <InputField
-                label="Requisitor Contact"
+                label="Requestor Phone"
                 disabled={!!isDisabled}
                 required
                 type="text"
-                placeholder="Contact Phone"
-                {...register("contact_info")}
+                placeholder="Requestor Phone"
+                {...register("requestor_phone")}
               />
-              {errors.contact_info && <p className="text-red-500 text-xs">{errors.contact_info.message}</p>}
+              {errors.requestor_phone && <p className="text-red-500 text-xs">{errors.requestor_phone.message}</p>}
               <InputField
                 label="Requestor Email"
                 disabled={!!isDisabled}

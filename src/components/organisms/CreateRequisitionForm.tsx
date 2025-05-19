@@ -16,7 +16,7 @@ import { useGetRequisitions } from "@/hooks/useGetRequisition";
 
 interface RequisitionFormType {
   department_id: string;
-  contact_info: string;
+  requestor_phone: string;
   requestor_name: string;
   requestor_email: string;
   request_description: string;
@@ -114,14 +114,14 @@ const CreateRequisitionForm: React.FC<CreateRequisitionFormProps> = ({ register,
                 />
               </div>
               <InputField
-                label="Requisitor Phone"
+                label="Requestor Phone"
                 disabled={!!isDisabled}
                 required
                 type="text"
-                placeholder="Contact phone"
-                {...register("contact_info")}
+                placeholder="Requestor phone"
+                {...register("requestor_phone")}
               />
-              {errors.contact_info && <p className="text-red-500 text-xs">{errors.contact_info.message}</p>}
+              {errors.requestor_phone && <p className="text-red-500 text-xs">{errors.requestor_phone.message}</p>}
               <InputField
                 label="Requestor Email"
                 disabled={!!isDisabled}

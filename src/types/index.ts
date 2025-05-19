@@ -393,7 +393,7 @@ export interface Owner {
       name:string
     };
     supplier: Supplier
-    contact_info: string;
+    requestor_phone: string;
     requestor_email:string;
     requestor_name: string;
     request_description: string;
@@ -415,7 +415,7 @@ export interface Owner {
   }
   export interface CreatePurchaseRequisitionData {
     department: string;
-    contact_info: string;
+    requestor_phone: string;
     requestor_name: string;
     request_description: string;
     branch:string;
@@ -685,7 +685,7 @@ interface Role {
     created_at: string;
     updated_at: string;
     pr_number: string;
-    contact_info: string;
+    requestor_phone: string;
     requestor_email:string;
     requestor_name: string;
     request_description: string;
@@ -724,7 +724,7 @@ interface Role {
     pr_number: string;
     department_id: string;
     branch_id: string;
-    contact_info: string;
+    requestor_phone: string;
     requestor_email:string;
     requestor_name: string;
     request_description: string;
@@ -736,7 +736,7 @@ interface Role {
   export interface PurchaseRequisitionSavedForLater {
     pr_number: string;
     department_id: string;
-    contact_info: string;
+    requestor_phone: string;
     requestor_email:string;
     requestor_name: string;
     request_description: string;

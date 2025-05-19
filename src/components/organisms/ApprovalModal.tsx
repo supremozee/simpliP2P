@@ -172,7 +172,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Contact</p>
-                    <p className="text-sm font-medium">{requisition?.contact_info}</p>
+                    <p className="text-sm font-medium">{requisition?.requestor_phone}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Department</p>

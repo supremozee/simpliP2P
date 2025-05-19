@@ -19,7 +19,7 @@ import { useGetRequisitions } from '@/hooks/useGetRequisition';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
-  contact_info: z.string().min(1,"contact Phone is required"),
+  requestor_phone: z.string().min(1,"contact Phone is required"),
   requestor_email: z.string().email().min(1, "Requestor email is required"),
   requestor_name: z.string().min(1, "Requestor name is required"),
   request_description: z.string().min(1, "Description of goods/services is required"),
@@ -44,7 +44,7 @@ const CreateRequisitionsPage = () => {
   } = useGetRequisitions()
   const defaultValues = {
     department_id: "",
-    contact_info: "",
+    requestor_phone: "",
     requestor_email: "",
     requestor_name: "",
     request_description: "",
@@ -70,7 +70,7 @@ const CreateRequisitionsPage = () => {
 
 const setRequisitionValues = useCallback((requisition: Requisition) => {
     setValue("department_id", requisition?.department?.id);
-    setValue("contact_info", requisition.contact_info);
+    setValue("requestor_phone", requisition.requestor_phone);
     setValue("requestor_email", requisition.requestor_email);
     setValue("requestor_name", requisition.requestor_name);
     setValue("request_description", requisition.request_description);
@@ -100,7 +100,7 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
         pr_number: pr?.pr_number,
         department_id: data.department_id,
         supplier_id: data.supplier_id,
-        contact_info: data.contact_info,
+        requestor_phone: data.requestor_phone,
         requestor_email: data.requestor_email,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
@@ -130,7 +130,7 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
         pr_number: pr?.pr_number,
         department_id: data.department_id,
         supplier_id: data.supplier_id,
-        contact_info: data.contact_info,
+        requestor_phone: data.requestor_phone,
         requestor_email: data.requestor_email,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
