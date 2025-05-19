@@ -19,7 +19,8 @@ import { useGetRequisitions } from '@/hooks/useGetRequisition';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
-  contact_info: z.string().email().min(1,"Invalid contact information"),
+  contact_info: z.string().min(1,"contact Phone is required"),
+  requestor_email: z.string().email().min(1, "Requestor email is required"),
   requestor_name: z.string().min(1, "Requestor name is required"),
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
@@ -44,6 +45,7 @@ const CreateRequisitionsPage = () => {
   const defaultValues = {
     department_id: "",
     contact_info: "",
+    requestor_email: "",
     requestor_name: "",
     request_description: "",
     branch_id: "",
@@ -69,6 +71,7 @@ const CreateRequisitionsPage = () => {
 const setRequisitionValues = useCallback((requisition: Requisition) => {
     setValue("department_id", requisition?.department?.id);
     setValue("contact_info", requisition.contact_info);
+    setValue("requestor_email", requisition.requestor_email);
     setValue("requestor_name", requisition.requestor_name);
     setValue("request_description", requisition.request_description);
     setValue("branch_id", requisition?.branch?.id);
@@ -98,6 +101,7 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
         department_id: data.department_id,
         supplier_id: data.supplier_id,
         contact_info: data.contact_info,
+        requestor_email: data.requestor_email,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
@@ -127,6 +131,7 @@ const setRequisitionValues = useCallback((requisition: Requisition) => {
         department_id: data.department_id,
         supplier_id: data.supplier_id,
         contact_info: data.contact_info,
+        requestor_email: data.requestor_email,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,

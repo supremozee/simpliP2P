@@ -1,7 +1,7 @@
 import { auth } from '@/api/auths'
 import useStore from '@/store'
 import { InitializePurchaseRequisition, InitializeRequisitionResponse } from '@/types'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import useNotify from './useNotify'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -10,6 +10,7 @@ const useInitializePurchaseRequisition = () => {
     const {setLoading, setPr} = useStore();
     const [errorMessage, setErrorMessage] = useState("")
     const router = useRouter()
+    const queryClient =  useQueryClient()
     const {success, error:notifyError} = useNotify()
     const {mutateAsync:initializePurchaseRequisitionMutation} = useMutation({
         onMutate: ()=> {
@@ -18,6 +19,7 @@ const useInitializePurchaseRequisition = () => {
         },
         mutationFn:auth.initializePurchaseRequisition,
         onSuccess:(response:InitializeRequisitionResponse) => {
+            queryClient.invalidateQueries({queryKey: ['fetchRequisition']});
             if(response?.status === "success") {
                 setLoading(false)
                 router.push(`/initialize-requisition/${response?.data.pr_number}`)

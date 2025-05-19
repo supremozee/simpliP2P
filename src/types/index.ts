@@ -394,6 +394,7 @@ export interface Owner {
     };
     supplier: Supplier
     contact_info: string;
+    requestor_email:string;
     requestor_name: string;
     request_description: string;
     quantity: number;
@@ -685,6 +686,7 @@ interface Role {
     updated_at: string;
     pr_number: string;
     contact_info: string;
+    requestor_email:string;
     requestor_name: string;
     request_description: string;
     quantity: number;
@@ -723,6 +725,7 @@ interface Role {
     department_id: string;
     branch_id: string;
     contact_info: string;
+    requestor_email:string;
     requestor_name: string;
     request_description: string;
     quantity?: number; 
@@ -734,6 +737,7 @@ interface Role {
     pr_number: string;
     department_id: string;
     contact_info: string;
+    requestor_email:string;
     requestor_name: string;
     request_description: string;
     justification: string;

@@ -21,6 +21,7 @@ interface RequisitionFormType {
   department_id: string;
   contact_info: string;
   requestor_name: string;
+  requestor_email: string;
   request_description: string;
   branch_id: string;
   supplier_id:string;
@@ -131,12 +132,20 @@ const ViewRequisitionForm: React.FC<ViewRequisitionFormProps> = ({ register, err
                 label="Requisitor Contact"
                 disabled={!!isDisabled}
                 required
-                type="email"
-                placeholder="Contact email"
+                type="text"
+                placeholder="Contact Phone"
                 {...register("contact_info")}
               />
               {errors.contact_info && <p className="text-red-500 text-xs">{errors.contact_info.message}</p>}
-
+              <InputField
+                label="Requestor Email"
+                disabled={!!isDisabled}
+                required
+                type="email"
+                placeholder="Contact email"
+                {...register("requestor_email")}
+              />
+              {errors.requestor_email && <p className="text-red-500 text-xs">{errors.requestor_email.message}</p>}
               <InputField
                 label="Requestor Name"
                 required

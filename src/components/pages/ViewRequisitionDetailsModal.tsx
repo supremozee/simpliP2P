@@ -20,7 +20,8 @@ import ViewRequisitionForm from '../organisms/ViewRequisitionForm';
 
 const PurchaseRequisitionSchema = z.object({
   department_id: z.string().min(1, "Department is required"),
-  contact_info: z.string().email().min(1,"Invalid contact information"),
+  contact_info: z.string().min(1,"Invalid contact phone number"),
+  requestor_email: z.string().email("Invalid email address"),
   requestor_name: z.string().min(1, "Requestor name is required"),
   request_description: z.string().min(1, "Description of goods/services is required"),
   branch_id: z.string().min(1, "Branch is required"),
@@ -34,7 +35,7 @@ type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
 
 const ViewRequisitions = () => {
   const { currentOrg, pr, isOpen, setIsOpen, hideCreatePrText } = useStore();
-  const { finaliseRequisition, loading: finalizeLoading, errorMessage: finalizeError } = useFinaliseRequisition();
+  const { finaliseRequisition, loading: finalizeLoading } = useFinaliseRequisition();
   const { saveForLater, loading: saveForLaterLoading } = useSaveForLater();
   const { error } = useNotify();
   const [saveForLaterChecked, setSaveForLaterChecked] = useState(false);
@@ -56,6 +57,7 @@ const ViewRequisitions = () => {
   const defaultValues = {
     department_id: "",
     contact_info: "",
+    requestor_email: "",
     requestor_name: "",
     request_description: "",
     branch_id: "",
@@ -81,6 +83,7 @@ const ViewRequisitions = () => {
   const setRequisitionValues = useCallback((requisition: Requisition) => {
     setValue("department_id", requisition?.department?.id);
     setValue("contact_info", requisition.contact_info);
+    setValue("requestor_email", requisition.requestor_email);
     setValue("requestor_name", requisition.requestor_name);
     setValue("request_description", requisition.request_description);
     setValue("branch_id", requisition?.branch?.id);
@@ -138,6 +141,7 @@ const ViewRequisitions = () => {
         department_id: data.department_id,
         supplier_id: data.supplier_id,
         contact_info: data.contact_info,
+        requestor_email: data.requestor_email,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
@@ -168,6 +172,7 @@ const ViewRequisitions = () => {
         department_id: data.department_id,
         supplier_id: data.supplier_id,
         contact_info: data.contact_info,
+        requestor_email: data.requestor_email,
         requestor_name: data.requestor_name,
         request_description: data.request_description,
         branch_id: data.branch_id,
@@ -300,12 +305,6 @@ const ViewRequisitions = () => {
                 </div>
               </div>
             </div>)}
-
-            {finalizeError && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{finalizeError}</p>
-              </div>
-            )}
           </div>
         </Modal>
       )}
