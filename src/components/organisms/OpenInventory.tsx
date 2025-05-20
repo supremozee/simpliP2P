@@ -44,6 +44,15 @@ const OpenInventory = ({dom}:{dom:string}) => {
       setSelectedItems(itemsByPrNumber);
     }
   }, [itemsByPrNumber]);
+  useEffect(() => {
+    if (products.length > 0) {
+      const initialQuantities: Record<string, number> = {};
+      products.forEach(product => {
+        initialQuantities[product.id] = 1;
+      });
+      setProductQuantities(prev => ({...prev, ...initialQuantities}));
+    }
+  }, [products]);
 
   const toggleItemSelection = async (product: FetchProduct) => {
     const existingItem = selectedItems.find(item => item?.product?.id === product.id);
@@ -64,11 +73,15 @@ const OpenInventory = ({dom}:{dom:string}) => {
   };
   const handleQuantityChange = (e:React.ChangeEvent, product:FetchProduct)=> {
     const newValue = Number((e.target as HTMLInputElement).value);
-    if (newValue > 1 ) {
-      setProductQuantities(prev=> ({
+    if (newValue >= 1) {
+      setProductQuantities(prev => ({
         ...prev,
         [product.id]: newValue
-      }))
+      }));
+      const existingItem = selectedItems.find(item => item?.product?.id === product.id);
+      if (existingItem) {
+        removeItemFromSelect(product);
+      }
     }
   }
 
@@ -141,7 +154,7 @@ const OpenInventory = ({dom}:{dom:string}) => {
                               type="number"
                               className="w-16 h-8 border border-gray-300 rounded text-center"
                               onChange={(e) => handleQuantityChange(e, prod)}
-                              value={productQuantities[prod.id] || 1}
+                              value={productQuantities[prod.id]}
                               min={1}
                             />,
                             <div key="checkbox" className="flex justify-center">
