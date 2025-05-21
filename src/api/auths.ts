@@ -295,7 +295,7 @@ const auth = {
   fetchRequisition: async (orgId: string, status?: string): Promise<any> => {
     const url = status
       ? `${ORGANIZATION_ENDPOINTS.REQUISITIONS(orgId)}?status=${status}`
-      : `${ORGANIZATION_ENDPOINTS.REQUISITIONS(orgId)}`;
+      : `${ORGANIZATION_ENDPOINTS.REQUISITIONS(orgId)}?page=${1}&pageSize=${100}`;
     return await apiRequest(url, getConfig());
   },
   fetchRequisitionById: async (orgId: string, reqId:string): Promise<any> => {

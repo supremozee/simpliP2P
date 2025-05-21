@@ -1,127 +1,118 @@
 import React from 'react';
-import useFetchSuppliers from '@/hooks/useFetchSuppliers';
-import useStore from '@/store';
 import Card from '../atoms/Card';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { IoTrendingUp } from 'react-icons/io5';
-import SupplierDetails from './SupplierDetails';
-import { cn } from '@/utils/cn';
-import useUserPermissions from '@/hooks/useUserPermissions';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdLocationPin } from 'react-icons/md';
+import Rating from '../atoms/Rating';
+import { BsEnvelope, BsGlobe, BsTelephone, BsTruck } from 'react-icons/bs';
 import Button from '../atoms/Button';
-
-const SupplierGrid = () => {
-  const { currentOrg, supplierId, setSupplierId } = useStore();
-  const { data: supplierData, isLoading } = useFetchSuppliers(currentOrg);
-  const { checkPermission } = useUserPermissions();
-
-  const handleSupplierClick = (id: string) => {
-    setSupplierId(id);
+import { Supplier } from '@/types';
+interface FilteredSupplier extends Supplier {
+  category: {
+    name: string;
   };
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-[200px] animate-pulse bg-gray-100 rounded-xl" />
-        ))}
-      </div>
-    );
-  }
-
+}
+const SupplierGrid = ({ 
+  supplier, 
+  onEdit, 
+  onDelete,
+  isSelected,
+  toggleSelect
+}: { 
+  supplier: FilteredSupplier, 
+  onEdit: (id: string) => void, 
+  onDelete: (id: string) => void,
+  isSelected: boolean,
+  toggleSelect: () => void
+}) => {
   return (
-    <div className={cn(
-      "grid gap-6",
-      supplierId ? "grid-cols-[1fr,400px]" : "grid-cols-1"
-    )}>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {supplierData?.data?.map((supplier) => (
-          <motion.div
-            key={supplier.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Card
-              className={cn(
-                "p-6 cursor-pointer transition-all duration-200",
-                supplierId === supplier.id ? "ring-2 ring-primary/20 shadow-lg" : "hover:shadow-md"
-              )}
-              onClick={() => handleSupplierClick(supplier.id)}
+    <Card className={`flex flex-col bg-white rounded-lg shadow-sm border transition-all duration-200 overflow-hidden h-auto ${isSelected ? 'border-primary bg-blue-50' : 'border-gray-200 hover:shadow-md'}`}>
+      <div className="p-4 flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <button
+              onClick={toggleSelect}
+              className="mr-2 flex items-center justify-center focus:outline-none"
             >
-              <div className="flex items-start gap-4">
-                <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                  <Image
-                    src={ '/testsupplier.png'}
-                    alt={supplier.full_name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 line-clamp-1">
-                    {supplier.full_name}
-                  </h3>
-                  <p className="text-sm text-gray-500 line-clamp-1">{supplier.email}</p>
-                </div>
+              {isSelected ? (
+                <MdCheckBox size={20} className="text-primary" />
+              ) : (
+                <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+              )}
+            </button>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-medium text-gray-800 truncate">
+                {supplier.full_name}
+              </h3>
+              <div className="flex items-center mt-1">
+                <Rating rating={Number(supplier.rating) || 0} />
               </div>
+            </div>
+          </div>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+            {supplier.category.name}
+          </span>
+        </div>
+        
+        <div className="mt-3 space-y-1.5">
+          <div className="flex items-center text-xs text-gray-600">
+            <BsEnvelope className="w-3 h-3 mr-2 text-gray-400" />
+            <span className="truncate">{supplier.email}</span>
+          </div>
+          {supplier.phone && (
+            <div className="flex items-center text-xs text-gray-600">
+              <BsTelephone className="w-3 h-3 mr-2 text-gray-400" />
+              <span>{supplier.phone}</span>
+            </div>
+          )}
+          {supplier.supplier_no && (
+            <div className="flex items-center text-xs text-gray-600">
+              <BsGlobe className="w-3 h-3 mr-2 text-gray-400" />
+              <span className="truncate">{supplier.supplier_no}</span>
+            </div>
+          )}
+          {supplier.address && (
+            <div className="flex items-start text-xs text-gray-600">
+              <MdLocationPin className="w-3 h-3 mr-2 mt-0.5 text-gray-400 flex-shrink-0" />
+              <span className="truncate">
+                {[
+                  supplier.address.street,
+                  supplier.address.city,
+                  supplier.address.zip_code && supplier.address.state ? 
+                    `${supplier.address.zip_code}, ${supplier.address.state}` : 
+                    (supplier.address.zip_code || supplier.address.state)
+                ].filter(Boolean).join(', ')}
+              </span>
+            </div>
+          )}
+        </div>
 
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Category:</span>
-                  <span className="font-medium text-gray-700">
-                    {supplier.category?.name || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm mt-2">
-                  <span className="text-gray-500">Rating:</span>
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium text-gray-700">
-                      {supplier.rating || 'N/A'}
-                    </span>
-                    {supplier.rating && (
-                      <IoTrendingUp className="w-4 h-4 text-green-500" />
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-2 mt-4">
-                    <Button
-                      disabled= {!checkPermission(['update_suppliers', 'manage_suppliers'])}
-                      onClick={() =>{
-                        handleSupplierClick(supplier.id);
-                      }}
-                      className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        // Add delete handler here
-                      }}
-                      disabled={!checkPermission(['delete_suppliers', 'manage_suppliers'])}
-                      className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
-                    >
-                      Delete
-                    </Button>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center">
+            <BsTruck className="w-3 h-3 text-gray-400 mr-1" />
+            <span className="text-xs text-gray-500">Since {new Date(supplier.created_at).toLocaleDateString()}</span>
+          </div>
+        </div>
       </div>
 
-      {supplierId && (
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
+      <div className="p-3 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-2">
+        <Button
+          onClick={() => onEdit(supplier.id)}
+          kind="white"
+          padding="xxs"
+          radius="xs"
+          className="text-xs border border-gray-200"
         >
-          <SupplierDetails />
-        </motion.div>
-      )}
-    </div>
+          Edit
+        </Button>
+        <Button
+          onClick={() => onDelete(supplier.id)}
+          padding="xxs" 
+          radius="xs"
+          className="text-xs bg-red-600 text-white hover:bg-red-700"
+        >
+          Delete
+        </Button>
+      </div>
+    </Card>
   );
 };
 

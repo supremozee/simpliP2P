@@ -22,9 +22,9 @@ export default function useUpdateRequisitionStatus() {
     },
     onSuccess: (response:any) => {
       setLoading(false);
+      queryClient.invalidateQueries({ queryKey: ['fetchRequisitionById'] });
       queryClient.invalidateQueries({ queryKey: ['organizationDashboard'] });
       queryClient.invalidateQueries({ queryKey: ['fetchRequisition'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchRequisitionById'] });
       if (response && response.status === 'success') {
         notifySuccess(response?.message);
       } else {

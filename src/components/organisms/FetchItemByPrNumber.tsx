@@ -45,13 +45,13 @@ const FetchItemByPrNumber = () => {
   if (isError) return <ErrorComponent text={error?.message || "Failed to fetch products."} />;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const headers: string | any = ["Item Image", "Item Name", "Description", "Unit Price", "Quantity", (showForSavedOnly && "Actions")];
+  const headers: string | any = ["Item Image", "Item Name", "Currency", "Unit Price", "Quantity", (showForSavedOnly && "Actions")];
   const renderRow = (item: AllItems, index: number) => {
     const rowData = [
-      <TableCell key="image" className="flex justify-center items-center text-center">
+      <TableCell key="image">
         {item.image_url ? (
           <Image
-            src={item.image_url}
+            src={item.image_url || "/logo-black.png"}
             alt={item.item_name}
             width={25}
             height={25}
@@ -61,11 +61,11 @@ const FetchItemByPrNumber = () => {
           <span className="text-gray-500">No Image</span>
         )}
       </TableCell>,
-      <TableCell key="name" className="flex justify-center items-center text-center">{item.item_name}</TableCell>,
-      <TableCell key="description" className="flex justify-center items-center text-center">{item.description || "No Description"}</TableCell>,
-      <TableCell key="price" className="flex justify-center items-center text-center">{format_price(item.unit_price, item.currency)}</TableCell>,
-      <TableCell key="quantity" className="flex justify-center items-center text-center">{item.pr_quantity}</TableCell>,
-      showForSavedOnly && (<TableCell key="actions" className="flex gap-2 justify-center">
+      <TableCell key="name">{item.item_name}</TableCell>,
+      <TableCell key="price">{format_price(item.unit_price, item.currency)}</TableCell>,
+      <TableCell key="currency">{item.currency}</TableCell>,
+      <TableCell key="quantity">{item.pr_quantity}</TableCell>,
+      showForSavedOnly && (<TableCell key="actions" className="flex gap-2">
         <Button
           key={item.id}
           type="button"
@@ -80,14 +80,14 @@ const FetchItemByPrNumber = () => {
         key={item.id}
         data={rowData}
         index={index}
-        className={`transition-colors text-center`}
+        className={`transition-colors`}
       />
     )
   }
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-[#808080] border-opacity-50 text-center">
+        <table className="w-full border-collapse border border-[#808080] border-opacity-50 text-start">
           <TableHead headers={headers} key={headers.length} />
           <TableBody
             data={products}

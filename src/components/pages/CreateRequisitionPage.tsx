@@ -27,7 +27,16 @@ const PurchaseRequisitionSchema = z.object({
   supplier_id: z.string().min(1, "Supplier is required"),
   currency: z.string().min(1, "Currency is required"),
   justification: z.string().min(1, "Justification is required"),
-  needed_by_date: z.string().min(1, "Needed by date must be in the future"),
+  needed_by_date: z.string()
+  .min(1, "Needed by date is required")
+  .refine((date) => {
+    if (!date) return false;
+    const selectedDate = new Date(date);
+    const today = new Date();
+    // Reset time parts to compare dates only
+    today.setHours(0, 0, 0, 0);
+    return selectedDate >= today;
+  }, "Date must be today or in the future"),
 });
 
 type PurchaseRequsitionData = z.infer<typeof PurchaseRequisitionSchema>;
@@ -64,7 +73,8 @@ const CreateRequisitionsPage = () => {
     watch,
   } = useForm<PurchaseRequsitionData>({
     resolver: zodResolver(PurchaseRequisitionSchema),
-    mode: "onSubmit",
+    mode: "onBlur",
+    reValidateMode: "onChange",
     defaultValues,
   });
 

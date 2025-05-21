@@ -5,9 +5,10 @@ import { RxHamburgerMenu } from 'react-icons/rx';
 import { FaPlus } from 'react-icons/fa';
 import { IoFilterOutline } from 'react-icons/io5';
 import { FiSearch } from 'react-icons/fi';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import useStore from '@/store';
 import useExportData from '@/hooks/useExportData';
+import ExportingLoader from '../atoms/ExportingLoader';
+import Tooltip from '../atoms/Tooltip';
 
 type FilterOption = {
   label: string;
@@ -35,27 +36,8 @@ const exportFormats = [
 
 ];
 
-const LoadingModal = () => (
-  <div className="absolute h-screen  w-full   flex items-center justify-center z-50">
-    <div className="bg-primary rounded-lg p-4 flex items-center gap-3 justify-center min-w-[180px] shadow-lg">
-      <AiOutlineLoading3Quarters className="w-5 h-5 text-white animate-spin" />
-      <p className="text-sm font-medium text-white">Exporting...</p>
-    </div>
-  </div>
-);
-
-const Tooltip = ({ content, children }: { content: string, children: React.ReactNode }) => (
-  <div className="group relative inline-block">
-    {children}
-    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap bg-gray-800 text-white text-xs rounded px-2 py-1 mb-1 z-50">
-      {content}
-      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-px border-4 border-transparent border-t-gray-800"></div>
-    </div>
-  </div>
-);
-
 const ActionBar: React.FC<ActionBarTypes> = ({
-  onSearch, showDate, buttonName, viewMode, toggleView, view, onClick, type, filterOptions = [], onFilter
+  onSearch, showDate, buttonName, viewMode, toggleView, view, onClick, type, onFilter, filterOptions = [],
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -63,11 +45,9 @@ const ActionBar: React.FC<ActionBarTypes> = ({
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const { currentOrg, startDate, endDate, format, setEndDate, setStartDate, setFormat } = useStore();
-  
   const { mutate: exportData, status, isError: isExportError } = useExportData({
     orgId: currentOrg, startDate, endDate, format, type
   });
-
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       if (onSearch) onSearch(searchQuery);
@@ -110,7 +90,7 @@ const ActionBar: React.FC<ActionBarTypes> = ({
 
   return (
     <>
-      { status === "pending"&& <LoadingModal />}
+      { status === "pending"&& <ExportingLoader />}
       
       <div className=" mb-4">
         <div className="flex items-center justify-between p-3 flex-wrap gap-2">

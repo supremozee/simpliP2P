@@ -8,7 +8,7 @@ interface TableBodyProps<T> {
 
 const TableBody = <T,>({ data, renderRow, emptyMessage }: TableBodyProps<T>) => {
   return (
-    <tbody className='divide-y divide-gray-200 text-center'>
+    <tbody className='divide-y divide-gray-200'>
       {data.length > 0 ? (
         data.map(renderRow)
       ) : (
