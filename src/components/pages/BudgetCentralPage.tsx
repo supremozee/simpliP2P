@@ -12,7 +12,7 @@ import { format_price } from '@/utils/helpers';
 import useExportSelected from '@/hooks/useExportSelected';
 import Button from '../atoms/Button';
 import SelectedItemForExport from '../organisms/SelectedItemForExport';
-import { IoWalletOutline, IoAddCircleOutline, IoAnalyticsOutline, IoWarningOutline, IoBusinessOutline } from 'react-icons/io5';
+import { IoWalletOutline, IoAddCircleOutline, IoAnalyticsOutline, IoBusinessOutline } from 'react-icons/io5';
 
 type FilterType = {
   currency?: string;
@@ -259,12 +259,6 @@ const BudgetCentralPage = () => {
       return available > 0 && available / allocated > 0.1;
     }).length;
 
-    const criticalBudgets = filteredBudgets.filter(budget => {
-      const available = parseFloat(budget.amount_available);
-      const allocated = parseFloat(budget.amount_allocated);
-      return available === 0 || available / allocated <= 0.1;
-    }).length;
-
     // Use the most common currency (simplified approach)
     const currencyCounts = filteredBudgets.reduce((counts, budget) => {
       counts[budget.currency] = (counts[budget.currency] || 0) + 1;
@@ -279,7 +273,6 @@ const BudgetCentralPage = () => {
       reservedBudget,
       utilizedBudget,
       activeBudgets,
-      criticalBudgets,
       currency
     };
   }, [filteredBudgets]);
@@ -407,36 +400,6 @@ const BudgetCentralPage = () => {
                 style={{ width: `${(budgetMetrics.reservedBudget / budgetMetrics.totalBudget) * 100}%` }}
                 className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-amber-500"
               ></div>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="bg-white shadow-md rounded-xl p-5 border border-gray-200"
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-gray-500 text-sm">Budget Status</p>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span className="text-sm">{budgetMetrics.activeBudgets}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span className="text-sm">{budgetMetrics.criticalBudgets}</span>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                {budgetMetrics.criticalBudgets > 0 ? 
-                  `${budgetMetrics.criticalBudgets} budget${budgetMetrics.criticalBudgets !== 1 ? 's' : ''} need attention` : 
-                  'All budgets in good standing'}
-              </p>
-            </div>
-            <div className="p-2 bg-red-50 rounded-full">
-              <IoWarningOutline className="w-6 h-6 text-red-600" />
             </div>
           </div>
         </motion.div>

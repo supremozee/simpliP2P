@@ -175,16 +175,6 @@ const OpenBudget: React.FC<OpenBudgetProps> = ({ budgetId }) => {
                           <span className="text-gray-500">Currency</span>
                           <span className="font-medium">{budget.currency}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Created By</span>
-                          <span className="font-medium">Admin User</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Status</span>
-                          <span className={`font-medium ${metrics.availabilityRate > 70 ? 'text-green-600' : metrics.availabilityRate > 30 ? 'text-amber-600' : 'text-red-600'}`}>
-                            {metrics.availabilityRate > 70 ? 'Active' : metrics.availabilityRate > 30 ? 'Limited' : 'Critical'}
-                          </span>
-                        </div>
                       </div>
                     </div>
 
