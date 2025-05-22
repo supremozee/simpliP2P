@@ -10,9 +10,8 @@ import TableSkeleton from '../atoms/Skeleton/Table';
 import BudgetSummarySkeleton from '../atoms/Skeleton/Budget';
 import { format_price } from '@/utils/helpers';
 import useExportSelected from '@/hooks/useExportSelected';
-import Button from '../atoms/Button';
 import SelectedItemForExport from '../organisms/SelectedItemForExport';
-import { IoWalletOutline, IoAddCircleOutline, IoAnalyticsOutline, IoBusinessOutline } from 'react-icons/io5';
+import { IoWalletOutline, IoAnalyticsOutline, IoBusinessOutline } from 'react-icons/io5';
 
 type FilterType = {
   currency?: string;
@@ -295,13 +294,6 @@ const BudgetCentralPage = () => {
             Manage and monitor your organization&apos;s budgets
           </p>
         </div>
-        <Button
-          onClick={handleOpenModal}
-          className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
-        >
-          <IoAddCircleOutline size={18} />
-          Create Budget
-        </Button>
       </div>
 
       <ActionBar 
