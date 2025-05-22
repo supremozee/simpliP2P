@@ -12,12 +12,14 @@ import { format_price } from '@/utils/helpers';
 import useExportSelected from '@/hooks/useExportSelected';
 import Button from '../atoms/Button';
 import SelectedItemForExport from '../organisms/SelectedItemForExport';
+import { IoWalletOutline, IoAddCircleOutline, IoAnalyticsOutline, IoWarningOutline, IoBusinessOutline } from 'react-icons/io5';
 
 type FilterType = {
   currency?: string;
   dateRange?: string;
   status?: string;
   amountRange?: string;
+  department?: string;
 };
 
 const BudgetCentralPage = () => {
@@ -60,35 +62,53 @@ const BudgetCentralPage = () => {
     ];
 
     const statuses = [
+      { label: 'All Statuses', value: 'all' },
       { label: 'Active', value: 'active' },
       { label: 'Depleted', value: 'depleted' },
       { label: 'Reserved', value: 'reserved' }
+    ];
+
+    const departments = [
+      { label: 'All Departments', value: 'all' },
+      { label: 'Finance', value: 'Finance' },
+      { label: 'Operations', value: 'Operations' },
+      { label: 'IT', value: 'IT' },
+      { label: 'Marketing', value: 'Marketing' }
     ];
 
     return [
       {
         label: "Currency",
         value: "currency",
-        options: currencies.map(currency => ({
-          label: currency,
-          value: currency
-        }))
+        options: [
+          { label: "All Currencies", value: "all" },
+          ...currencies.map(currency => ({
+            label: currency,
+            value: currency
+          }))
+        ]
       },
       {
         label: "Amount Range",
         value: "amountRange",
-        options: amountRanges.map(range => ({
-          label: range.label,
-          value: `${range.min}-${range.max === Infinity ? '+' : range.max}`
-        }))
+        options: [
+          { label: "All Amounts", value: "all" },
+          ...amountRanges.map(range => ({
+            label: range.label,
+            value: `${range.min}-${range.max === Infinity ? '+' : range.max}`
+          }))
+        ]
       },
       {
         label: "Date Range",
         value: "dateRange",
-        options: dateRanges.map(range => ({
-          label: range.label,
-          value: range.value
-        }))
+        options: [
+          { label: "All Time", value: "all" },
+          ...dateRanges.map(range => ({
+            label: range.label,
+            value: range.value
+          }))
+        ]
       },
       {
         label: "Status",
@@ -96,6 +116,14 @@ const BudgetCentralPage = () => {
         options: statuses.map(status => ({
           label: status.label,
           value: status.value
+        }))
+      },
+      {
+        label: "Department",
+        value: "department",
+        options: departments.map(dept => ({
+          label: dept.label,
+          value: dept.value
         }))
       }
     ];
@@ -110,10 +138,16 @@ const BudgetCentralPage = () => {
   };
 
   const handleFilter = (filterType: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
+    if (value === 'all') {
+      const newFilters = { ...activeFilters };
+      delete newFilters[filterType as keyof FilterType];
+      setActiveFilters(newFilters);
+    } else {
+      setActiveFilters(prev => ({
+        ...prev,
+        [filterType]: value
+      }));
+    }
   };
 
   const handleSelectAll = () => {
@@ -175,7 +209,10 @@ const BudgetCentralPage = () => {
     if (activeFilters.status) {
       filtered = filtered.filter(budget => {
         const available = parseFloat(budget.amount_available);
+        const allocated = parseFloat(budget.amount_allocated);
         const reserved = parseFloat(budget.amount_reserved);
+        const utilized = allocated - available - reserved;
+        const utilizationRate = allocated > 0 ? (utilized / allocated) * 100 : 0;
 
         switch (activeFilters.status) {
           case 'depleted':
@@ -183,7 +220,7 @@ const BudgetCentralPage = () => {
           case 'reserved':
             return reserved > 0;
           case 'active':
-            return available > 0;
+            return available > 0 && utilizationRate < 90;
           default:
             return true;
         }
@@ -193,19 +230,58 @@ const BudgetCentralPage = () => {
     return filtered;
   }, [data, searchQuery, activeFilters]);
 
-  // Summary calculations for the cards
-  const summaryMetrics = useMemo(() => {
-    if (!filteredBudgets.length) return [];
+  // Calculate budget metrics
+  const budgetMetrics = useMemo(() => {
+    if (!filteredBudgets.length) return {
+      totalBudget: 0,
+      availableBudget: 0,
+      reservedBudget: 0,
+      utilizedBudget: 0,
+      activeBudgets: 0,
+      criticalBudgets: 0,
+      currency: 'USD'
+    };
 
-    return filteredBudgets.map(budget => ({
-      id: budget.id,
-      name: budget.name,
-      currency: budget.currency,
-      allocated: parseFloat(budget.amount_allocated),
-      available: parseFloat(budget.amount_available),
-      reserved: parseFloat(budget.amount_reserved),
-      balance: parseFloat(budget.balance)
-    }));
+    const totalBudget = filteredBudgets.reduce((sum, budget) => 
+      sum + parseFloat(budget.amount_allocated), 0);
+    
+    const availableBudget = filteredBudgets.reduce((sum, budget) => 
+      sum + parseFloat(budget.balance), 0);
+    
+    const reservedBudget = filteredBudgets.reduce((sum, budget) => 
+      sum + parseFloat(budget.amount_reserved), 0);
+    
+    const utilizedBudget = totalBudget - availableBudget - reservedBudget;
+
+    const activeBudgets = filteredBudgets.filter(budget => {
+      const available = parseFloat(budget.amount_available);
+      const allocated = parseFloat(budget.amount_allocated);
+      return available > 0 && available / allocated > 0.1;
+    }).length;
+
+    const criticalBudgets = filteredBudgets.filter(budget => {
+      const available = parseFloat(budget.amount_available);
+      const allocated = parseFloat(budget.amount_allocated);
+      return available === 0 || available / allocated <= 0.1;
+    }).length;
+
+    // Use the most common currency (simplified approach)
+    const currencyCounts = filteredBudgets.reduce((counts, budget) => {
+      counts[budget.currency] = (counts[budget.currency] || 0) + 1;
+      return counts;
+    }, {} as Record<string, number>);
+    
+    const currency = Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'USD';
+
+    return {
+      totalBudget,
+      availableBudget,
+      reservedBudget,
+      utilizedBudget,
+      activeBudgets,
+      criticalBudgets,
+      currency
+    };
   }, [filteredBudgets]);
 
   if (isLoading) return (
@@ -216,18 +292,21 @@ const BudgetCentralPage = () => {
   );
 
   return (
-    <main className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <main className="space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Budget Central</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+            <IoWalletOutline className="text-primary" /> Budget Central
+          </h1>
           <p className="text-gray-600 mt-1">
-            All your organization&apos;s budgets in one space.
+            Manage and monitor your organization&apos;s budgets
           </p>
         </div>
         <Button
           onClick={handleOpenModal}
-          className="bg-primary hover:bg-primary/90 text-white"
+          className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
         >
+          <IoAddCircleOutline size={18} />
           Create Budget
         </Button>
       </div>
@@ -238,61 +317,141 @@ const BudgetCentralPage = () => {
         filterOptions={filterOptions}
         type='budgets'
         showDate
+        buttonName="Create Budget"
+        onClick={handleOpenModal}
       />
 
       {selectedItems.length > 0 && (
-        <div className="mb-4">
-          <SelectedItemForExport
-            selectedItems={selectedItems}
-            items={filteredBudgets}
-            deselectAll={deselectAll}
-            entityType="budgets"
-          />
-        </div>
+        <SelectedItemForExport
+          selectedItems={selectedItems}
+          items={filteredBudgets}
+          deselectAll={deselectAll}
+          entityType="budgets"
+        />
       )}
 
       {/* Budget Summary Cards */}
-      <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ staggerChildren: 0.2 }}
-      >
-        {summaryMetrics.map((budget) => (
-          <motion.div
-            key={budget.id}
-            className="bg-white shadow-md rounded-xl p-5 border border-gray-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <p className="text-gray-500">{budget.name} ({budget.currency})</p>
-            <h2 className="text-lg font-semibold text-gray-700">
-               {format_price(budget.allocated, budget.currency)}
-            </h2>
-            <div className="flex justify-between text-sm text-gray-500 mt-2">
-              <span>Available: {format_price(budget.available, budget.currency)}</span>
-              <span>Reserved: {format_price(budget.reserved, budget.currency)}</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          className="bg-white shadow-md rounded-xl p-5 border border-gray-200"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm">Total Budget</p>
+              <h2 className="text-xl font-semibold text-gray-800">
+                {format_price(budgetMetrics.totalBudget, budgetMetrics.currency)}
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                {filteredBudgets.length} active budget{filteredBudgets.length !== 1 ? 's' : ''}
+              </p>
             </div>
-            <div className="relative pt-2">
-              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-100">
-                <div
-                  style={{ width: `${(budget.balance / budget.allocated) * 100}%` }}
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"
-                ></div>
+            <div className="p-2 bg-blue-50 rounded-full">
+              <IoBusinessOutline className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white shadow-md rounded-xl p-5 border border-gray-200"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm">Available Budget</p>
+              <h2 className="text-xl font-semibold text-green-600">
+                {format_price(budgetMetrics.availableBudget, budgetMetrics.currency)}
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                {((budgetMetrics.availableBudget / budgetMetrics.totalBudget) * 100).toFixed(1)}% of total budget
+              </p>
+            </div>
+            <div className="p-2 bg-green-50 rounded-full">
+              <IoAnalyticsOutline className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+          <div className="relative pt-3">
+            <div className="overflow-hidden h-1.5 text-xs flex rounded bg-gray-100">
+              <div
+                style={{ width: `${(budgetMetrics.availableBudget / budgetMetrics.totalBudget) * 100}%` }}
+                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-600"
+              ></div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white shadow-md rounded-xl p-5 border border-gray-200"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm">Reserved Amount</p>
+              <h2 className="text-xl font-semibold text-amber-600">
+                {format_price(budgetMetrics.reservedBudget, budgetMetrics.currency)}
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                {((budgetMetrics.reservedBudget / budgetMetrics.totalBudget) * 100).toFixed(1)}% of total budget
+              </p>
+            </div>
+            <div className="p-2 bg-amber-50 rounded-full">
+              <IoAnalyticsOutline className="w-6 h-6 text-amber-600" />
+            </div>
+          </div>
+          <div className="relative pt-3">
+            <div className="overflow-hidden h-1.5 text-xs flex rounded bg-gray-100">
+              <div
+                style={{ width: `${(budgetMetrics.reservedBudget / budgetMetrics.totalBudget) * 100}%` }}
+                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-amber-500"
+              ></div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white shadow-md rounded-xl p-5 border border-gray-200"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm">Budget Status</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-sm">{budgetMetrics.activeBudgets}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-sm">{budgetMetrics.criticalBudgets}</span>
+                </div>
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {budgetMetrics.criticalBudgets > 0 ? 
+                  `${budgetMetrics.criticalBudgets} budget${budgetMetrics.criticalBudgets !== 1 ? 's' : ''} need attention` : 
+                  'All budgets in good standing'}
+              </p>
             </div>
-          </motion.div>
-        ))}
-      </motion.div>
+            <div className="p-2 bg-red-50 rounded-full">
+              <IoWarningOutline className="w-6 h-6 text-red-600" />
+            </div>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Budget Table */}
-      <BudgetTable 
-        budgets={filteredBudgets}
-        selectedItems={selectedItems}
-        toggleSelectItem={toggleSelectItem}
-        isSelected={isSelected}
-        handleSelectAll={handleSelectAll}
-      />
+      <div className="mt-4">
+        <BudgetTable 
+          budgets={filteredBudgets}
+          selectedItems={selectedItems}
+          toggleSelectItem={toggleSelectItem}
+          isSelected={isSelected}
+          handleSelectAll={handleSelectAll}
+        />
+      </div>
 
       {/* Create Budget Modal */}
       <CreateBudgetModal showModal={isModalOpen} setShowModal={setIsModalOpen} />

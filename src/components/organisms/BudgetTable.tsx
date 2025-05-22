@@ -3,6 +3,11 @@ import { Budget } from '@/types';
 import { format_price } from '@/utils/helpers';
 import TableShadowWrapper from '../atoms/TableShadowWrapper';
 import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import TableHead from '../atoms/TableHead';
+import TableBody from '../atoms/TableBody';
+import TableRow from '../molecules/TableRow';
+import OpenBudget from './OpenBudget';
+import ExportCheckBox from '../molecules/ExportCheckBox';
 
 interface BudgetTableProps {
   budgets: Budget[];
@@ -27,76 +32,75 @@ const BudgetTable: React.FC<BudgetTableProps> = ({
     );
   }
 
+  const headers = [
+    <ExportCheckBox
+      handleSelectAll={handleSelectAll}
+      items={budgets}
+      selectedItems={selectedItems}
+      key="select-all"
+    />,
+    "Budget Name",
+    "Allocated Amount",
+    "Available Balance",
+    "Reserved Amount",
+    "Created Date",
+    "Actions"
+  ];
+
+  const renderRow = (budget: Budget, index: number) => (
+    <TableRow
+      key={budget.id}
+      data={[
+        <div key={`select-${budget.id}`} className="flex items-center justify-center">
+          <button 
+            onClick={() => toggleSelectItem(budget.id)}
+            className="flex items-center justify-center w-5 h-5 focus:outline-none"
+            aria-label={isSelected(budget.id) ? "Deselect budget" : "Select budget"}
+          >
+            {isSelected(budget.id) ? (
+              <MdCheckBox size={20} className="text-primary" />
+            ) : (
+              <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+            )}
+          </button>
+        </div>,
+        budget.name,
+        format_price(parseFloat(budget.amount_allocated), budget.currency),
+        <span key={`balance-${budget.id}`} className={`${
+          parseFloat(budget.amount_available) <= 0 
+            ? 'text-red-600' 
+            : parseFloat(budget.amount_available) < parseFloat(budget.amount_allocated) / 5 
+              ? 'text-amber-600' 
+              : 'text-green-600'
+        }`}>
+          {format_price(parseFloat(budget.balance), budget.currency)}
+        </span>,
+        format_price(parseFloat(budget.amount_reserved), budget.currency),
+        <span key={`date-${budget.id}`} className="text-gray-500">
+          {new Date(budget.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </span>,
+        <div key={`actions-${budget.id}`} className="flex items-center justify-center">
+          <OpenBudget budgetId={budget.id} />
+        </div>
+      ]}
+      className={`${isSelected(budget.id) ? 'bg-blue-50 hover:bg-blue-100' : index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}`}
+      index={index}
+    />
+  );
+
   return (
     <TableShadowWrapper maxHeight="calc(100vh - 500px)">
-      <table className="min-w-full bg-white border-collapse">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="py-3 px-4 text-left">
-              <button 
-                onClick={handleSelectAll}
-                className="flex items-center justify-center w-5 h-5 focus:outline-none"
-                aria-label={selectedItems.length === budgets.length ? "Deselect all budgets" : "Select all budgets"}
-              >
-                {selectedItems.length > 0 && selectedItems.length === budgets.length ? (
-                  <MdCheckBox size={20} className="text-primary" />
-                ) : (
-                  <MdCheckBoxOutlineBlank size={20} className="text-gray-400" />
-                )}
-              </button>
-            </th>
-            <th className="py-3 px-4 text-left">Budget Name</th>
-            <th className="py-3 px-4 text-left">Allocated Amount</th>
-            <th className="py-3 px-4 text-left">Available Balance</th>
-            <th className="py-3 px-4 text-left">Reserved Amount</th>
-            <th className="py-3 px-4 text-left">Created Date</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {budgets.map((budget) => (
-            <tr 
-              key={budget.id} 
-              className={`hover:bg-gray-50 transition-colors ${
-                isSelected(budget.id) ? 'bg-blue-50 hover:bg-blue-100' : ''
-              }`}
-            >
-              <td className="py-3 px-4">
-                <button 
-                  onClick={() => toggleSelectItem(budget.id)}
-                  className="flex items-center justify-center w-5 h-5 focus:outline-none"
-                  aria-label={isSelected(budget.id) ? "Deselect budget" : "Select budget"}
-                >
-                  {isSelected(budget.id) ? (
-                    <MdCheckBox size={20} className="text-primary" />
-                  ) : (
-                    <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
-                  )}
-                </button>
-              </td>
-              <td className="py-3 px-4 font-medium">{budget.name}</td>
-              <td className="py-3 px-4">{format_price(parseFloat(budget.amount_allocated), budget.currency)}</td>
-              <td className="py-3 px-4">
-                <span className={`${
-                  parseFloat(budget.amount_available) <= 0 
-                    ? 'text-red-600' 
-                    : parseFloat(budget.amount_available) < parseFloat(budget.amount_allocated) / 5 
-                      ? 'text-amber-600' 
-                      : 'text-green-600'
-                }`}>
-                  {format_price(parseFloat(budget.amount_available), budget.currency)}
-                </span>
-              </td>
-              <td className="py-3 px-4">{format_price(parseFloat(budget.amount_reserved), budget.currency)}</td>
-              <td className="py-3 px-4 text-gray-500">
-                {new Date(budget.created_at).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                })}
-              </td>
-            </tr>
-          ))}
-        </tbody>
+      <table className="min-w-full bg-white border-collapse table-auto">
+        <TableHead headers={headers} />
+        <TableBody
+          data={budgets}
+          renderRow={renderRow}
+          emptyMessage="No budgets found."
+        />
       </table>
     </TableShadowWrapper>
   );

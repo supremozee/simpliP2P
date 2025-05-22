@@ -340,7 +340,7 @@ const auth = {
   allOrders:async (orgId:string, status?:string ):Promise<any> => {
     const url  = status ?
      `${ORGANIZATION_ENDPOINTS.ORDERS(orgId)}?status=${status}` 
-     : `${ORGANIZATION_ENDPOINTS.ORDERS(orgId)}`
+     : `${ORGANIZATION_ENDPOINTS.ORDERS(orgId)}?page=1&pageSize=100`
     return await apiRequest(url, getConfig());
   },
   fetchOrderById: async (orgId: string, orderId: string): Promise<any> => {

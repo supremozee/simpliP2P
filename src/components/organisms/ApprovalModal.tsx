@@ -47,11 +47,9 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
   const items = itemData?.data?.data
   if (isLoading) {
     return (
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="max-w-5xl">
-        <div className="flex justify-center items-center h-96">
+        <div className="flex justify-center items-center h-screen z-50 absolute inset-0">
           <LoaderSpinner size="lg" text="Loading requisition details..." />
         </div>
-      </Modal>
     );
   }
 
@@ -171,8 +169,12 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                     <p className="text-sm font-medium">{requisition?.requestor_name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Contact</p>
+                    <p className="text-sm text-gray-500">Phone No.</p>
                     <p className="text-sm font-medium">{requisition?.requestor_phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="text-sm font-medium">{requisition?.requestor_email}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Department</p>
@@ -180,7 +182,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Branch</p>
-                    <p className="text-sm font-medium">{requisition?.branch?.name}</p>
+                    <p className="text-sm font-medium">{requisition?.branch?.address}</p>
                   </div>
                 </div>
               </div>

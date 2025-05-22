@@ -8,7 +8,7 @@ import useFetchAllOrderById from "@/hooks/useFetchOrderById";
 import CommentSection from "./CommentSection";
 import useUpdateOrderStatus from "@/hooks/useUpdateOrderStatus";
 import Image from "next/image";
-import { IoDocumentTextOutline, IoWarningOutline } from "react-icons/io5";
+import { IoDocumentTextOutline } from "react-icons/io5";
 import { FaFileInvoiceDollar, FaUserTie } from "react-icons/fa";
 import { BsClockHistory } from "react-icons/bs";
 import { cn } from "@/utils/cn";
@@ -24,11 +24,9 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
 
   if (isLoading) {
     return (
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="max-w-5xl">
-        <div className="flex justify-center items-center h-96">
+        <div className="flex justify-center items-center h-screen absolute inset-0  z-50">
           <LoaderSpinner size="lg" text="Loading order details..." />
         </div>
-      </Modal>
     );
   }
 
@@ -163,16 +161,10 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Total Amount</p>
-                    <p className="text-lg font-semibold text-primary">
+                    <p className="text-lg font-semibold text-primary flex items-center gap-1">
+                      <span className="text-sm font-medium">{order?.currency}</span>
                       {format_price(Number(order?.total_amount), order?.currency)}
                     </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Budget Impact</p>
-                    <div className="flex items-center gap-2">
-                      <IoWarningOutline className="w-4 h-4 text-yellow-500" />
-                      <span className="text-sm">Requires budget review</span>
-                    </div>
                   </div>
                 </div>
               </div>

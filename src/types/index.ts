@@ -391,6 +391,7 @@ export interface Owner {
     branch:{
       id:string
       name:string
+      address:string;
     };
     supplier: Supplier
     requestor_phone: string;

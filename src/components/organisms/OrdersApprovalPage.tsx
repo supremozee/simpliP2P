@@ -196,7 +196,8 @@ const OrdersApprovalPage = () => {
                     <div className="grid grid-cols-3 gap-8">
                       <div>
                         <p className="text-sm text-gray-500">Total Amount</p>
-                        <p className="text-lg font-semibold text-primary">
+                        <p className="text-lg font-semibold text-primary flex items-center gap-1">
+                          <span className="text-sm font-medium">{order.currency}</span>
                           {format_price(Number(order.total_amount), order?.currency)}
                         </p>
                       </div>
