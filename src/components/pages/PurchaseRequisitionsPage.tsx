@@ -24,6 +24,7 @@ import useExportSelected from "@/hooks/useExportSelected";
 import SelectedItemForExport from "../organisms/SelectedItemForExport";
 import ExportCheckBox from "../molecules/ExportCheckBox";
 import ViewRequisitions from "./ViewRequisitionDetailsModal";
+import useFetchDepartment from "@/hooks/useFetchDepartments";
 
 interface CompletionProps {
   id: string;
@@ -38,6 +39,8 @@ const PurchaseRequisitionsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const { data: prItemData, isLoading: isLineItemsLoading } = useFetchItemsByPrNumber(currentOrg, prNumber);
+  const {data} = useFetchDepartment(currentOrg);
+
   const lineItems = prItemData?.data?.data;
   
   // Set export type for requisitions
@@ -169,6 +172,20 @@ const PurchaseRequisitionsPage = () => {
       return matchesSearch && matchesDepartment && matchesDateRange;
     });
   };
+  const filterOptions = [
+    { 
+      label: "Department", 
+      value: "department", 
+      options: [
+        { label: "All", value: "all" },
+       ...( data?.data?.departments.map((department) => ({
+          label: department.name,
+          value: department.name,
+        })) || []),
+      ] 
+    }
+  ];
+
 
   const getStatusStyle = (status: string) => {
     switch(status) {
@@ -319,7 +336,7 @@ const PurchaseRequisitionsPage = () => {
                     <thead className="bg-gray-100 ">
                       <tr>
                         {expandedHeading.map((header, i) => (
-                          <th key={`header-${i}`} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase text-center">
+                          <th key={`header-${i}`} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">
                             {header}
                           </th>
                         ))}
@@ -375,20 +392,6 @@ const PurchaseRequisitionsPage = () => {
   };
 
   const tabCounts = tabNames.map(getTabCount);
-
-  const filterOptions = [
-    { 
-      label: "Department", 
-      value: "department", 
-      options: [
-        { label: "All", value: "all" },
-        { label: "Engineering", value: "Engineering" },
-        { label: "Executive Management", value: "Executive Management" },
-        { label: "Operations", value: "Operations" }
-      ] 
-    }
-  ];
-
   if (
     isLoadingSavedRequisitions ||
     isPendingLoading ||

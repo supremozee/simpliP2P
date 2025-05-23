@@ -92,8 +92,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
     setIsOpen(false);
   };
 
-  const calculateTotal = () => {
-    return requisition?.items?.reduce((total, item) => total + (item.unit_price * item.pr_quantity), 0) || 0;
+  const calculateTotal = ():number => {
+    return requisition?.estimated_cost || 0;
   };
 
   return (
@@ -190,7 +190,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <FaFileInvoiceDollar className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-gray-800">Items & Costs</h3>
+                  <h3 className="font-semibold text-gray-800"></h3>
                 </div>
                 <div className="overflow-x-auto">
                 <div className="overflow-x-auto">
@@ -222,7 +222,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
         </table>
       )}
 </div>
-                  <div className="flex justify-end mt-4">
+               <div className="flex justify-end mt-4">
                     <div className="bg-gray-50 px-4 py-2 rounded-lg">
                       <span className="text-sm text-gray-500">Total Amount: </span>
                       <span className="text-lg font-semibold text-primary">

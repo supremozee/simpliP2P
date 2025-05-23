@@ -292,6 +292,7 @@ export interface Owner {
     id: string;
     supplier_no:string;
     full_name: string;
+    lead_time:string;
     created_at:string;
     email: string;
     phone: string;

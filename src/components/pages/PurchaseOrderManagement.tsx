@@ -40,35 +40,17 @@ const PurchaseOrdersManagement: React.FC = () => {
   // Generate filter options based on available data
   const filterOptions = useMemo(() => {
     if (!data?.data?.orders) return [];
-
     const suppliers = [...new Set(data.data.orders.map(order => order.supplier.full_name))];
-    
-    // Define cost ranges with formatted labels
-    const costRanges = [
-      { min: 0, max: 1000, label: '$0 - $1,000' },
-      { min: 1001, max: 5000, label: '$1,001 - $5,000' },
-      { min: 5001, max: 10000, label: '$5,001 - $10,000' },
-      { min: 10001, max: 50000, label: '$10,001 - $50,000' },
-      { min: 50001, max: Infinity, label: 'Above $50,000' }
-    ];
-
     return [
       {
         label: "Supplier",
         value: "supplier",
-        options: suppliers.map(supplier => ({
+        options: 
+          suppliers.map(supplier => ({
           label: supplier,
           value: supplier
         }))
       },
-      {
-        label: "Cost Range",
-        value: "costRange",
-        options: costRanges.map(range => ({
-          label: range.label,
-          value: `${range.min}-${range.max === Infinity ? '+' : range.max}`
-        }))
-      }
     ];
   }, [data?.data?.orders]);
 

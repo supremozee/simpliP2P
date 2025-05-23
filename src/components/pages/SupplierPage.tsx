@@ -37,7 +37,6 @@ const SupplierPage = () => {
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [ratingFilter, setRatingFilter] = useState('all');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const itemsPerPage = 8;
   const { data, isLoading, isError, error } = useFetchSuppliers(currentOrg, currentPage, itemsPerPage);
@@ -93,8 +92,6 @@ const SupplierPage = () => {
   const handleFilter = (filterType: string, value: string) => {
     if (filterType === 'category') {
       setCategoryFilter(value);
-    } else if (filterType === 'rating') {
-      setRatingFilter(value);
     }
     setCurrentPage(1);
   };
@@ -121,27 +118,6 @@ const SupplierPage = () => {
       const matchesCategory = categoryFilter === 'all' || 
         supplier.category.name.toLowerCase() === categoryFilter.toLowerCase();
 
-      // Rating filter
-      let matchesRating = true;
-      if (ratingFilter !== 'all') {
-        const rating = Number(supplier.rating) || 0;
-        switch(ratingFilter) {
-          case '4':
-            matchesRating = rating >= 4.0;
-            break;
-          case '3':
-            matchesRating = rating >= 3.0;
-            break;
-          case '2':
-            matchesRating = rating >= 2.0;
-            case '1':
-              matchesRating = rating >= 1.0;
-            break;
-          default:
-            matchesRating = true;
-        }
-      }
-
       // Date range filter
       let matchesDateRange = true;
       if (startDate || endDate) {
@@ -160,7 +136,7 @@ const SupplierPage = () => {
         }
       }
 
-      return matchesSearch && matchesCategory && matchesRating && matchesDateRange;
+      return matchesSearch && matchesCategory && matchesDateRange;
     });
   };
 
@@ -188,10 +164,12 @@ const SupplierPage = () => {
     { 
       label: "Category", 
       value: "category", 
-      options: categories?.data?.categories?.map((category:Category) => ({
+      options:[
+        { label: "All", value: "all" },
+       ...(categories?.data?.categories?.map((category:Category) => ({
         label: category.name,
         value: category.name
-      })) || []
+      }))) || []]
     
     }
   ];
