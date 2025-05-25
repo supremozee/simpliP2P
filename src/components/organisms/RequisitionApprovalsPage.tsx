@@ -347,7 +347,7 @@ const RequisitionsApprovalPage = () => {
                             <MdOutlinePriceCheck className="w-3 h-3" /> Items
                           </p>
                           <p className="text-sm font-medium text-gray-700">
-                            {requisition.items?.length || 0} items
+                            {requisition.quantity || 0} items
                           </p>
                         </div>
                       </div>

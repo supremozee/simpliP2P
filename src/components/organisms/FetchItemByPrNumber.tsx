@@ -45,7 +45,7 @@ const FetchItemByPrNumber = () => {
   if (isError) return <ErrorComponent text={error?.message || "Failed to fetch products."} />;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const headers: string | any = ["Item Image", "Item Name", "Currency", "Unit Price", "Quantity", (showForSavedOnly && "Actions")];
+  const headers: string | any = ["Item Image", "Item Name", "Unit Price", "Currency", "Quantity", (showForSavedOnly && "Actions")];
   const renderRow = (item: AllItems, index: number) => {
     const rowData = [
       <TableCell key="image">
