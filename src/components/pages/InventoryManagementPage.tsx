@@ -29,7 +29,7 @@ const InventoryManagement = () => {
   const { currentOrg, setProductId, productId } = useStore();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 100;
-  const { data, isLoading, isError } = useFetchProducts(currentOrg, 1, 10);
+  const { data, isLoading, isError } = useFetchProducts(currentOrg, 1, 100);
   const { deleteProduct } = useDeleteProduct();
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
