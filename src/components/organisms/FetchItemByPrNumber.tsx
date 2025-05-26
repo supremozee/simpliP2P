@@ -8,7 +8,6 @@ import { AllItems } from "@/types";
 import useFetchItemsByPrNumber from "@/hooks/useFetchAllItemsByPrNumber";
 import useRemoveItem from "@/hooks/useRemoveItems";
 // import UpdateItem from "./UpdateItem";
-import TableCell from "../atoms/TableCell";
 import TableHead from "../atoms/TableHead";
 import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
@@ -48,8 +47,7 @@ const FetchItemByPrNumber = () => {
   const headers: string | any = ["Item Image", "Item Name", "Unit Price", "Currency", "Quantity", (showForSavedOnly && "Actions")];
   const renderRow = (item: AllItems, index: number) => {
     const rowData = [
-      <TableCell key="image">
-        {item.image_url ? (
+        item.image_url ? (
           <Image
             src={item.image_url || "/logo-black.png"}
             alt={item.item_name}
@@ -59,13 +57,12 @@ const FetchItemByPrNumber = () => {
           />
         ) : (
           <span className="text-gray-500">No Image</span>
-        )}
-      </TableCell>,
-      <TableCell key="name">{item.item_name}</TableCell>,
-      <TableCell key="price">{format_price(item.unit_price, item.currency)}</TableCell>,
-      <TableCell key="currency">{item.currency}</TableCell>,
-      <TableCell key="quantity">{item.pr_quantity}</TableCell>,
-      showForSavedOnly && (<TableCell key="actions" className="flex gap-2">
+        ),
+      item.item_name,
+      format_price(item.unit_price, item.currency),
+      item.currency,
+      item.pr_quantity,
+      showForSavedOnly && (
         <Button
           key={item.id}
           type="button"
@@ -73,7 +70,7 @@ const FetchItemByPrNumber = () => {
           onClick={() => handleRemove(item.id)} className="bg-[#F10000] text-white p-2 flex justify-center items-center max-w-8 rounded-full">
           <FaTimes />
         </Button>
-      </TableCell>)
+)
     ]
     return (
       <TableRow
@@ -87,7 +84,7 @@ const FetchItemByPrNumber = () => {
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-[#808080] border-opacity-50 text-start">
+        <table className="w-full border-collapse border border-[#808080] border-opacity-50 ">
           <TableHead headers={headers} key={headers.length} />
           <TableBody
             data={products}

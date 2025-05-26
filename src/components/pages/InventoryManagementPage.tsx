@@ -28,7 +28,6 @@ import Button from '../atoms/Button';
 const InventoryManagement = () => {
   const { currentOrg, setProductId, productId } = useStore();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 100;
   const { data, isLoading, isError } = useFetchProducts(currentOrg, 1, 100);
   const { deleteProduct } = useDeleteProduct();
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
@@ -88,6 +87,8 @@ const InventoryManagement = () => {
 
   const products = filterProduct || [];
   const totalItems = data?.metadata?.total || products.length;
+  const pageSize = data?.metadata?.pageSize || 100;
+  
   
   const tableHeaders: string[] | any = [
     <ExportCheckBox
