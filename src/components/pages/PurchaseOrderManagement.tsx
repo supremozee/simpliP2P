@@ -120,18 +120,21 @@ const PurchaseOrdersManagement: React.FC = () => {
     }
   };
 
-  // Calculate pagination values
   const totalItems = filteredOrders.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  // Ensure page doesn't exceed total pages
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  // Ensure we don't slice beyond array bounds
   const currentOrders = filteredOrders.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
-    // Ensure the page is within valid bounds
     const validPage = Math.max(1, Math.min(page, Math.ceil(totalItems / itemsPerPage)));
     setCurrentPage(validPage);
-    // Scroll to top of table when changing pages
     const tableElement = document.querySelector('.table-shadow-wrapper');
     if (tableElement) {
       tableElement.scrollTop = 0;
