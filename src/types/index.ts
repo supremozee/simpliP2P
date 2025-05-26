@@ -404,6 +404,7 @@ export interface Owner {
     estimated_cost: number;
     justification: string;
     needed_by_date: string;
+    total_items: number,
     organisation: Organisation;
     created_by: CreatedBy;
     pr_number: string;
@@ -880,6 +881,7 @@ export interface ViewPOResponse {
     status: string;
     attachment: string | null;
     supplier: Supplier;
+    branch:Branch;
     items: ViewPOItem[];
     organisation: ViewPOOrganisation;
 }

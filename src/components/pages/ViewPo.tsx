@@ -262,6 +262,11 @@ const PurchaseOrderDetails = () => {
     organisation: {
       name: "azeezend(sub)",
       logo: "http://api-simplip2p.onrender.com/files/de05aefe2a7f4ccfb770932590e6873d"
+    },
+    branch: {
+      id: "4a83682b-5821-4329-b46d-32211c96cc2e",
+      name: "Epe",
+      address: "Sango Ota"
     }
   };
 
@@ -487,16 +492,19 @@ const PurchaseOrderDetails = () => {
             
             {/* Address Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <AddressBlock 
-                  entity={po.organisation} 
-                  title="BUYER / SHIP TO"
-                />
-              </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 h-full">
+                    <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3 pb-2 border-b border-gray-200">
+                      BUYER / SHIP TO
+                    </h3>
+                    <div className="font-bold text-gray-800 text-base mb-1">{po.branch?.name || "N/A"}</div>
+                    <div className="text-gray-600">{po.branch?.address || "N/A"}</div>
+                  </div>
+                </motion.div>
               
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
