@@ -198,7 +198,7 @@ const SupplierPage = () => {
         <div key={`rating-${supplier.id}`} className="flex items-start justify-start">
           <Rating rating={Number(supplier.rating) || 0} />
         </div>,
-        <div key={`actions-${supplier.id}`} className="flex justify-center items-center space-x-2">
+        <div key={`actions-${supplier.id}`} className="flex justify-start items-start space-x-2">
           <Tooltip content="Edit supplier">
             <button
               onClick={() => handleEdit(supplier.id)}
