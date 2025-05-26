@@ -266,7 +266,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                       options={budgets || []}
                       value={selectedBudget}
                       onChange={(selectedOption) => setSelectedBudget(selectedOption)}
-                      error={!selectedBudget ? "Please select a budget" : ""}
+                      error={(selectedBudget.length === 0) ? "Please select a budget" : ""}
                       loading={isBudgetLoading}
                       required
                       placeholder="Select a budget"
@@ -278,7 +278,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                       options={supplier || []}
                       value={selectedSupplier || requisition?.supplier?.id}
                       onChange={(selectedOption) => setSelectedSupplier(selectedOption)}
-                      error={!selectedSupplier ? "Please select a supplier" : ""}
+                      error={(selectedSupplier.length === 0 && !requisition?.supplier?.id ) ? "Please select a supplier" : ""}
                       required
                       placeholder="Select a Supplier"
                     />
@@ -290,7 +290,7 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                         options={actionTypes}
                         value={selectedActionType}
                         onChange={(selectedOption) => setSelectedActionType(selectedOption)}
-                        error={!selectedActionType ? "Please select an action type" : ""}
+                        error={(selectedActionType.length === 0 ) ? "Please select an action type" : ""}
                         required
                         placeholder="Select action type"
                       />

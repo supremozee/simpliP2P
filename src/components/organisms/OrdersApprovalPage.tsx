@@ -204,7 +204,7 @@ const OrdersApprovalPage = () => {
                       <div>
                         <p className="text-sm text-gray-500">Items</p>
                         <p className="text-lg font-semibold text-gray-700">
-                          {order.purchase_requisition.quantity || 0}
+                          {order.purchase_requisition.total_items || 0}
                         </p>
                       </div>
                       <div>

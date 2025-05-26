@@ -693,6 +693,7 @@ interface Role {
     requestor_name: string;
     request_description: string;
     quantity: number;
+    total_items:number;
     estimated_cost: number;
     justification: string;
     status: "APPROVED" | "PENDING" | "REJECTED" | "REQUESTED_MODIFICATION" | "SAVED_FOR_LATER";
