@@ -501,9 +501,21 @@ const PurchaseOrderDetails = () => {
                     <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3 pb-2 border-b border-gray-200">
                       BUYER / SHIP TO
                     </h3>
-                    <div className="font-bold text-gray-800 text-base mb-1">{po.branch?.name || "N/A"}</div>
-                    <div className="text-gray-600">{po.branch?.address || "N/A"}</div>
-                  </div>
+                    <div className="space-y-2">
+                            <div className="flex items-baseline">
+                              <span className="text-gray-600 font-medium w-24">Department:</span>
+                              <span className="text-gray-800 font-semibold">{po.branch?.name || "N/A"}</span>
+                            </div>
+                            <div className="flex items-baseline">
+                              <span className="text-gray-600 font-medium w-24">Address:</span>
+                              <span className="text-gray-800">{po.branch?.address || "N/A"}</span>
+                            </div>
+                            <div className="flex items-baseline">
+                              <span className="text-gray-600 font-medium w-24">Company:</span>
+                              <span className="text-gray-800">{po.organisation?.name || "N/A"}</span>
+                            </div>
+                          </div>
+            </div>
                 </motion.div>
               
               <motion.div
