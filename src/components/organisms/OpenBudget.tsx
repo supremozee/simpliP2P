@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -7,10 +8,9 @@ import { IoEyeOutline, IoWallet, IoTrendingUp, IoTime, IoWarning } from 'react-i
 import useFetchBudgetById from "@/hooks/useFetchBudgetById";
 import useStore from "@/store";
 import BudgetDetailCard from '../molecules/BudgetDetailCard';
-import BudgetChart from './BudgetChart';
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import Tooltip from "../atoms/Tooltip";
-import { format_price } from "@/utils/helpers";
+import BudgetChart  from "./BudgetChart";
 
 interface OpenBudgetProps {
   budgetId: string;
@@ -98,16 +98,6 @@ const OpenBudget: React.FC<OpenBudgetProps> = ({ budgetId }) => {
                   </div>
                 </div>
 
-              {/* Tabs Navigation */}
-              <div className="flex mb-6">
-                <button
-                  className={`py-2 px-4 text-sm font-medium ${selectedTab === 'overview' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'}`}
-                  onClick={() => setSelectedTab('overview')}
-                >
-                  Overview
-                </button>
-              </div>
-
               {selectedTab === 'overview' && (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -161,71 +151,7 @@ const OpenBudget: React.FC<OpenBudgetProps> = ({ budgetId }) => {
                   <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                     <BudgetChart budgetData={budget} />
                   </div>
-
-                  {/* Additional Budget Details */}
-                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-                      <h3 className="text-lg font-medium mb-4">Budget Details</h3>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Budget Name</span>
-                          <span className="font-medium">{budget.name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Currency</span>
-                          <span className="font-medium">{budget.currency}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-                      <h3 className="text-lg font-medium mb-4">Budget Allocation</h3>
-                      <div className="mb-4">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-500">Available</span>
-                          <span className="text-sm font-medium">{format_price(metrics.balance, budget.currency)} ({metrics.availabilityRate.toFixed(1)}%)</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div className="bg-green-600 h-2.5 rounded-full" style={{ width: `${metrics.availabilityRate}%` }}></div>
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-500">Reserved</span>
-                          <span className="text-sm font-medium">{format_price(metrics.reserved, budget.currency)} ({metrics.reservationRate.toFixed(1)}%)</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div className="bg-yellow-500 h-2.5 rounded-full" style={{ width: `${metrics.reservationRate}%` }}></div>
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-500">Used</span>
-                          <span className="text-sm font-medium">{format_price(metrics.used, budget.currency)} ({metrics.utilizationRate.toFixed(1)}%)</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div className="bg-red-500 h-2.5 rounded-full" style={{ width: `${metrics.utilizationRate}%` }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </>
-              )}
-
-              {selectedTab === 'history' && (
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-                  <h3 className="text-lg font-medium mb-4">Transaction History</h3>
-                  <p className="text-gray-500 text-center py-6">Transaction history will be displayed here when available.</p>
-                </div>
-              )}
-
-              {selectedTab === 'related' && (
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-                  <h3 className="text-lg font-medium mb-4">Related Purchase Requisitions</h3>
-                  <p className="text-gray-500 text-center py-6">Related requisitions will be displayed here when available.</p>
-                </div>
               )}
             </div>
           ) : (
