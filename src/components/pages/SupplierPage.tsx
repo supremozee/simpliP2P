@@ -307,6 +307,7 @@ const SupplierPage = () => {
           {data?.metadata && data.metadata.totalPages > 1 && (
             <div className="p-4 border-t border-gray-100 flex justify-center">
               <Pagination
+               totalPages={data.metadata.totalPages}
                 currentPage={data.metadata.page}
                 totalItems={data.metadata.total}
                 pageSize={data.metadata.pageSize}
