@@ -3,27 +3,22 @@ import Button from '../atoms/Button';
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 
 interface PaginationProps {
+  totalPages:number
   currentPage: number;
   totalItems: number;
   pageSize: number;
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems, pageSize, onPageChange }) => {
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  
-  // Don't render pagination if there's only one page
+const Pagination: React.FC<PaginationProps> = ({ currentPage, onPageChange, totalPages }) => {
   if (totalPages <= 1) return null;
-
-  // Simple array of page numbers to display
   const getVisiblePageNumbers = () => {
     const pages = [];
-    const maxButtons = 5; // Maximum number of page buttons to show
+    const maxButtons = 5;
     
     let startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, startPage + maxButtons - 1);
     
-    // Adjust startPage if endPage is maxed out
     if (endPage === totalPages) {
       startPage = Math.max(1, endPage - maxButtons + 1);
     }

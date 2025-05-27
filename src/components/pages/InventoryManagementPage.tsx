@@ -88,6 +88,7 @@ const InventoryManagement = () => {
   const products = filterProduct || [];
   const totalItems = data?.metadata?.total || products.length;
   const pageSize = data?.metadata?.pageSize || 100;
+  const totalPages = data?.metadata?.totalPages
   
   
   const tableHeaders: string[] | any = [
@@ -270,11 +271,9 @@ const InventoryManagement = () => {
         </table> 
       </TableShadowWrapper>       
       <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
-        <div className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1 w-[20%] text-end ">
-          Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
-        </div>
         <div className="w-full items-center">
           <Pagination
+            totalPages={totalPages || 1}
             currentPage={currentPage}
             totalItems={totalItems}
             pageSize={pageSize}

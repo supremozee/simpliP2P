@@ -19,11 +19,11 @@ const PurchaseOrdersManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
-  const itemsPerPage = 10;
   const { currentOrg, setIsOpen, isOpen, setType } = useStore();
   const { data, isLoading } = useFetchAllOrders(currentOrg);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-  
+  const metadata = data?.data?.metadata || { total: 0, page: 1, pageSize: 10, totalPages: 1 };
+  const currentOrders = filteredOrders;
   const { 
     selectedItems, 
     toggleSelectItem, 
@@ -119,27 +119,9 @@ const PurchaseOrdersManagement: React.FC = () => {
       }
     }
   };
-
-  const totalItems = filteredOrders.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  // Ensure page doesn't exceed total pages
-  useEffect(() => {
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(totalPages);
-    }
-  }, [totalPages, currentPage]);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const currentOrders = filteredOrders.slice(startIndex, endIndex);
-
   const handlePageChange = (page: number) => {
-    const validPage = Math.max(1, Math.min(page, Math.ceil(totalItems / itemsPerPage)));
-    setCurrentPage(validPage);
-    const tableElement = document.querySelector('.table-shadow-wrapper');
-    if (tableElement) {
-      tableElement.scrollTop = 0;
-    }
-  };
+    setCurrentPage(page);
+  }
 
   const tabNames = ["ALL", "APPROVED", "PENDING", "REJECTED"];
   const getTabCount = (tabName: string) => {
@@ -290,10 +272,11 @@ const PurchaseOrdersManagement: React.FC = () => {
           </table>
         </TableShadowWrapper>
         <div className="flex justify-center mt-4">
-          <Pagination
+        <Pagination
+           totalPages={metadata.totalPages}
             currentPage={currentPage}
-            totalItems={totalItems}
-            pageSize={itemsPerPage}
+            totalItems={metadata.total}
+            pageSize={metadata.pageSize}
             onPageChange={handlePageChange}
           />
         </div>
