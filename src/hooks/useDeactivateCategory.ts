@@ -1,34 +1,35 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { auth } from '../api/auths';
-import { useState } from 'react';
-import useNotify from './useNotify';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useNotify from "./useNotify";
+import { auth } from "@/api/auths";
 
-const useDeactivateCategory = () => {
+export default function useDeactivateCategory() {
   const queryClient = useQueryClient();
-    const {success} = useNotify()
-    const [loading, setIsLoading] = useState(false)
-   const {mutateAsync: deactivateMutation} = useMutation({
-    onMutate: ()=> {
-      setIsLoading(true)
-  },
-    mutationFn: async ({orgId, CategoryId}: {orgId: string, CategoryId: string})=> {
-         return auth.deactivateCategory(orgId, CategoryId)
-    },
-    onSuccess: (data)=> {
-      if(data) {
-      queryClient.invalidateQueries({queryKey: ['fetchCategory']})
-      success(data?.message)
-      setIsLoading(false)
-      }
-  }
-   })
-   const deactivateCategory = (orgId:string, CategoryId:string)=> {
-         deactivateMutation({orgId, CategoryId}) 
-   }
-   return {
-     deactivateCategory,
-     loading
-   }
-};
+  const { success: notifySuccess, error: notifyError } = useNotify();
 
-export default useDeactivateCategory;
+  const { mutateAsync: DeactivateCategoryMutation, isPending: isDeactivating } = useMutation({
+    mutationFn: async ({ orgId, categoryId }: { orgId: string; categoryId: string }) => {
+      return auth.deactivateCategory(orgId, categoryId);
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['fetchCategory'] });
+      queryClient.invalidateQueries({ queryKey: ['organizationDashboard'] });
+      if (response && response.status === 'success') {
+        notifySuccess(response.message || 'Category deactivated successfully');
+      } else {
+        notifyError(response.message || 'Failed to deactivate category');
+      }
+    },
+    onError: (err: any) => {
+      const message = err.response?.data?.message || err.message || 'An error occurred while deactivating the category. Please try again.';
+      notifyError(message);
+    },
+  });
+
+  const deactivateCategory = async (orgId: string, categoryId: string) => {
+    await DeactivateCategoryMutation({ orgId, categoryId });
+  };
+
+  return { deactivateCategory, isDeactivating };
+}

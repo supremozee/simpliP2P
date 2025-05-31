@@ -573,6 +573,7 @@ interface Role {
     id?: string;
     name: string;
     status?:string;
+    department_code:string;
     organisation?: {
       id: string;
       tenant_code?: string;
@@ -907,6 +908,9 @@ export interface EditBranch {
 
 export interface EditDepartment {
   name?: string;
-  department_code?: string;
-  description?: string;
+  department_code:string;
+  head_of_department: {
+    first_name: string;
+    last_name: string;
+  };
 }

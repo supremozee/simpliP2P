@@ -14,7 +14,7 @@ export default function useEditCategory() {
       return auth.editCategory(orgId, categoryId,data);
     },
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['fetchProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchCategory'] });
       queryClient.invalidateQueries({ queryKey: ['organizationDashboard'] });
       if (response && response.status === 'success') {
         notifySuccess(response.message);
