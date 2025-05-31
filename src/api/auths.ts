@@ -428,7 +428,7 @@ const auth = {
     const token = Cookies.get('accessToken');
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetch(`https://api-simplip2p.onrender.com/organisations/${orgId}/products/upload/bulk`, {
+    const response = await fetch(`https://backend-uw62.onrender.com/organisations/${orgId}/products/upload/bulk`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`, // <-- include the token here
