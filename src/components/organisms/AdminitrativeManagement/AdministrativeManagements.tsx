@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useFetchBranch from "@/hooks/useFetchBranch";
 import useFetchDepartment from "@/hooks/useFetchDepartments";
 import useStore from "@/store";
@@ -42,9 +42,10 @@ const EnhancedTableRowWithActions = ({
   const { deleteDepartment, isDeleting: isDeletingDepartment } = useDeleteDepartment();
   const { deactivateCategory, isDeactivating } = useDeactivateCategory();
   const { reactivateCategory, isReactivating } = useReactivateCategory();
-
-  const isActive =  item.deactivated_at === null;
-  
+ const [isActive, setIsActive] = useState(item.deactivated_at === null);
+ useEffect(() => {
+  setIsActive(item.deactivated_at === null);
+}, [item.deactivated_at, item.name])
   const handleDelete = async () => {
     try {
       if (activeTab === "Branches") {

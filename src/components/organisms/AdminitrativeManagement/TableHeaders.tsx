@@ -11,7 +11,7 @@ const TableHeaders: React.FC<TableHeadersProps> = ({ activeTab }) => {
       case "Branches":
         return (
           <tr className="bg-gray-100">
-            <th className="px-4 py-3 text-center w-16">#</th>
+            <th className="px-4 py-3 text-center w-16">s/n</th>
             <th className="px-4 py-3 text-left flex items-center gap-2">
               <span>Name</span>
             </th>
@@ -22,7 +22,7 @@ const TableHeaders: React.FC<TableHeadersProps> = ({ activeTab }) => {
       case "Departments":
         return (
           <tr className="bg-gray-100">
-            <th className="px-4 py-3 text-center w-16">#</th>
+            <th className="px-4 py-3 text-center w-16">s/n</th>
             <th className="px-4 py-3 text-left flex items-center gap-2">
               <span>Name</span>
             </th>
@@ -34,7 +34,7 @@ const TableHeaders: React.FC<TableHeadersProps> = ({ activeTab }) => {
       case "Categories":
         return (
           <tr className="bg-gray-100">
-            <th className="px-4 py-3 text-center w-16">#</th>
+            <th className="px-4 py-3 text-center w-16">s/n</th>
             <th className="px-4 py-3 text-left flex items-center gap-2">
               <span>Name</span>
             </th>
