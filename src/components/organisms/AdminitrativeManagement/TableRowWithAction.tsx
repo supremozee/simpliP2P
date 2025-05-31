@@ -1,6 +1,5 @@
 import TableRow from "@/components/molecules/TableRow";
 import React from "react";
-import DropdownActions from "./DropDownActions";
 import { Branch, Category, Department, Supplier } from "@/types";
 import { VscEdit } from "react-icons/vsc";
 import Button from "@/components/atoms/Button";
@@ -67,9 +66,6 @@ const TableRowWithActions = <T extends Item>({
   };
 
   const renderActions = () => {
-    if (activeTab === "Categories" && "deactivated_at" in item) {
-      return <DropdownActions itemId={item.id || ""} />;
-    }
     if (!activeTab && "full_name" in item) {
       return (
         <div className="flex gap-3 justify-center">

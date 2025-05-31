@@ -43,7 +43,7 @@ const EnhancedTableRowWithActions = ({
   const { deactivateCategory, isDeactivating } = useDeactivateCategory();
   const { reactivateCategory, isReactivating } = useReactivateCategory();
 
-  const isActive = item.status !== "inactive" && !item.deactivated_at;
+  const isActive =  item.deactivated_at === null;
   
   const handleDelete = async () => {
     try {
