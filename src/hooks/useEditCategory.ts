@@ -3,14 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
 import { auth } from "@/api/auths";
+import { EditCategory } from "@/types";
 
 export default function useEditCategory() {
   const queryClient = useQueryClient();
   const { success: notifySuccess, error: notifyError } = useNotify();
 
   const { mutateAsync: EditCategoryMutation } = useMutation({
-    mutationFn: async ({ orgId, categoryId }: { orgId: string; categoryId: string; }) => {
-      return auth.editCategory(orgId, categoryId);
+    mutationFn: async ({ orgId, categoryId, data }: { orgId: string; categoryId: string, data:EditCategory }) => {
+      return auth.editCategory(orgId, categoryId,data);
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['fetchProducts'] });
@@ -27,8 +28,8 @@ export default function useEditCategory() {
     },
   });
 
-  const editCategory = async (orgId: string, categoryId:string) => {
-    await EditCategoryMutation({ orgId, categoryId });
+  const editCategory = async (orgId: string, categoryId:string, data:EditCategory) => {
+    await EditCategoryMutation({ orgId, categoryId, data });
   };
 
   return { editCategory };

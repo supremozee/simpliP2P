@@ -251,7 +251,7 @@ export interface Owner {
     newPassword: string;
   }
   export interface AcceptInvitationResponse {
-    status: string;
+    status: string
     message: string;
   } 
   export interface EditMemberData {
@@ -891,4 +891,22 @@ export interface ExportSelected {
   entity: string, 
   format: "excel" | "csv", 
   ids: string[]
+}
+export interface CreateCategory {
+  name: string;
+}
+
+export interface EditCategory {
+  name: string;
+}
+
+export interface EditBranch {
+  name?: string;
+  address?: string;
+}
+
+export interface EditDepartment {
+  name?: string;
+  department_code?: string;
+  description?: string;
 }

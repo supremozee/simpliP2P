@@ -49,7 +49,10 @@ import { forgotData,
                          Comment,
                          updateOrderStatus,
                          CreateBudget,
-                         ExportSelected} 
+                         ExportSelected,
+                         EditDepartment,
+                         EditBranch,
+                         EditCategory} 
                          from "@/types"
 import { apiRequest } from "./apiRequest"
 import { setCookies } from "@/utils/setCookies"
@@ -277,8 +280,23 @@ const auth = {
   reactivateCategory: async (orgId: string, categoryId: string): Promise<any> => {
     return apiRequest(ORGANIZATION_ENDPOINTS.REACTIVATE_CATEGORY(orgId, categoryId), patchConfig());
   },
-  editCategory: async (orgId: string, categoryId: string): Promise<any> => {
-    return apiRequest(ORGANIZATION_ENDPOINTS.EDIT_CATEGORY(orgId, categoryId), patchConfig());
+  editCategory: async (orgId: string, categoryId: string, data: EditCategory): Promise<any> => {
+    return apiRequest(ORGANIZATION_ENDPOINTS.EDIT_CATEGORY(orgId, categoryId), putConfig(data));
+  },
+  editBranch: async (orgId: string, branchId: string, data: EditBranch): Promise<any> => {
+    return apiRequest(ORGANIZATION_ENDPOINTS.EDIT_BRANCH(orgId, branchId), putConfig(data));
+  },
+  
+  deleteBranch: async (orgId: string, branchId: string): Promise<any> => {
+    return apiRequest(ORGANIZATION_ENDPOINTS.DELETE_BRANCH(orgId, branchId), deleteConfig());
+  },
+  
+  editDepartment: async (orgId: string, departmentId: string, data: EditDepartment): Promise<any> => {
+    return apiRequest(ORGANIZATION_ENDPOINTS.EDIT_DEPARTMENT(orgId, departmentId), putConfig(data));
+  },
+  
+  deleteDepartment: async (orgId: string, departmentId: string): Promise<any> => {
+    return apiRequest(ORGANIZATION_ENDPOINTS.DELETE_DEPARTMENT(orgId, departmentId), deleteConfig());
   },
   initializePurchaseRequisition: async(data:InitializePurchaseRequisition):Promise<any> => {
    return apiRequest(ORGANIZATION_ENDPOINTS.INITIALIZE_PURCHASE_REQUISITION(), postConfig(data))
