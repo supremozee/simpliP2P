@@ -46,7 +46,6 @@ const CreateBudgetModal: React.FC<ModalProps> = ({ showModal = false, setShowMod
 
   const onSubmit = async (data: CreateBudgetFormData) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await createBudget(data, currentOrg);
       setTimeout(()=> {
         setShowModal(false);
