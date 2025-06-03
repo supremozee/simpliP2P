@@ -278,7 +278,6 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                       options={supplier || []}
                       value={selectedSupplier || requisition?.supplier?.id}
                       onChange={(selectedOption) => setSelectedSupplier(selectedOption)}
-                      error={selectedSupplier.length === 0 ? "Please select a supplier" : ""}
                       required
                       placeholder="Select a Supplier"
                     />
