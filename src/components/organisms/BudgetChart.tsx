@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer } from "recharts";
-import { format } from "date-fns";
+import React, { useMemo } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer, CartesianGrid } from "recharts";
+// import { format } from "date-fns";
 import { Budget } from "@/types";
 import { format_price } from "@/utils/helpers";
 
@@ -13,25 +13,28 @@ interface BudgetChartProps {
 }
 
 const COLORS = {
-  available: "#10B981",
-  reserved: "#F59E0B",
-  used: "#EF4444",
+  available: "#10B981", // Green
+  reserved: "#F59E0B", // Amber
+  used: "#EF4444",     // Red
 };
 
-const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'month' }) => {
-  const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange);
+const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData}) => {
 
   const parsedBudget = useMemo(() => {
     const allocated = parseFloat(budgetData.amount_allocated) || 0;
     const reserved = parseFloat(budgetData.amount_reserved) || 0;
     const balance = parseFloat(budgetData.balance) || 0;
-    const used = Math.max(allocated - reserved - balance, 0); // Ensure no negatives
+    // Calculate used based on allocated minus balance and reserved
+    // If balance is negative, adjust the calculation to show correct usage
+    const used = balance < 0 
+      ? allocated + Math.abs(balance) - reserved 
+      : allocated - balance - reserved;
 
     return {
       allocated,
       reserved,
-      balance,
-      used,
+      balance: balance < 0 ? 0 : balance, // Don't show negative balance in chart
+      used: Math.max(used, 0), // Ensure no negative values
       currency: budgetData.currency,
     };
   }, [budgetData]);
@@ -52,10 +55,11 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'mont
         : "0.0";
 
       return (
-        <div className="bg-white border rounded shadow-sm p-2">
+        <div className="bg-white border rounded-md shadow-md p-3">
           <p className="text-sm font-medium text-gray-700">{data.name}</p>
-          <p className="text-xs text-gray-500">
-            {parsedBudget.currency} {data.value.toFixed(2)} ({percentage}%)
+          <p className="text-sm mt-1">
+            <span className="font-medium">{parsedBudget.currency} {format_price(data.value)}</span>
+            <span className="text-gray-500 text-xs ml-2">({percentage}%)</span>
           </p>
         </div>
       );
@@ -63,67 +67,79 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ budgetData, timeRange = 'mont
     return null;
   };
 
-  const renderTimeLabel = useMemo(() => {
-    const now = new Date();
-    switch (selectedTimeRange) {
-      case "week":
-        return `Week of ${format(now, "MMM d, yyyy")}`;
-      case "month":
-        return format(now, "MMMM yyyy");
-      case "quarter":
-        return `Q${Math.floor((now.getMonth() + 3) / 3)} ${now.getFullYear()}`;
-      case "year":
-        return now.getFullYear().toString();
-      default:
-        return "";
-    }
-  }, [selectedTimeRange]);
+
+  const formatYAxis = (value: number): string => {
+      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+      if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+      return value.toString();
+  };
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm p-8">
+    <div className="w-full bg-white rounded-xl shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-gray-800">
             {format_price(parsedBudget.allocated, parsedBudget.currency)}
           </h2>
-          <p className="text-sm text-gray-500">Budget Allocation - {renderTimeLabel}</p>
+          {/* <p className="text-sm text-gray-500 font-medium">Budget Allocation - {renderTimeLabel}</p> */}
+          
+          {/* Summary stats */}
+          <div className="mt-2 grid grid-cols-3 gap-4">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <span className="text-sm text-gray-600">
+                Available: <span className="font-medium">{format_price(parsedBudget.balance)}</span>
+              </span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-amber-500 rounded-full mr-2"></div>
+              <span className="text-sm text-gray-600">
+                Reserved: <span className="font-medium">{format_price(parsedBudget.reserved)}</span>
+              </span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+              <span className="text-sm text-gray-600">
+                Used: <span className="font-medium">{format_price(parsedBudget.used)}</span>
+              </span>
+            </div>
+          </div>
         </div>
-        <select
-          className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-          value={selectedTimeRange}
-          onChange={(e) => {
-            const value = e.target.value as BudgetChartProps["timeRange"];
-            if (value) setSelectedTimeRange(value);
-          }}
-        >
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-          <option value="quarter">This Quarter</option>
-          <option value="year">This Year</option>
-        </select>
       </div>
 
       <div className="h-[300px] w-full">
         {barChartData.length ? (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={barChartData}
-             margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
+            <BarChart 
+              data={barChartData}
+              margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
             >
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="value"
-              barSize={30}
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="name" 
+                tickLine={false}
+                axisLine={{ stroke: '#E5E7EB' }}
+              />
+              <YAxis 
+                tickFormatter={formatYAxis} 
+                tickLine={false}
+                axisLine={{ stroke: '#E5E7EB' }}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }} />
+              <Bar 
+                dataKey="value"
+                barSize={100} // Wider bars
+                radius={[4, 4, 0, 0]} // Rounded tops
               >
                 {barChartData.map((entry, index) => (
-                  <Cell key={`bar-${index}`} fill={entry.fill} />
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-500">
-            No budget data available
+            <p>No budget data available</p>
           </div>
         )}
       </div>
