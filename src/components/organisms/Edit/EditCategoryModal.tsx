@@ -23,8 +23,8 @@ interface EditCategoryModalProps {
 }
 
 const EditCategoryModal = ({ isOpen, onClose, category }: EditCategoryModalProps) => {
-  const { currentOrg, loading } = useStore();
-  const { editCategory } = useEditCategory();
+  const { currentOrg } = useStore();
+  const { editCategory, isUpdateCategory } = useEditCategory();
   
   const { register, handleSubmit, formState: { errors } } = useForm<EditCategoryFormData>({
     resolver: zodResolver(EditCategorySchema),
@@ -82,7 +82,7 @@ const EditCategoryModal = ({ isOpen, onClose, category }: EditCategoryModalProps
               <span className="text-[12px]">Cancel</span>
             </Button>
             <Button type="submit" className="px-5 py-2">
-              <span className="text-white text-[12px]">{loading ? `Updating...` : `Update Category`}</span>
+              <span className="text-white text-[12px]">{isUpdateCategory ? `Updating...` : `Update Category`}</span>
             </Button>
           </div>
         </form>

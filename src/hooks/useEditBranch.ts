@@ -9,7 +9,7 @@ export default function useEditBranch() {
   const queryClient = useQueryClient();
   const { success: notifySuccess, error: notifyError } = useNotify();
 
-  const { mutateAsync: EditBranchMutation } = useMutation({
+  const { mutateAsync: EditBranchMutation, isPending:isUpdateBranch } = useMutation({
     mutationFn: async ({ orgId, branchId, data }: { orgId: string; branchId: string, data: EditBranch }) => {
       return auth.editBranch(orgId, branchId, data);
     },
@@ -32,5 +32,5 @@ export default function useEditBranch() {
     await EditBranchMutation({ orgId, branchId, data });
   };
 
-  return { editBranch };
+  return { editBranch, isUpdateBranch };
 }

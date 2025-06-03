@@ -273,13 +273,10 @@ const auth = {
   fetchCategoryById: async (orgId: string, categoryId: string): Promise<any> => {
     return apiRequest(ORGANIZATION_ENDPOINTS.CATEGORY_BY_ID(orgId, categoryId), getConfig());
   },
-  deactivateCategory: async (orgId: string, categoryId: string): Promise<any> => {
-    return apiRequest(ORGANIZATION_ENDPOINTS.DEACTIVATE_CATEGORY(orgId, categoryId),patchConfig());
+  deleteCategory: async (orgId: string, categoryId: string): Promise<any> => {
+    return apiRequest(ORGANIZATION_ENDPOINTS.DELETE_CATEGORY(orgId, categoryId),deleteConfig());
   },
 
-  reactivateCategory: async (orgId: string, categoryId: string): Promise<any> => {
-    return apiRequest(ORGANIZATION_ENDPOINTS.REACTIVATE_CATEGORY(orgId, categoryId), patchConfig());
-  },
   editCategory: async (orgId: string, categoryId: string, data: EditCategory): Promise<any> => {
     return apiRequest(ORGANIZATION_ENDPOINTS.EDIT_CATEGORY(orgId, categoryId), putConfig(data));
   },

@@ -12,7 +12,6 @@ import { Branch, EditBranch } from "@/types";
 
 const EditBranchSchema = z.object({
   name: z.string().nonempty("Branch name is required"),
-  address: z.string().nonempty("Address is required"),
 });
 
 type EditBranchFormData = z.infer<typeof EditBranchSchema>;
@@ -24,21 +23,19 @@ interface EditBranchModalProps {
 }
 
 const EditBranchModal = ({ isOpen, onClose, branch }: EditBranchModalProps) => {
-  const { currentOrg, loading } = useStore();
-  const { editBranch } = useEditBranch();
+  const { currentOrg } = useStore();
+  const { editBranch, isUpdateBranch } = useEditBranch();
   
   const { register, handleSubmit, formState: { errors } } = useForm<EditBranchFormData>({
     resolver: zodResolver(EditBranchSchema),
     defaultValues: {
       name: branch.name || "",
-      address: branch.address || "",
     }
   });
   
   const onSubmit = async (data: EditBranchFormData) => {
     const updateData: EditBranch = {
       name: data.name,
-      address: data.address
     };
     
     await editBranch(currentOrg, branch.id as string, updateData);
@@ -62,16 +59,6 @@ const EditBranchModal = ({ isOpen, onClose, branch }: EditBranchModalProps) => {
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
-          <div>
-            <InputField
-              required
-              type="text"
-              label="Address"
-              {...register("address")}
-              placeholder="Input branch address"
-            />
-            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>}
-          </div>
           <div className="flex justify-end gap-3 mt-3">
             <Button 
               onClick={onClose}
@@ -81,7 +68,7 @@ const EditBranchModal = ({ isOpen, onClose, branch }: EditBranchModalProps) => {
               <span className="text-[12px]">Cancel</span>
             </Button>
             <Button type="submit" className="px-5 py-2">
-              <span className="text-white text-[12px]">{loading ? `Updating...` : `Update Branch`}</span>
+              <span className="text-white text-[12px]">{isUpdateBranch? `Updating...` : `Update Branch`}</span>
             </Button>
           </div>
         </form>

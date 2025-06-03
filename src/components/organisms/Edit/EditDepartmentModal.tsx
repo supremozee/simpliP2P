@@ -12,7 +12,6 @@ import { Department, EditDepartment } from "@/types";
 
 const EditDepartmentSchema = z.object({
   name: z.string().nonempty("Department name is required"),
-  department_code: z.string().nonempty("Department code is required"),
 });
 
 type EditDepartmentFormData = z.infer<typeof EditDepartmentSchema>;
@@ -24,8 +23,8 @@ interface EditDepartmentModalProps {
 }
 
 const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModalProps) => {
-  const { currentOrg, loading } = useStore();
-  const { editDepartment } = useEditDepartment();
+  const { currentOrg } = useStore();
+  const { editDepartment,isUpdateDepartment } = useEditDepartment();
   
   const { register, handleSubmit, formState: { errors } } = useForm<EditDepartmentFormData>({
     resolver: zodResolver(EditDepartmentSchema),
@@ -91,7 +90,7 @@ const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModa
               <span className="text-[12px]">Cancel</span>
             </Button>
             <Button type="submit" className="px-5 py-2">
-              <span className="text-white text-[12px]">{loading ? `Updating...` : `Update Department`}</span>
+              <span className="text-white text-[12px]">{isUpdateDepartment ? `Updating...` : `Update Department`}</span>
             </Button>
           </div>
         </form>

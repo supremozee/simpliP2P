@@ -36,7 +36,6 @@ const TableHeaders: React.FC<TableHeadersProps> = ({ activeTab }) => {
             <th className="px-4 py-3 text-left flex items-center gap-2">
               <span>Name</span>
             </th>
-            <th className="px-4 py-3 text-center">Status</th>
             <th className="px-4 py-3 text-center w-32">Actions</th>
           </tr>
         );

@@ -9,7 +9,7 @@ export default function useEditDepartment() {
   const queryClient = useQueryClient();
   const { success: notifySuccess, error: notifyError } = useNotify();
 
-  const { mutateAsync: EditDepartmentMutation } = useMutation({
+  const { mutateAsync: EditDepartmentMutation, isPending:isUpdateDepartment } = useMutation({
     mutationFn: async ({ orgId, departmentId, data }: { orgId: string; departmentId: string, data: EditDepartment }) => {
       return auth.editDepartment(orgId, departmentId, data);
     },
@@ -32,5 +32,5 @@ export default function useEditDepartment() {
     await EditDepartmentMutation({ orgId, departmentId, data });
   };
 
-  return { editDepartment };
+  return { editDepartment, isUpdateDepartment };
 }

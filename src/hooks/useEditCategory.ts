@@ -9,7 +9,7 @@ export default function useEditCategory() {
   const queryClient = useQueryClient();
   const { success: notifySuccess, error: notifyError } = useNotify();
 
-  const { mutateAsync: EditCategoryMutation } = useMutation({
+  const { mutateAsync: EditCategoryMutation, isPending:isUpdateCategory } = useMutation({
     mutationFn: async ({ orgId, categoryId, data }: { orgId: string; categoryId: string, data:EditCategory }) => {
       return auth.editCategory(orgId, categoryId,data);
     },
@@ -32,5 +32,5 @@ export default function useEditCategory() {
     await EditCategoryMutation({ orgId, categoryId, data });
   };
 
-  return { editCategory };
+  return { editCategory, isUpdateCategory };
 }
