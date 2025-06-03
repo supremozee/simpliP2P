@@ -13,10 +13,6 @@ import { Department, EditDepartment } from "@/types";
 const EditDepartmentSchema = z.object({
   name: z.string().nonempty("Department name is required"),
   department_code: z.string().nonempty("Department code is required"),
-  head_of_department: z.object({
-    first_name: z.string().optional(),
-    last_name: z.string().optional(),
-  }).optional(),
 });
 
 type EditDepartmentFormData = z.infer<typeof EditDepartmentSchema>;
@@ -35,22 +31,14 @@ const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModa
     resolver: zodResolver(EditDepartmentSchema),
     defaultValues: {
       name: department.name || "",
-      department_code: department.department_code || "",
-      head_of_department: {
-        first_name: "",
-        last_name: ""
-      },
+    //   department_code: department.department_code || ""
     }
   });
   
   const onSubmit = async (data: EditDepartmentFormData) => {
     const updateData: EditDepartment = {
       name: data.name,
-      department_code: data.department_code,
-      head_of_department: {
-        first_name: data.head_of_department?.first_name || "",
-        last_name: data.head_of_department?.last_name || "",
-      }
+    //   department_code: data.department_code,
     };
     
     await editDepartment(currentOrg, department.id as string, updateData);
@@ -84,7 +72,7 @@ const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModa
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
           
-          <div>
+          {/* <div>
             <InputField
               required
               type="text"
@@ -93,30 +81,7 @@ const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModa
               placeholder="Input department code"
             />
             {errors.department_code && <p className="text-red-500 text-sm mt-1">{errors.department_code.message}</p>}
-          </div>
-            <div>
-                <InputField
-                type="text"
-                label="Head of Department First Name"
-                {...register("head_of_department.first_name")}
-                placeholder="Input first name"
-                />
-                {errors.head_of_department?.first_name && (
-                <p className="text-red-500 text-sm mt-1">{errors.head_of_department.first_name.message}</p>
-                )}
-            </div>
-            <div>
-                <InputField
-                type="text"
-                label="Head of Department Last Name"
-                {...register("head_of_department.last_name")}
-                placeholder="Input last name"
-                />
-                {errors.head_of_department?.last_name && (
-                <p className="text-red-500 text-sm mt-1">{errors.head_of_department.last_name.message}</p>
-                )}
-            </div>
-          
+          </div> */}
           <div className="flex justify-end gap-3 mt-3">
             <Button 
               onClick={onClose}

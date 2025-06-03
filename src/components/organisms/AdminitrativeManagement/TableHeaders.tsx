@@ -15,7 +15,7 @@ const TableHeaders: React.FC<TableHeadersProps> = ({ activeTab }) => {
             <th className="px-4 py-3 text-left flex items-center gap-2">
               <span>Name</span>
             </th>
-            <th className="px-4 py-3 text-left">Address</th>
+            {/* <th className="px-4 py-3 text-left">Address</th> */}
             <th className="px-4 py-3 text-center w-32">Actions</th>
           </tr>
         );
@@ -26,8 +26,6 @@ const TableHeaders: React.FC<TableHeadersProps> = ({ activeTab }) => {
             <th className="px-4 py-3 text-left flex items-center gap-2">
               <span>Name</span>
             </th>
-            <th className="px-4 py-3 text-left">Department Code</th>
-            <th className="px-4 py-3 text-left">Head of Department</th>
             <th className="px-4 py-3 text-center w-32">Actions</th>
           </tr>
         );

@@ -908,9 +908,5 @@ export interface EditBranch {
 
 export interface EditDepartment {
   name?: string;
-  department_code:string;
-  head_of_department: {
-    first_name: string;
-    last_name: string;
-  };
+  // department_code:string;
 }

@@ -51,12 +51,18 @@ interface SimpliP2PStore {
   setType: (type: string) => void;
   isUpdateSupplierOpen: boolean;
   setIsUpdateSupplierOpen: (value: boolean) => void;
+  isActive: boolean;
+  setIsActive: (isActive: boolean) => void;
 }
 
 const useStore = create<SimpliP2PStore>()(
   devtools(
     persist(
     (set) => ({
+      isActive: true,
+      setIsActive: (isActive) => {
+        set({isActive: isActive})
+      },
       hideCreatePrText: "",
       setHidePrText: (hide:string)=> {
         set({hideCreatePrText: hide})
@@ -143,6 +149,7 @@ const useStore = create<SimpliP2PStore>()(
         orgName: state.orgName,
         organizationByAdmin: state.organizationByAdmin,
         organizationByUser: state.organizationByUser,
+        isActive: state.isActive
       }),
     }
   )

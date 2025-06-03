@@ -8,7 +8,6 @@ export default function useFetchCategories(orgId: string) {
     queryKey: ['fetchCategory', orgId],
     queryFn: () => auth.fetchCategory(orgId),
     enabled: !!orgId ,
-    refetchOnWindowFocus: false
   });
 
   return { data, error, isLoading, isError };

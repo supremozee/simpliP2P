@@ -33,19 +33,23 @@ const EnhancedTableRowWithActions = ({
   activeTab: string;
   item: any;
 }) => {
-  const { currentOrg } = useStore();
+  const { currentOrg } = useStore(); // Remove dependency on global isActive
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  
+  const [itemActive, setItemActive] = useState(item.deactivated_at === null);
   
   const { deleteBranch, isDeleting: isDeletingBranch } = useDeleteBranch();
   const { deleteDepartment, isDeleting: isDeletingDepartment } = useDeleteDepartment();
   const { deactivateCategory, isDeactivating } = useDeactivateCategory();
   const { reactivateCategory, isReactivating } = useReactivateCategory();
- const [isActive, setIsActive] = useState(item.deactivated_at === null);
- useEffect(() => {
-  setIsActive(item.deactivated_at === null);
-}, [item.deactivated_at, item.name])
+ 
+  // Update local state when item changes
+  useEffect(() => {
+    setItemActive(item.deactivated_at === null);
+  }, [item.deactivated_at])
+
   const handleDelete = async () => {
     try {
       if (activeTab === "Branches") {
@@ -61,11 +65,13 @@ const EnhancedTableRowWithActions = ({
 
   const handleStatusChange = async () => {
     try {
-      if (activeTab === "Categories") {
-        if (isActive) {
+      if (activeTab === "Categories" && item.id) {
+        if (itemActive) {
           await deactivateCategory(currentOrg, item.id);
+          setItemActive(false);
         } else {
           await reactivateCategory(currentOrg, item.id);
+          setItemActive(true);
         }
       }
       setShowStatusModal(false);
@@ -74,45 +80,27 @@ const EnhancedTableRowWithActions = ({
     }
   };
 
+  // Use itemActive instead of isActive throughout the component
   return (
     <tr className="border-b border-gray-300 hover:bg-gray-50">
       <td className="px-4 py-2 text-center">{index + 1}</td>
       <td className="px-4 py-2">{item.name}</td>
       
-      {activeTab === "Branches" && (
-        <td className="px-4 py-2">{item.address || "N/A"}</td>
-      )}
-      
-      {activeTab === "Departments" && (
-        <>
-          <td className="px-4 py-2">{item.department_code || "N/A"}</td>
-          <td className="px-4 py-2">
-            {item.head_of_department ? (
-              <span className="text-sm font-medium">
-                {item.head_of_department.first_name} {item.head_of_department.last_name}
-              </span>
-            ) : (
-              <span className="text-sm text-gray-500">Not assigned</span>
-            )}
-          </td>
-        </>
-      )}
-
       {activeTab === "Categories" && (
         <td className="px-4 py-2 text-center">
           <span 
             className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium ${
-              isActive 
+              itemActive
                 ? "bg-green-100 text-green-800" 
                 : "bg-red-100 text-red-800"
             }`}
           >
-            {isActive ? (
+            {(itemActive) ? (
               <HiCheck className="mr-1 h-3 w-3" />
             ) : (
               <HiXMark className="mr-1 h-3 w-3" />
             )}
-            {isActive ? "Active" : "Inactive"}
+            {itemActive ? "Active" : "Inactive"}
           </span>
         </td>
       )}
@@ -136,19 +124,20 @@ const EnhancedTableRowWithActions = ({
             </Button>
           ) : (
             <Button
-          onClick={() => setShowStatusModal(true)}
-          className={`p-2 flex justify-center items-center max-w-8 rounded-full text-white ${
-            isActive 
-              ? "bg-amber-500 hover:bg-amber-600" 
-              : "bg-green-500 hover:bg-green-600"
-          }`}
-          disabled={isDeactivating || isReactivating}
-  >
-    {isActive ? <HiXMark className="h-4 w-4" /> : <HiCheck className="h-4 w-4" />}
-  </Button>
+              onClick={() => setShowStatusModal(true)}
+              className={`p-2 flex justify-center items-center max-w-8 rounded-full text-white ${
+                itemActive
+                ? "bg-amber-500 hover:bg-amber-600" 
+                : "bg-green-500 hover:bg-green-600" 
+              }`}
+              disabled={isDeactivating || isReactivating}
+            >
+              {itemActive ? <HiXMark className="h-4 w-4" /> : <HiCheck className="h-4 w-4" />}
+            </Button>
           )}
         </div>
       </td>
+
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
@@ -168,9 +157,9 @@ const EnhancedTableRowWithActions = ({
         <ConfirmActionModal
           isOpen={showStatusModal}
           onClose={() => setShowStatusModal(false)}
-          title={isActive ? "Deactivate Category" : "Activate Category"}
-          message={`Are you sure you want to ${isActive ? "deactivate" : "activate"} this category?`}
-          confirmText={isActive ? "Deactivate" : "Activate"}
+          title={itemActive ? "Deactivate Category" : "Activate Category"}
+          message={`Are you sure you want to ${itemActive ? "deactivate" : "activate"} this category?`}
+          confirmText={itemActive ? "Deactivate" : "Activate"}
           onConfirm={handleStatusChange}
           isProcessing={isDeactivating || isReactivating}
         />

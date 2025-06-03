@@ -31,17 +31,9 @@ const TableRowWithActions = <T extends Item>({
         if ("name" in item) return [item.name];
         break;
       case "Departments":
-        if ("organisation" in item) {
-          const department = item as Department;
-          const headOfDepartment = department.head_of_department
-            ? `${department.head_of_department.first_name} ${department.head_of_department.last_name}`
-            : "N/A";
-          return [
-            department.name,
-            department.organisation?.tenant_code,
-            headOfDepartment,
+        if ("name" in item)  return [
+            item.name
           ];
-        }
         break;
       case "Categories":
         if ("name" in item) return [item.name];
