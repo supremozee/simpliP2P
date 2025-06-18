@@ -572,7 +572,7 @@ interface Role {
   export interface Department {
     id?: string;
     name: string;
-    department?:string;
+    description?:string;
     status?:string;
     department_code:string;
     organisation?: {
