@@ -9,9 +9,12 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Department, EditDepartment } from "@/types";
+import useFetchMembers from "@/hooks/useFetchMembers";
 
 const EditDepartmentSchema = z.object({
   name: z.string().nonempty("Department name is required"),
+    description: z.string().optional(),
+    hod_id: z.string().optional(),
 });
 
 type EditDepartmentFormData = z.infer<typeof EditDepartmentSchema>;
@@ -25,21 +28,23 @@ interface EditDepartmentModalProps {
 const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModalProps) => {
   const { currentOrg } = useStore();
   const { editDepartment,isUpdateDepartment } = useEditDepartment();
-  
+  const members = useFetchMembers(currentOrg)
   const { register, handleSubmit, formState: { errors } } = useForm<EditDepartmentFormData>({
     resolver: zodResolver(EditDepartmentSchema),
     defaultValues: {
       name: department.name || "",
-    //   department_code: department.department_code || ""
+      description: department.description || "",
+      hod_id: department.head_of_department?.id || ""
     }
   });
   
+  const hodId = members.data?.data
   const onSubmit = async (data: EditDepartmentFormData) => {
     const updateData: EditDepartment = {
       name: data.name,
-    //   department_code: data.department_code,
+      description: data.description,
+      hod_id: data.hod_id === "" ? undefined : data.hod_id
     };
-    
     await editDepartment(currentOrg, department.id as string, updateData);
     onClose();
   };
@@ -70,17 +75,30 @@ const EditDepartmentModal = ({ isOpen, onClose, department }: EditDepartmentModa
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
-          
-          {/* <div>
+          <div className="cursor-pointer">
+            <label htmlFor="hod_id"
+              className="block text-sm font-medium text-gray-700">Head of Department</label>
+            <select id="hod_id" {...register("hod_id")}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer"
+            >
+              <option value="">Select Head of Department</option>
+              {hodId?.users.map((hod) => (
+                <option key={hod.id}
+                  className="cursor-pointer"
+                  value={hod.id}>{hod.first_name + " " + hod.last_name}</option>
+              ))}
+            </select>
+            {errors.hod_id && <p className="text-red-500 text-sm">{errors.hod_id.message}</p>}
+          </div>
+          <div>
             <InputField
-              required
               type="text"
-              label="Department Code"
-              {...register("department_code")}
-              placeholder="Input department code"
+              label="Description"
+              {...register("description")}
+              placeholder="Input department description"
             />
-            {errors.department_code && <p className="text-red-500 text-sm mt-1">{errors.department_code.message}</p>}
-          </div> */}
+            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+          </div>
           <div className="flex justify-end gap-3 mt-3">
             <Button 
               onClick={onClose}
