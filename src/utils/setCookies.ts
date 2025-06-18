@@ -5,7 +5,9 @@ export const setCookies = (accessToken: string, refreshToken: string) => {
     path: "/",
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const, // Changed from strict to lax for better cross-site redirects
-    domain: window.location.hostname === 'localhost' ? 'localhost' : '.simplip2p.vercel.app', // Set appropriate domain
+    domain: window.location.hostname === 'localhost'
+      ? 'localhost'
+      : window.location.hostname,
   };
 
   // Set cookies with longer expiration time
