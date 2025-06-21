@@ -59,11 +59,27 @@ const EnhancedTableRowWithActions = ({
       console.error(`Error deleting ${activeTab.slice(0, -1)}:`, error);
     }
   };
+  const renderData = () => {
+    if (activeTab === "Departments") {
+      const head = item.head_of_department;
+      const headName = head
+        ? [head.first_name, head.last_name].filter(Boolean).join(" ")
+        : "N/A";
+      const description = item?.description || "N/A";
+      return [headName, description];
+    }
+    return [];
+  };
 
   return (
     <tr className="border-b border-gray-300 hover:bg-gray-50">
       <td className="px-4 py-2 text-center">{index + 1}</td>
       <td className="px-4 py-2">{item.name}</td>  
+      {activeTab === "Departments" ? (
+        renderData()?.map((data, idx) => (
+          <td key={idx} className="px-4 py-2">{data}</td>
+        ))
+      ) : null}
       <td className="px-4 py-2 text-center">
         <div className="flex gap-2 justify-center items-center">
           <Button
@@ -134,7 +150,6 @@ const AdministrativeManagements = () => {
   const branch = branchData?.data?.branches || [];
   const department = departmentData?.data?.departments || [];
   const category = categoryData?.data?.categories || [];
-
   const getDataForActiveTab = () => {
     switch (activeTab) {
       case "Branches":

@@ -574,7 +574,7 @@ interface Role {
     name: string;
     description?:string;
     status?:string;
-    department_code:string;
+    department_code?:string;
     organisation?: {
       id: string;
       tenant_code?: string;
