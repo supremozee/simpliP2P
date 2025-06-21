@@ -27,7 +27,7 @@ const Input = ({
     value={value}
     disabled={disabled}
     {...props}
-    className={`w-full p-2 border border-[#dddada] font-[400] rounded-[12px] text-[17px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] placeholder:text-[10px] placeholder:pl-2 ${
+    className={`w-full p-2 border border-[#dddada] font-[400] rounded-[12px] text-[17px] bg-transparent text-[#424242] transition-colors duration-300 placeholder-[#AAAAAA] focus:outline-none focus:border-[#BDBDBD] md:placeholder:text-[16px] placeholder:text-[12px] placeholder:pl-2 ${
       isDropdown ? "pr-10" : ""
     } ${disabled ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""} ${className || ""}`}
   />
