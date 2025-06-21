@@ -28,7 +28,7 @@ const LoginPage = () => {
       {loading && <Loader/>}
       <div className="bg-[url('/loginImage.png')] w-full sm:w-1/2 h-1/3 sm:h-full object-cover bg-cover lg:flex hidden flex-col justify-center items-center pt-10">
         <p className='w-[90%] sm:w-[600px] mt-10 sm:mt-28 text-white text-[14px] sm:text-[16px] text-center sm:text-left'>
-        Enter your email or username and password to access your account
+        
         </p>
       </div>
       <div className='flex justify-center flex-col gap-4 w-full lg:w-1/2 p-5 lg:p-[100px]'>
