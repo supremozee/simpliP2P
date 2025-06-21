@@ -6,6 +6,7 @@ import isAuthenticated from "@/hooks/isAuthenticated";
 import useStore from "@/store";
 import useGetUser from "@/hooks/useGetUser";
 import FullScreenLoader from "@/components/organisms/FullScreenLoader";
+import Head from "next/head";
 
 export default function Home() {
   const router = useRouter();
@@ -49,5 +50,12 @@ export default function Home() {
     routeAuthenticatedUser();
   }, [authChecked, isLoading, user, router, orgName, currentOrg, setOrganizationByAdmin, setOrganizationByUser]);
 
-  return <FullScreenLoader />;
+  return (
+    <>
+    <Head>
+       <title>simplip2p | dashboard</title>
+    </Head>
+      <FullScreenLoader />
+    </>
+  );
 }
