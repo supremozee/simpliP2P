@@ -85,9 +85,6 @@ const RegisterPage = () => {
     <div className='flex h-auto w-full font-roboto'>
       {loading && <Loader/>}
       <div className="bg-[url('//loginImage.png')] w-full sm:w-1/2 h-1/3 sm:h-auto object-cover bg-cover sm:flex hidden flex-col justify-center items-center pt-10">
-        <p className='w-[90%] sm:w-[600px] mt-10 sm:mt-28 text-primary font-bold text-[14px] sm:text-[16px] text-center sm:text-left'>
-          Create a new account by providing your company name, role, and contact information
-        </p>
       </div>
       <div className='flex justify-center flex-col gap-4 w-full sm:w-1/2 p-5 sm:p-[150px]'>
         <div className='flex flex-col items-center justify-center'>
