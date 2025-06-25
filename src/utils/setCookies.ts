@@ -4,7 +4,7 @@ export const setCookies = (accessToken: string, refreshToken: string) => {
   const cookieOptions = {
     path: "/",
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const, // Changed from strict to lax for better cross-site redirects
+    sameSite: "lax" as const, 
     domain: window.location.hostname === 'localhost'
       ? 'localhost'
       : window.location.hostname,
@@ -19,15 +19,11 @@ export const setCookies = (accessToken: string, refreshToken: string) => {
     ...cookieOptions,
     expires: 30, // 30 days
   });
-
-  // // Store in local storage as fallback and for immediate access
-  // localStorage.setItem("accessToken", accessToken);
-  // localStorage.setItem("refreshToken", refreshToken);
 };
 
 export const getCookies = () => {
-  const accessToken = Cookies.get("accessToken") || localStorage.getItem("accessToken");
-  const refreshToken = Cookies.get("refreshToken") || localStorage.getItem("refreshToken");
+  const accessToken = Cookies.get("accessToken") 
+  const refreshToken = Cookies.get("refreshToken")
   return { accessToken, refreshToken };
 };
 
@@ -35,6 +31,4 @@ export const clearCookies = () => {
   const domain = window.location.hostname === 'localhost' ? 'localhost' : '.simplip2p.vercel.app';
   Cookies.remove("accessToken", { path: "/", domain });
   Cookies.remove("refreshToken", { path: "/", domain });
-  // localStorage.removeItem("accessToken");
-  // localStorage.removeItem("refreshToken");
 };
