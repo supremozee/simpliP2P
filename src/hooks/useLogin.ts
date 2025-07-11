@@ -2,18 +2,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { auth } from '@/api/auths';
 import { User, LoginFormData, LoginResponse } from '@/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import useNotify from './useNotify';
 import { useRouter, usePathname } from 'next/navigation';
+import useStore from '@/store';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
+  // const {clearUserData} = useAuthHandler()
   const [loginResponse, setLoginRespone] = useState<User | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { success: notifySuccess, error: notifyError } = useNotify();
+  const {setUserId}=useStore()
 const router = useRouter()
 const pathname = usePathname();
+const queryClient =  useQueryClient()
 useEffect(() => {
   if (!['/login', '/register', '/reset-password', '/forgot-password', '/verify-email'].includes(pathname)) {
   }
@@ -30,8 +34,11 @@ useEffect(() => {
       setLoading(false);
       if (response?.status === 'success') {
         notifySuccess("Successfully logged in");
+        queryClient.invalidateQueries({queryKey: ['organizationById']})
+        queryClient.invalidateQueries({queryKey: ['customer']})
         setLoginRespone(response?.data?.user)
-         router.push(`/${response.data.user.id}`);
+        setUserId(response?.data?.user?.id)
+          router.push(`/${response.data.user.id}`);
       }
     },
     onError: (err: any) => {

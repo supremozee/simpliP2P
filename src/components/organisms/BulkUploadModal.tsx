@@ -1,17 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { FiUpload, FiDownload, FiX } from 'react-icons/fi';
-import Button from '../atoms/Button';
-import { motion } from 'framer-motion';
-import useBulkUpload from '@/hooks/useBulkUpload';
-import useStore from '@/store';
-import Modal from '../atoms/Modal';
+import React, { useState, useRef } from "react";
+import { FiUpload, FiDownload, FiX } from "react-icons/fi";
+import Button from "../atoms/Button";
+import { motion } from "framer-motion";
+import useBulkUpload from "@/hooks/useBulkUpload";
+import useStore from "@/store";
+import Modal from "../atoms/Modal";
 
 interface BulkUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) => {
+const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -19,8 +22,10 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
   const { bulkUploadProduct, loading, errorMessage } = useBulkUpload();
 
   const validateFile = (file: File): boolean => {
-    const validExtensions = ['.xlsx', '.xls', '.csv'];
-    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    const validExtensions = [".xlsx", ".xls", ".csv"];
+    const fileExtension = file.name
+      .substring(file.name.lastIndexOf("."))
+      .toLowerCase();
     if (!validExtensions.includes(fileExtension)) {
       alert("Please upload an Excel or CSV file");
       return false;
@@ -31,9 +36,9 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -72,11 +77,11 @@ Sample Product 3,Product description here,1000,NGN,50,10,pcs,Wholesalers,PROD-00
 Sample Product 4,Product description here,1000,NGN,50,10,pcs,Wholesalers,PROD-002,'/logo-black.png'
 Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PROD-006,`;
 
-    const blob = new Blob([template], { type: 'text/xlsx' });
+    const blob = new Blob([template], { type: "text/xlsx" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'inventory_upload_template.xls';
+    link.download = "inventory_upload_template.xls";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -99,15 +104,18 @@ Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PRO
     <Modal isOpen={isOpen} onClose={onClose} title="Bulk Upload Inventory">
       <div className="p-6">
         <div className="mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-2">Upload Your Inventory Data</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-2">
+            Upload Your Inventory Data
+          </h2>
           <p className="text-sm text-gray-600">
-            Upload your inventory data in bulk using an Excel or CSV file. Make sure to follow the required format.
+            Upload your inventory data in bulk using an Excel or CSV file. Make
+            sure to follow the required format.
           </p>
         </div>
 
-        <div 
+        <div
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-            dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'
+            dragActive ? "border-primary bg-primary/5" : "border-gray-300"
           }`}
           onDragEnter={handleDrag}
           onDragOver={handleDrag}
@@ -115,25 +123,27 @@ Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PRO
           onDrop={handleDrop}
           onClick={handleButtonClick}
         >
-          <input 
-            type="file" 
-            ref={fileInputRef} 
+          <input
+            type="file"
+            ref={fileInputRef}
             className="hidden"
             onChange={handleFileChange}
-            accept=".xlsx,.xls,.csv" 
+            accept=".xlsx,.xls,.csv"
           />
-          
+
           <div className="flex flex-col items-center justify-center py-5">
             {selectedFile ? (
               <>
                 <div className="text-green-500 text-4xl mb-3">
                   <FiUpload />
                 </div>
-                <p className="text-sm font-semibold text-gray-700">{selectedFile.name}</p>
+                <p className="text-sm font-semibold #181819">
+                  {selectedFile.name}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">
                   {(selectedFile.size / 1024).toFixed(1)} KB
                 </p>
-                <button 
+                <button
                   className="mt-2 text-xs text-red-500 hover:text-red-700 flex items-center"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -146,17 +156,21 @@ Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PRO
             ) : (
               <>
                 <FiUpload className="text-gray-400 text-4xl mb-4" />
-                <h3 className="text-gray-700 font-medium mb-2">Drag and drop your file here</h3>
+                <h3 className="#181819 font-medium mb-2">
+                  Drag and drop your file here
+                </h3>
                 <p className="text-gray-500 text-sm mb-3">or click to browse</p>
-                <p className="text-xs text-gray-400">Supports Excel (.xlsx, .xls) and CSV files</p>
+                <p className="text-xs text-gray-400">
+                  Supports Excel (.xlsx, .xls) and CSV files
+                </p>
               </>
             )}
           </div>
         </div>
 
         {errorMessage && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }} 
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-3 bg-red-50 text-red-600 p-3 rounded-md text-sm"
           >
@@ -172,7 +186,7 @@ Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PRO
           >
             <FiDownload className="mr-2" /> Download Template
           </Button>
-          
+
           <Button
             onClick={handleUpload}
             className="flex-1 bg-primary hover:bg-primary/90 text-white flex items-center justify-center"
@@ -192,14 +206,17 @@ Sample Product 5,Another product description,2500,NGN,100,20,pcs,Wholesalers,PRO
         </div>
 
         <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <h3 className="font-medium text-gray-800 mb-2 text-sm">Required Format</h3>
+          <h3 className="font-medium text-primary mb-2 text-sm">
+            Required Format
+          </h3>
           <div className="bg-white p-3 rounded-md border border-gray-200 overflow-x-auto">
-            <pre className="text-xs text-gray-700 whitespace-pre-wrap">
+            <pre className="text-xs #181819 whitespace-pre-wrap">
               name,description,unitPrice,currency,stockQty,stockQtyAlert,unitOfMeasure,category,productCode,image_url
             </pre>
           </div>
           <p className="mt-2 text-xs text-gray-500">
-            Make sure your file follows this exact column structure. The image_url is optional.
+            Make sure your file follows this exact column structure. The
+            image_url is optional.
           </p>
         </div>
       </div>

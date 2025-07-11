@@ -1,4 +1,6 @@
-"use client"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+import { ReactTyped } from "react-typed";
 import { usePathname, useRouter } from "next/navigation";
 import useStore from "@/store";
 import Card from "../atoms/Card";
@@ -6,17 +8,42 @@ import useGetUser from "@/hooks/useGetUser";
 import LoaderSpinner from "../atoms/LoaderSpinner";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { IoBusinessOutline, IoAddCircle, IoChevronForward } from "react-icons/io5";
+import {
+  IoBusinessOutline,
+  IoAddCircle,
+  IoChevronForward,
+} from "react-icons/io5";
 import Button from "../atoms/Button";
 import { sanitize } from "@/utils/helpers";
+import NotUser from "../atoms/Icons/NotUser";
 
 const OrganizationsPage: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isLoading } = useGetUser();
-  const findUser = pathname.split('/').pop() === user?.data?.id;
-  const { organizationByAdmin, organizationByUser, setCurrentOrg, setOrgName } = useStore();
+  const { userId } = useStore();
+  const findUser = pathname.split("/").pop() === userId;
+  const { setCurrentOrg, setOrgName } = useStore();
+  const handleCardClick = (orgId: string, name: string) => {
+    const sanitizedOrgName = sanitize(name);
+    router.push(`/${sanitizedOrgName}/dashboard`);
+    setCurrentOrg(orgId);
+    setOrgName(sanitizedOrgName);
+  };
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
 
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  };
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -27,168 +54,132 @@ const OrganizationsPage: React.FC = () => {
     );
   }
 
-  if (!findUser) {
+  if (user?.data?.user_organisations.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full mx-4">
-          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <IoBusinessOutline className="w-10 h-10 text-red-500" />
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-3">User Not Found</h2>
-          <p className="text-gray-500">We couldn&apos;t find the user you&apos;re looking for.</p>
-          <Button
-            onClick={() => router.push('/login')}
-            className="mt-6 bg-gray-100 text-gray-700 px-6 py-2 rounded-xl hover:bg-gray-200 transition-colors"
-          >
-            Back to Login
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (organizationByAdmin.length === 0 && organizationByUser.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-        <motion.div 
+      <section className="min-h-screen flex flex-col items-center justify-center bg-tertiary">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md text-center"
+          className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-[450px] drop-shadow-md w-full mx-4 flex flex-col gap-4"
         >
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <IoBusinessOutline className="w-10 h-10 text-primary" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-3">
-              Create Your First Organization
-            </h2>
-            <p className="text-gray-500 mb-8">
-              Get started by creating your organization. Set up your procurement workspace and streamline your operations.
-            </p>
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+            <IoBusinessOutline className="w-10 h-10 text-primary" />
+          </div>
+          <h2 className="text-4xl font-bold text-primary text-center">
+            Create Your First <br /> Organization
+          </h2>
+          <p className="text-foreground">
+            Get started by creating your organization. Set up your procurement
+            workspace and streamline your operations.
+          </p>
+          <div className="flex justify-center items-center">
             <Button
-              onClick={() => router.push('/create-organization')}
-              className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-primary/90 transition-all transform hover:scale-[1.02] flex items-center gap-3 justify-center w-full shadow-sm"
+              onClick={() => router.push("/create-organization")}
+              className="bg-primary text-white px-5 py-4 rounded-xl hover:bg-tertiary transition-all transform hover:scale-[1.02] flex items-center gap-3 justify-center mt-4 shadow-sm"
             >
               <IoAddCircle className="w-6 h-6" />
               <span className="font-medium">Create Organization</span>
             </Button>
           </div>
         </motion.div>
-      </div>
+      </section>
+    );
+  }
+  if (!findUser) {
+    return (
+      <section className="min-h-screen flex flex-col items-center justify-center bg-tertiary">
+        <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-[450px] drop-shadow-md w-full mx-4 flex flex-col gap-4">
+          <div className="w-24 h-24 bg-red-300 rounded-full flex items-center justify-center mx-auto">
+            <NotUser />
+          </div>
+          <h2 className="text-2xl font-semibold text-primary">
+            User Not Found
+          </h2>
+          <p className="text-foreground">
+            We couldn&apos;t find the user you&apos;re looking for.
+          </p>
+          <div className="flex justify-center items-center">
+            <Button
+              onClick={() => router.push("/login")}
+              className="bg-tertiary text-foreground px-6 py-2 rounded-xl hover:bg-primary transition-colors"
+            >
+              Back to Login
+            </Button>
+          </div>
+        </div>
+      </section>
     );
   }
 
-  const handleCardClick = (orgId: string, name: string) => {
-    const sanitizedOrgName =sanitize(name); 
-    router.push(`/${sanitizedOrgName}/dashboard`);
-    setCurrentOrg(orgId);
-    setOrgName(sanitizedOrgName);
-  };
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen flex flex-col gap-8 items-center py-8 px-3 bg-tertiary">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
+        className="text-center flex flex-col gap-1 "
       >
-        <h1 className="text-4xl font-bold text-gray-900 mb-3">Welcome Back!</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="text-4xl font-bold text-primary">
+          <ReactTyped
+            strings={[`Welcome ${user?.data?.first_name}!`]}
+            typeSpeed={50}
+            showCursor={false}
+          />
+        </h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 10 }}
+          className="text-lg text-foreground"
+        >
           Select an organization to access its dashboard and resources
-        </p>
+        </motion.p>
       </motion.div>
 
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className="w-full max-w-8xl flex flex-wrap gap-6 justify-center"
+        className="w-full flex flex-wrap gap-4 justify-center"
       >
         <motion.div variants={item}>
           <Card
             onClick={() => router.push(`/create-organization`)}
-            className="group relative p-8 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border-2 border-dashed border-primary/20 hover:border-primary/30 flex flex-col items-center justify-center h-[320px]"
+            className="group  relative p-8 bg-gradient-to-br from-primary/5 to-primary hover:from-primary/10 hover:to-primary/20 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border-2 border-dashed border-primary/90 hover:border-primary flex flex-col gap-5 items-center justify-center h-[320px]"
           >
-            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
               <IoAddCircle className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Create New</h3>
-            <p className="text-gray-500 text-center">
+            <p className="text-foreground text-center font-semibold text-lg">
               Set up a new organization
             </p>
           </Card>
         </motion.div>
 
-        {organizationByAdmin?.map((org) => (
-          <motion.div key={org.org_id} variants={item}>
+        {user?.data?.user_organisations?.map((org) => (
+          <motion.div key={org.org_id} variants={item} aria-label="list-orgs">
             <Card
               onClick={() => handleCardClick(org.org_id, org.name)}
-              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100 h-[320px] flex flex-col"
+              className="group relative bg-white hover:bg-tertiary transition-all duration-300 cursor-pointer rounded-2xl shadow-sm drop-shadow-md hover:shadow-md border border-tertiary h-[320px] flex flex-col"
             >
-              <div className="absolute top-4 right-4 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
-                Admin
-              </div>
-              <div className="flex flex-col items-center text-center flex-1">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-primary/10 mb-4 group-hover:ring-primary/20 transition-all duration-300 flex-shrink-0">
+              <em className="absolute top-4 right-4 text-primary  text-sm font-medium">
+                {org.is_creator === true ? "Admin" : "Member"}
+              </em>
+              <div className="flex flex-col items-center h-full justify-center text-center gap-5">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-tertiary ring-4 ring-primary group-hover:ring-primary/20 transition-all duration-300 flex-shrink-0 flex justify-center items-center">
                   <Image
-                    src={org?.logo || "/placeholder-org.png"}
+                    src={org?.logo || "/logo-black.png"}
                     alt={org?.name}
                     fill
                     className="object-cover"
                   />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2 line-clamp-2">
+                <h4 className="text-xl font-semibold text-primary group-hover:text-primary transition-colors line-clamp-2 capitalize">
                   {org?.name}
-                </h2>
-                <p className="text-sm text-gray-500 mb-auto">Administrator Access</p>
-                <div className="mt-4 flex items-center gap-2 text-primary pt-4 border-t border-gray-100 w-full justify-center">
-                  <span className="text-sm font-medium">Open Dashboard</span>
-                  <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
+                </h4>
               </div>
-            </Card>
-          </motion.div>
-        ))}
-
-        {organizationByUser?.map((org) => (
-          <motion.div key={org.org_id} variants={item}>
-            <Card
-              onClick={() => handleCardClick(org.org_id, org.name)}
-              className="group relative p-8 bg-white hover:bg-gray-50 transition-all duration-300 cursor-pointer rounded-2xl shadow-sm hover:shadow-md border border-gray-100 h-[320px] flex flex-col"
-            >
-              <div className="absolute top-4 right-4 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
-                Member
-              </div>
-              <div className="flex flex-col items-center text-center flex-1">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-gray-100 mb-4 group-hover:ring-gray-200 transition-all duration-300 flex-shrink-0">
-                  <Image
-                    src={org?.logo || "/placeholder-org.png"}
-                    alt={org?.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2 line-clamp-2">
-                  {org?.name}
-                </h2>
-                <p className="text-sm text-gray-500 mb-auto">Member Access</p>
-                <div className="mt-4 flex items-center gap-2 text-primary pt-4 border-t border-gray-100 w-full justify-center">
-                  <span className="text-sm font-medium">Open Dashboard</span>
+              <div className="flex flex-col items-end justify-end p-4 gap-2 text-primary mt-10 border-t border-tertiary w-full">
+                <div className="flex gap-2 items-center justify-center">
+                  <em className="text-sm font-medium">Open Dashboard</em>
                   <IoChevronForward className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>

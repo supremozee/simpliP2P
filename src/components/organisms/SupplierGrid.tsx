@@ -1,30 +1,40 @@
-import React from 'react';
-import Card from '../atoms/Card';
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdLocationPin } from 'react-icons/md';
-import Rating from '../atoms/Rating';
-import { BsEnvelope, BsGlobe, BsTelephone, BsTruck } from 'react-icons/bs';
-import Button from '../atoms/Button';
-import { Supplier } from '@/types';
+import React from "react";
+import Card from "../atoms/Card";
+import {
+  MdCheckBox,
+  MdCheckBoxOutlineBlank,
+  MdLocationPin,
+} from "react-icons/md";
+import Rating from "../atoms/Rating";
+import { BsEnvelope, BsGlobe, BsTelephone, BsTruck } from "react-icons/bs";
+import Button from "../atoms/Button";
+import { Supplier } from "@/types";
 interface FilteredSupplier extends Supplier {
   category: {
     name: string;
   };
 }
-const SupplierGrid = ({ 
-  supplier, 
-  onEdit, 
+const SupplierGrid = ({
+  supplier,
+  onEdit,
   onDelete,
   isSelected,
-  toggleSelect
-}: { 
-  supplier: FilteredSupplier, 
-  onEdit: (id: string) => void, 
-  onDelete: (id: string) => void,
-  isSelected: boolean,
-  toggleSelect: () => void
+  toggleSelect,
+}: {
+  supplier: FilteredSupplier;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  isSelected: boolean;
+  toggleSelect: () => void;
 }) => {
   return (
-    <Card className={`flex flex-col bg-white rounded-lg shadow-sm border transition-all duration-200 overflow-hidden h-auto ${isSelected ? 'border-primary bg-blue-50' : 'border-gray-200 hover:shadow-md'}`}>
+    <Card
+      className={`flex flex-col bg-white rounded-lg shadow-sm border transition-all duration-200 overflow-hidden h-auto ${
+        isSelected
+          ? "border-primary bg-blue-50"
+          : "border-gray-200 hover:shadow-md"
+      }`}
+    >
       <div className="p-4 flex-1">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
@@ -35,11 +45,14 @@ const SupplierGrid = ({
               {isSelected ? (
                 <MdCheckBox size={20} className="text-primary" />
               ) : (
-                <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+                <MdCheckBoxOutlineBlank
+                  size={20}
+                  className="text-gray-400 hover:text-gray-600"
+                />
               )}
             </button>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-medium text-gray-800 truncate">
+              <h3 className="text-base font-medium text-primary truncate">
                 {supplier.full_name}
               </h3>
               <div className="flex items-center mt-1">
@@ -51,7 +64,7 @@ const SupplierGrid = ({
             {supplier.category.name}
           </span>
         </div>
-        
+
         <div className="mt-3 space-y-1.5">
           <div className="flex items-center text-xs text-gray-600">
             <BsEnvelope className="w-3 h-3 mr-2 text-gray-400" />
@@ -76,10 +89,12 @@ const SupplierGrid = ({
                 {[
                   supplier.address.street,
                   supplier.address.city,
-                  supplier.address.zip_code && supplier.address.state ? 
-                    `${supplier.address.zip_code}, ${supplier.address.state}` : 
-                    (supplier.address.zip_code || supplier.address.state)
-                ].filter(Boolean).join(', ')}
+                  supplier.address.zip_code && supplier.address.state
+                    ? `${supplier.address.zip_code}, ${supplier.address.state}`
+                    : supplier.address.zip_code || supplier.address.state,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </span>
             </div>
           )}
@@ -88,7 +103,9 @@ const SupplierGrid = ({
         <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center">
             <BsTruck className="w-3 h-3 text-gray-400 mr-1" />
-            <span className="text-xs text-gray-500">Since {new Date(supplier.created_at).toLocaleDateString()}</span>
+            <span className="text-xs text-gray-500">
+              Since {new Date(supplier.created_at).toLocaleDateString()}
+            </span>
           </div>
         </div>
       </div>
@@ -105,7 +122,7 @@ const SupplierGrid = ({
         </Button>
         <Button
           onClick={() => onDelete(supplier.id)}
-          padding="xxs" 
+          padding="xxs"
           radius="xs"
           className="text-xs bg-red-600 text-white hover:bg-red-700"
         >
@@ -116,4 +133,4 @@ const SupplierGrid = ({
   );
 };
 
-export default SupplierGrid; 
+export default SupplierGrid;

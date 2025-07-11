@@ -1,43 +1,43 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
-import useViewPO from '@/hooks/useViewPO';
-import LoaderSpinner from '@/components/atoms/LoaderSpinner';
-import { format_price } from '@/utils/helpers';
-import { motion } from 'framer-motion';
-import Button from '@/components/atoms/Button';
-import { 
-  FaPrint, 
-  FaFileInvoice, 
-  FaShippingFast, 
-  FaCreditCard, 
+import React, { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import useViewPO from "@/hooks/useViewPO";
+import LoaderSpinner from "@/components/atoms/LoaderSpinner";
+import { format_price } from "@/utils/helpers";
+import { motion } from "framer-motion";
+import Button from "@/components/atoms/Button";
+import {
+  FaPrint,
+  FaFileInvoice,
+  FaShippingFast,
+  FaCreditCard,
   FaFileContract,
   FaRegCalendarAlt,
   FaRegClock,
   FaCheckCircle,
   FaExclamationCircle,
   FaExclamationTriangle,
-} from 'react-icons/fa';
-import Image from 'next/image';
-import TableHead from '@/components/atoms/TableHead';
-import TableBody from '@/components/atoms/TableBody';
-import TableRow from '@/components/molecules/TableRow';
-import { ViewPOItem } from '@/types';
+} from "react-icons/fa";
+import Image from "next/image";
+import TableHead from "@/components/atoms/TableHead";
+import TableBody from "@/components/atoms/TableBody";
+import TableRow from "@/components/molecules/TableRow";
+import { ViewPOItem } from "@/types";
 
 const formatPaymentTerm = (term: string) => {
   const termMap: Record<string, string> = {
-    'pia': 'Payment in Advance',
-    'cod': 'Cash on Delivery',
-    'loc': 'Line of Credit',
-    'nt00': 'Payment Immediately',
-    'nt15': '15 Days After Invoice',
-    'nt30': 'Net 30 Days',
-    'nt45': 'Net 45 Days',
-    'nt60': 'Net 60 Days',
-    'nt90': 'Net 90 Days',
-    'nt120': 'Net 120 Days'
+    pia: "Payment in Advance",
+    cod: "Cash on Delivery",
+    loc: "Line of Credit",
+    nt00: "Payment Immediately",
+    nt15: "15 Days After Invoice",
+    nt30: "Net 30 Days",
+    nt45: "Net 45 Days",
+    nt60: "Net 60 Days",
+    nt90: "Net 90 Days",
+    nt120: "Net 120 Days",
   };
-  
+
   return termMap[term?.toLowerCase()] || term || "Standard Terms";
 };
 
@@ -48,62 +48,75 @@ const AddressBlock = ({ entity, title }: { entity: any; title: string }) => (
     <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3 pb-2 border-b border-gray-200">
       {title}
     </h3>
-    <div className="font-bold text-gray-800 text-base mb-1">{entity?.full_name || entity?.name || "N/A"}</div>
+    <div className="font-bold text-primary text-base mb-1">
+      {entity?.full_name || entity?.name || "N/A"}
+    </div>
     <div className="text-gray-600">{entity?.address?.street || "N/A"}</div>
     <div className="text-gray-600">
-      {entity?.address?.city || "N/A"}, {entity?.address?.state || "N/A"} {entity?.address?.zip_code || ""}
+      {entity?.address?.city || "N/A"}, {entity?.address?.state || "N/A"}{" "}
+      {entity?.address?.zip_code || ""}
     </div>
-    <div className="text-gray-600 mb-2">{entity?.address?.country || "N/A"}</div>
-    
-    {entity?.email && <div className="text-gray-600 mt-2">Email: <span className="text-gray-800">{entity.email}</span></div>}
-    {entity?.phone && <div className="text-gray-600">Phone: <span className="text-gray-800">{entity.phone}</span></div>}
+    <div className="text-gray-600 mb-2">
+      {entity?.address?.country || "N/A"}
+    </div>
+
+    {entity?.email && (
+      <div className="text-gray-600 mt-2">
+        Email: <span className="text-primary">{entity.email}</span>
+      </div>
+    )}
+    {entity?.phone && (
+      <div className="text-gray-600">
+        Phone: <span className="text-primary">{entity.phone}</span>
+      </div>
+    )}
   </div>
 );
 
 // Status badge component
 const StatusBadge = ({ status }: { status: string }) => {
-  let bgColor = "bg-gray-100 text-gray-800 border-gray-300";
+  let bgColor = "bg-gray-100 text-primary border-gray-300";
   let icon = <FaRegClock className="mr-1" />;
-  
+
   switch (status) {
-    case 'APPROVED':
+    case "APPROVED":
       bgColor = "bg-green-100 text-green-800 border-green-300";
       icon = <FaCheckCircle className="mr-1" />;
       break;
-    case 'PENDING':
+    case "PENDING":
       bgColor = "bg-yellow-100 text-yellow-800 border-yellow-300";
       icon = <FaExclamationCircle className="mr-1" />;
       break;
-    case 'REJECTED':
+    case "REJECTED":
       bgColor = "bg-red-100 text-red-800 border-red-300";
       icon = <FaExclamationTriangle className="mr-1" />;
       break;
   }
-  
+
   return (
-    <div className={`px-3 py-1.5 rounded-full inline-flex items-center text-sm font-medium ${bgColor}`}>
+    <div
+      className={`px-3 py-1.5 rounded-full inline-flex items-center text-sm font-medium ${bgColor}`}
+    >
       {icon}
       {status}
     </div>
   );
 };
 
-const OrderDetailBox = ({ 
-  label, 
-  value, 
-  icon 
-}: { 
+const OrderDetailBox = ({
+  label,
+  value,
+  icon,
+}: {
   label: string;
   value: string | React.ReactNode;
   icon: React.ReactNode;
 }) => (
   <div className="bg-gray-50 p-3 rounded-lg flex items-center border border-gray-200">
-    <div className="mr-3 bg-white p-2 rounded-full">
-      {icon}
-    </div>
+    <div className="mr-3 bg-white p-2 rounded-full">{icon}</div>
     <div>
       <div className="text-xs text-gray-500 font-medium">{label}</div>
-      <div className="text-sm font-semibold text-gray-800">{value}</div>
+      <div className="text-sm font-semibold text-primary">{value}</div>
     </div>
   </div>
 );
@@ -112,22 +125,26 @@ const PurchaseOrderDetails = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const orderId = params.orderId as string;
-  const resourceToken = searchParams.get('x-resource-token') || "";
+  const resourceToken = searchParams.get("x-resource-token") || "";
   const [isLoading, setIsLoading] = useState(true);
   const [tokenValid, setTokenValid] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
-  
-  const { data: poData, isLoading: isFetchingPO, error } = useViewPO(resourceToken, orderId);
-  
+  const [activeTab, setActiveTab] = useState<"details" | "history">("details");
+
+  const {
+    data: poData,
+    isLoading: isFetchingPO,
+    error,
+  } = useViewPO(resourceToken, orderId);
+
   useEffect(() => {
     if (resourceToken) {
       setTokenValid(true);
     }
-    
+
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-    
+
     return () => clearTimeout(timer);
   }, [resourceToken]);
 
@@ -140,16 +157,18 @@ const PurchaseOrderDetails = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
           <div className="mb-4">
-            <Image 
-              src="/big-logo.png" 
-              alt="SimpliP2P Logo" 
-              width={120} 
-              height={40} 
-              className="mx-auto" 
+            <Image
+              src="/big-logo.png"
+              alt="SimpliP2P Logo"
+              width={120}
+              height={40}
+              className="mx-auto"
             />
           </div>
           <LoaderSpinner size="lg" text="Loading purchase order details..." />
-          <p className="text-sm text-gray-500 mt-4">Please wait while we retrieve the purchase order information</p>
+          <p className="text-sm text-gray-500 mt-4">
+            Please wait while we retrieve the purchase order information
+          </p>
         </div>
       </div>
     );
@@ -220,18 +239,18 @@ const PurchaseOrderDetails = () => {
         state: "Abuja Federal Capital Territory",
         street: "sabr street",
         country: "Nigeria",
-        zip_code: "1000022"
+        zip_code: "1000022",
       },
       rating: "5.0",
       bank_details: {
         bank_name: "Eco bank",
         account_name: "Sabr Ariyibi",
-        account_number: "1234567890"
+        account_number: "1234567890",
       },
       meta_data: null,
       payment_term: "Line of Credit",
       lead_time: "2 days",
-      notification_channel: "email"
+      notification_channel: "email",
     },
     items: [
       {
@@ -244,7 +263,7 @@ const PurchaseOrderDetails = () => {
         image_url: "https://example.com/image.jpg",
         pr_quantity: 12,
         po_quantity: null,
-        status: "PENDING"
+        status: "PENDING",
       },
       {
         id: "98f180f9-8d02-47b6-aaa6-1af58f64c920",
@@ -256,43 +275,49 @@ const PurchaseOrderDetails = () => {
         image_url: "",
         pr_quantity: 1,
         po_quantity: null,
-        status: "PENDING"
-      }
+        status: "PENDING",
+      },
     ],
     organisation: {
       name: "azeezend(sub)",
-      logo: "http://api-simplip2p.onrender.com/files/de05aefe2a7f4ccfb770932590e6873d"
+      logo: "http://api-simplip2p.onrender.com/files/de05aefe2a7f4ccfb770932590e6873d",
     },
     branch: {
       id: "4a83682b-5821-4329-b46d-32211c96cc2e",
       name: "Epe",
-      address: "Sango Ota"
-    }
+      address: "Sango Ota",
+    },
   };
 
   const items = po.items || [];
 
-  const orderDate = new Date(po.created_at).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+  const orderDate = new Date(po.created_at).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
-  
+
   // Calculate expected delivery date (default to 14 days from PO date)
   const expectedDeliveryDate = new Date(po.created_at);
-  expectedDeliveryDate.setDate(expectedDeliveryDate.getDate() + parseInt(po.supplier.lead_time?.split(' ')[0] || '14'));
-  const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-  
+  expectedDeliveryDate.setDate(
+    expectedDeliveryDate.getDate() +
+      parseInt(po.supplier.lead_time?.split(" ")[0] || "14")
+  );
+  const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }
+  );
+
   // Calculate order totals
   const subtotal = items.reduce((sum: number, item: ViewPOItem) => {
     const quantity = item.pr_quantity || 0;
-    return sum + (Number(item.unit_price) * quantity);
+    return sum + Number(item.unit_price) * quantity;
   }, 0);
-  
+
   const taxRate = 7.5; // VAT rate in Nigeria
   const taxAmount = subtotal * (taxRate / 100);
   const shippingCost = 0; // Assuming no shipping cost for this example
@@ -300,18 +325,25 @@ const PurchaseOrderDetails = () => {
 
   // Format payment term for display
   const displayPaymentTerm = formatPaymentTerm(po.supplier.payment_term || "");
-  
+
   // Lead time from supplier data
   const leadTime = po.supplier.lead_time || "2-3 days";
 
   // Item table headers
-  const itemHeaders = ["Item #", "Description", "Quantity", "Unit Price", "Currency", "Total"];
+  const itemHeaders = [
+    "Item #",
+    "Description",
+    "Quantity",
+    "Unit Price",
+    "Currency",
+    "Total",
+  ];
 
   const renderItemRow = (item: ViewPOItem, index: number) => {
     const quantity = item.pr_quantity || 0;
     const unitPrice = Number(item.unit_price);
     const total = unitPrice * quantity;
-    
+
     return (
       <TableRow
         key={item.id || `item-${index}`}
@@ -320,12 +352,14 @@ const PurchaseOrderDetails = () => {
           <div key={`desc-${index}`} className="text-left">
             <div className="font-medium">{item.item_name}</div>
           </div>,
-          <div key={`qty-${index}`} >{quantity}</div>,
-          <div key={`price-${index}`}>{format_price(unitPrice, po.currency)}</div>,
+          <div key={`qty-${index}`}>{quantity}</div>,
+          <div key={`price-${index}`}>
+            {format_price(unitPrice, po.currency)}
+          </div>,
           <div key={`curr-${index}`}>{po.currency}</div>,
           <div key={`total-${index}`}>{format_price(total, po.currency)}</div>,
         ]}
-        className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
         index={index}
       />
     );
@@ -338,25 +372,35 @@ const PurchaseOrderDetails = () => {
         <div className="bg-primary p-6 text-white print:bg-white print:text-primary print:border-b-2 print:border-primary">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">PURCHASE ORDER</h1>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+                PURCHASE ORDER
+              </h1>
               <p className="opacity-75 mt-1">PO #{po.po_number}</p>
             </div>
             <StatusBadge status={po.status} />
           </div>
         </div>
-        
+
         {/* Navigation Tabs */}
         <div className="border-b border-gray-200 bg-white print:hidden">
           <div className="flex max-w-6xl mx-auto">
-            <button 
-              className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === 'details' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-              onClick={() => setActiveTab('details')}
+            <button
+              className={`px-6 py-3 text-sm font-medium border-b-2 ${
+                activeTab === "details"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:#181819 hover:border-gray-300"
+              }`}
+              onClick={() => setActiveTab("details")}
             >
               Order Details
             </button>
-            <button 
-              className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === 'history' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-              onClick={() => setActiveTab('history')}
+            <button
+              className={`px-6 py-3 text-sm font-medium border-b-2 ${
+                activeTab === "history"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:#181819 hover:border-gray-300"
+              }`}
+              onClick={() => setActiveTab("history")}
             >
               Activity History
             </button>
@@ -372,12 +416,14 @@ const PurchaseOrderDetails = () => {
               </div>
               <div>
                 <p className="text-xs text-gray-500">Purchase Order</p>
-                <p className="text-base font-bold text-gray-800">{po.po_number}</p>
+                <p className="text-base font-bold text-primary">
+                  {po.po_number}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 print:hidden">
-              <Button 
-                onClick={handlePrint} 
+              <Button
+                onClick={handlePrint}
                 className="px-3 py-1.5 bg-primary/10 text-primary text-sm rounded-lg flex items-center gap-1.5 hover:bg-primary/20 transition-colors"
               >
                 <FaPrint className="w-3.5 h-3.5" />
@@ -386,13 +432,13 @@ const PurchaseOrderDetails = () => {
             </div>
           </div>
         </div>
-        
-        {activeTab === 'details' && (
+
+        {activeTab === "details" && (
           <div className="p-6 md:p-8">
             {/* Top Section: Company & Order Details */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
               {/* Company Logo & Information */}
-              <motion.div 
+              <motion.div
                 className="md:col-span-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -401,7 +447,7 @@ const PurchaseOrderDetails = () => {
                 <div className="flex items-center mb-4">
                   <div className="mr-4">
                     <Image
-                      src={po.organisation?.logo || "/big-logo.png"} 
+                      src={po.organisation?.logo || "/big-logo.png"}
                       alt="Company Logo"
                       width={120}
                       height={60}
@@ -410,7 +456,7 @@ const PurchaseOrderDetails = () => {
                     />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800">
+                    <h2 className="text-xl font-bold text-primary">
                       {po.organisation?.name || "SimpliP2P Organization"}
                     </h2>
                     <p className="text-sm text-gray-600">
@@ -418,7 +464,7 @@ const PurchaseOrderDetails = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-3 mt-6">
                   <OrderDetailBox
                     label="PO Number"
@@ -442,7 +488,7 @@ const PurchaseOrderDetails = () => {
                   />
                 </div>
               </motion.div>
-              
+
               {/* Order Summary Box */}
               <motion.div
                 className="md:col-span-2"
@@ -451,7 +497,7 @@ const PurchaseOrderDetails = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 h-full">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-gray-200">
                     Order Summary
                   </h3>
                   <div className="space-y-3">
@@ -461,15 +507,21 @@ const PurchaseOrderDetails = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Tax ({taxRate}%):</span>
-                      <span className="font-medium">{format_price(taxAmount, po.currency)}</span>
+                      <span className="font-medium">
+                        {format_price(taxAmount, po.currency)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Shipping:</span>
-                      <span className="font-medium">{format_price(shippingCost, po.currency)}</span>
+                      <span className="font-medium">
+                        {format_price(shippingCost, po.currency)}
+                      </span>
                     </div>
                     <div className="pt-2 mt-2 border-t border-gray-200">
                       <div className="flex justify-between">
-                        <span className="font-semibold text-gray-800">Total:</span>
+                        <span className="font-semibold text-primary">
+                          Total:
+                        </span>
                         <span className="font-bold text-primary text-xl">
                           {format_price(totalAmount, po.currency)}
                         </span>
@@ -482,54 +534,65 @@ const PurchaseOrderDetails = () => {
                       </div>
                       <div className="flex justify-between text-sm mt-1">
                         <span className="text-gray-600">Payment Terms:</span>
-                        <span className="font-medium">{displayPaymentTerm}</span>
+                        <span className="font-medium">
+                          {displayPaymentTerm}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
               </motion.div>
             </div>
-            
+
             {/* Address Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                >
-                  <div className="bg-white border border-gray-200 rounded-lg p-4 h-full">
-                    <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3 pb-2 border-b border-gray-200">
-                      BUYER / SHIP TO
-                    </h3>
-                    <div className="space-y-2">
-                            <div className="flex items-baseline">
-                              <span className="text-gray-600 font-medium w-24">Department:</span>
-                              <span className="text-gray-800 font-semibold">{po.branch?.name || "N/A"}</span>
-                            </div>
-                            <div className="flex items-baseline">
-                              <span className="text-gray-600 font-medium w-24">Address:</span>
-                              <span className="text-gray-800">{po.branch?.address || "N/A"}</span>
-                            </div>
-                            <div className="flex items-baseline">
-                              <span className="text-gray-600 font-medium w-24">Company:</span>
-                              <span className="text-gray-800">{po.organisation?.name || "N/A"}</span>
-                            </div>
-                          </div>
-            </div>
-                </motion.div>
-              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="bg-white border border-gray-200 rounded-lg p-4 h-full">
+                  <h3 className="text-sm uppercase font-semibold text-gray-600 mb-3 pb-2 border-b border-gray-200">
+                    BUYER / SHIP TO
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline">
+                      <span className="text-gray-600 font-medium w-24">
+                        Department:
+                      </span>
+                      <span className="text-primary font-semibold">
+                        {po.branch?.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-gray-600 font-medium w-24">
+                        Address:
+                      </span>
+                      <span className="text-primary">
+                        {po.branch?.address || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-gray-600 font-medium w-24">
+                        Company:
+                      </span>
+                      <span className="text-primary">
+                        {po.organisation?.name || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                <AddressBlock 
-                  entity={po.supplier} 
-                  title="SUPPLIER / VENDOR"
-                />
+                <AddressBlock entity={po.supplier} title="SUPPLIER / VENDOR" />
               </motion.div>
             </div>
-            
+
             {/* Line Items Table */}
             <motion.div
               className="mb-8"
@@ -538,12 +601,12 @@ const PurchaseOrderDetails = () => {
               transition={{ duration: 0.5, delay: 0.5 }}
             >
               <div className="border-b-2 border-gray-200 pb-2 mb-4">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <h3 className="text-lg font-semibold text-primary flex items-center">
                   <FaFileInvoice className="mr-2 text-primary" />
                   Order Line Items
                 </h3>
               </div>
-              
+
               <div className="border border-gray-200 rounded-lg overflow-hidden">
                 <table className="min-w-full bg-white">
                   <TableHead headers={itemHeaders} />
@@ -552,33 +615,53 @@ const PurchaseOrderDetails = () => {
                     renderRow={renderItemRow}
                     emptyMessage="No items found for this purchase order"
                   />
-                  
+
                   {/* Table Footer with Totals */}
                   <tfoot>
                     <tr className="bg-gray-50 border-t border-gray-200">
                       <td colSpan={3} className="px-6 py-3"></td>
-                      <td colSpan={2} className="px-6 py-3 text-right font-medium text-gray-700">Subtotal:</td>
+                      <td
+                        colSpan={2}
+                        className="px-6 py-3 text-right font-medium #181819"
+                      >
+                        Subtotal:
+                      </td>
                       <td className="px-6 py-3 text-right font-medium">
                         {format_price(subtotal, po.currency)}
                       </td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td colSpan={3} className="px-6 py-3"></td>
-                      <td colSpan={2} className="px-6 py-3 text-right font-medium text-gray-700">VAT ({taxRate}%):</td>
+                      <td
+                        colSpan={2}
+                        className="px-6 py-3 text-right font-medium #181819"
+                      >
+                        VAT ({taxRate}%):
+                      </td>
                       <td className="px-6 py-3 text-right font-medium">
                         {format_price(taxAmount, po.currency)}
                       </td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td colSpan={3} className="px-6 py-3"></td>
-                      <td colSpan={2} className="px-6 py-3 text-right font-medium text-gray-700">Shipping:</td>
+                      <td
+                        colSpan={2}
+                        className="px-6 py-3 text-right font-medium #181819"
+                      >
+                        Shipping:
+                      </td>
                       <td className="px-6 py-3 text-right font-medium">
                         {format_price(shippingCost, po.currency)}
                       </td>
                     </tr>
                     <tr className="bg-primary/5 border-t-2 border-primary">
                       <td colSpan={3} className="px-6 py-3"></td>
-                      <td colSpan={2} className="px-6 py-3 text-right font-bold text-gray-900">TOTAL:</td>
+                      <td
+                        colSpan={2}
+                        className="px-6 py-3 text-right font-bold text-gray-900"
+                      >
+                        TOTAL:
+                      </td>
                       <td className="px-6 py-3 text-right font-bold text-primary text-lg">
                         {format_price(totalAmount, po.currency)}
                       </td>
@@ -587,7 +670,7 @@ const PurchaseOrderDetails = () => {
                 </table>
               </div>
             </motion.div>
-            
+
             {/* Additional Information Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               Payment Information
@@ -603,25 +686,38 @@ const PurchaseOrderDetails = () => {
                   </h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Payment Terms:</span>
-                      <span className="font-medium text-sm">{displayPaymentTerm}</span>
+                      <span className="text-gray-600 text-sm">
+                        Payment Terms:
+                      </span>
+                      <span className="font-medium text-sm">
+                        {displayPaymentTerm}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 text-sm">Bank Name:</span>
-                      <span className="font-medium text-sm">{po.supplier?.bank_details?.bank_name || "N/A"}</span>
+                      <span className="font-medium text-sm">
+                        {po.supplier?.bank_details?.bank_name || "N/A"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Account Name:</span>
-                      <span className="font-medium text-sm">{po.supplier?.bank_details?.account_name || "N/A"}</span>
+                      <span className="text-gray-600 text-sm">
+                        Account Name:
+                      </span>
+                      <span className="font-medium text-sm">
+                        {po.supplier?.bank_details?.account_name || "N/A"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Account Number:</span>
-                      <span className="font-medium text-sm">{po.supplier?.bank_details?.account_number || "N/A"}</span>
+                      <span className="text-gray-600 text-sm">
+                        Account Number:
+                      </span>
+                      <span className="font-medium text-sm">
+                        {po.supplier?.bank_details?.account_number || "N/A"}
+                      </span>
                     </div>
                   </div>
                 </div>
               </motion.div>
-              
               {/* Shipping Information */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -635,25 +731,34 @@ const PurchaseOrderDetails = () => {
                   </h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Expected Delivery:</span>
-                      <span className="font-medium text-sm">{formattedDeliveryDate}</span>
+                      <span className="text-gray-600 text-sm">
+                        Expected Delivery:
+                      </span>
+                      <span className="font-medium text-sm">
+                        {formattedDeliveryDate}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 text-sm">Lead Time:</span>
                       {/* <span className="font-medium text-sm">{leadTime}</span> */}
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Shipping Method:</span>
-                      <span className="font-medium text-sm">Standard Delivery</span>
+                      <span className="text-gray-600 text-sm">
+                        Shipping Method:
+                      </span>
+                      <span className="font-medium text-sm">
+                        Standard Delivery
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 text-sm">Incoterms:</span>
-                      <span className="font-medium text-sm">DDP (Delivered Duty Paid)</span>
+                      <span className="font-medium text-sm">
+                        DDP (Delivered Duty Paid)
+                      </span>
                     </div>
                   </div>
                 </div>
               </motion.div>
-              
               {/* Terms & Conditions */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -666,45 +771,55 @@ const PurchaseOrderDetails = () => {
                     Terms & Conditions
                   </h3>
                   <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5">
-                    <li>This PO is subject to our standard terms & conditions.</li>
+                    <li>
+                      This PO is subject to our standard terms & conditions.
+                    </li>
                     <li>Prices and payment in {po.currency}.</li>
-                    <li>Please quote PO #{po.po_number} on all correspondence.</li>
+                    <li>
+                      Please quote PO #{po.po_number} on all correspondence.
+                    </li>
                     <li>Goods must match specifications exactly.</li>
                     <li>Notify us immediately of any potential delays.</li>
                   </ul>
                 </div>
               </motion.div>
             </div>
-            
+
             {/* Signatures */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div>
                 <div className="border-t-2 border-gray-300 pt-3 mt-6">
-                  <p className="text-gray-700 font-medium">Authorized By</p>
+                  <p className="#181819 font-medium">Authorized By</p>
                   <p className="text-sm text-gray-600">Procurement Manager</p>
-                  <p className="text-xs text-gray-500 mt-1">Date: {orderDate}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Date: {orderDate}
+                  </p>
                 </div>
               </div>
               <div>
                 <div className="border-t-2 border-gray-300 pt-3 mt-6">
-                  <p className="text-gray-700 font-medium">Accepted By</p>
-                  <p className="text-sm text-gray-600">{po.supplier?.full_name || "Supplier"} Representative</p>
-                  <p className="text-xs text-gray-500 mt-1">Date: ____________________</p>
+                  <p className="#181819 font-medium">Accepted By</p>
+                  <p className="text-sm text-gray-600">
+                    {po.supplier?.full_name || "Supplier"} Representative
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Date: ____________________
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         )}
-  
-        {activeTab === 'history' && (
+
+        {activeTab === "history" && (
           <div className="p-6 md:p-8">
             <div className="border-b-2 border-gray-200 pb-2 mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+              <h3 className="text-lg font-semibold text-primary flex items-center">
                 <FaRegClock className="mr-2 text-primary" />
                 Order Activity History
               </h3>
             </div>
-            
+
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <div className="space-y-6">
                 {/* Current status */}
@@ -717,7 +832,9 @@ const PurchaseOrderDetails = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-800">Purchase Order Created</h4>
+                      <h4 className="font-medium text-primary">
+                        Purchase Order Created
+                      </h4>
                       <StatusBadge status={po.status} />
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
@@ -726,7 +843,7 @@ const PurchaseOrderDetails = () => {
                     <p className="text-xs text-gray-500 mt-1">{orderDate}</p>
                   </div>
                 </div>
-              
+
                 {/* Future activities - these would be populated from real data */}
                 <div className="flex opacity-40">
                   <div className="mr-4">
@@ -735,29 +852,40 @@ const PurchaseOrderDetails = () => {
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-400">Awaiting Supplier Acknowledgment</h4>
+                    <h4 className="font-medium text-gray-400">
+                      Awaiting Supplier Acknowledgment
+                    </h4>
                     <p className="text-sm text-gray-400 mt-1">
                       Supplier has not yet acknowledged this purchase order
                     </p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Empty state for when there's no history yet */}
-              {po.status === 'PENDING' && (
+              {po.status === "PENDING" && (
                 <div className="mt-8 p-6 bg-gray-50 rounded-lg text-center">
-                  <p className="text-gray-600">This purchase order is new and waiting for supplier action.</p>
-                  <p className="text-sm text-gray-500 mt-2">Activity history will be updated as the order progresses.</p>
+                  <p className="text-gray-600">
+                    This purchase order is new and waiting for supplier action.
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Activity history will be updated as the order progresses.
+                  </p>
                 </div>
               )}
             </div>
           </div>
         )}
-        
+
         {/* Footer */}
         <div className="bg-gray-50 p-6 text-center text-sm text-gray-500 border-t border-gray-200 print:bg-white">
-          <p>This purchase order was generated electronically by SimpliP2P on {new Date().toLocaleDateString()}</p>
-          <p className="mt-1">PO #{po.po_number} | Document ID: {po.id?.substring(0, 8)}</p>
+          <p>
+            This purchase order was generated electronically by SimpliP2P on{" "}
+            {new Date().toLocaleDateString()}
+          </p>
+          <p className="mt-1">
+            PO #{po.po_number} | Document ID: {po.id?.substring(0, 8)}
+          </p>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { MdEdit, MdAdd } from 'react-icons/md';
-import { IoCheckmarkCircle, IoChevronDown, IoChevronUp } from 'react-icons/io5';
+import React, { useState } from "react";
+import Image from "next/image";
+import { MdEdit, MdAdd } from "react-icons/md";
+import { IoCheckmarkCircle, IoChevronDown, IoChevronUp } from "react-icons/io5";
 
 interface OrganizationCardProps {
   name?: string;
@@ -21,7 +21,7 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
   email,
   role,
   permissions,
-  imageUrl = '/placeholder-user.png',
+  imageUrl = "/placeholder-user.png",
   online_status,
   showPending,
   isDeactivated,
@@ -41,41 +41,52 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
           <MdAdd className="w-8 h-8 text-primary" />
         </div>
         <p className="text-gray-600 font-medium">Add New Member</p>
-        <p className="text-sm text-gray-500 mt-1">Click to invite a team member</p>
+        <p className="text-sm text-gray-500 mt-1">
+          Click to invite a team member
+        </p>
       </button>
     );
   }
 
-  const displayPermissions = showAllPermissions 
-    ? permissions 
+  const displayPermissions = showAllPermissions
+    ? permissions
     : permissions?.slice(0, PERMISSIONS_TO_SHOW);
 
   const formatPermission = (permission: string) => {
-    return permission.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return permission
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`relative flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer
-        ${isDeactivated ? 'opacity-75 bg-gray-50' : ''}
+        ${isDeactivated ? "opacity-75 bg-gray-50" : ""}
       `}
     >
       {/* Status Indicator */}
       {!isDeactivated && !showPending && (
-        <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${
-          online_status ? 'bg-green-500' : 'bg-gray-300'
-        }`} />
+        <div
+          className={`absolute top-4 right-4 w-3 h-3 rounded-full ${
+            online_status ? "bg-green-500" : "bg-gray-300"
+          }`}
+        />
       )}
-      
+
       {/* Member Status Badge */}
       {(showPending || isDeactivated) && (
-        <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-medium
-          ${showPending ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}
-        `}>
-          {showPending ? 'Pending' : 'Deactivated'}
+        <div
+          className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-medium
+          ${
+            showPending
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          }
+        `}
+        >
+          {showPending ? "Pending" : "Deactivated"}
         </div>
       )}
 
@@ -83,11 +94,11 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
       <div className="relative w-24 h-24 mb-4">
         <Image
           src={imageUrl}
-          alt={name || 'Profile'}
+          alt={name || "Profile"}
           fill
           className="rounded-full object-cover"
         />
-        <button 
+        <button
           className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
@@ -113,17 +124,19 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
       {permissions && permissions.length > 0 && (
         <div className="mt-4 w-full">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Permissions</span>
+            <span className="text-sm font-medium #181819">Permissions</span>
             <span className="text-xs text-gray-500">{permissions.length}</span>
           </div>
           <div className="space-y-2 bg-gray-50 rounded-lg p-3">
             {displayPermissions?.map((permission) => (
-              <div 
-                key={permission} 
+              <div
+                key={permission}
                 className="flex items-center text-sm text-gray-600 bg-white rounded-md px-3 py-2 shadow-sm"
               >
                 <IoCheckmarkCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                <span className="line-clamp-1">{formatPermission(permission)}</span>
+                <span className="line-clamp-1">
+                  {formatPermission(permission)}
+                </span>
               </div>
             ))}
             {permissions.length > PERMISSIONS_TO_SHOW && (
@@ -140,7 +153,8 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
                   </>
                 ) : (
                   <>
-                    Show More ({permissions.length - PERMISSIONS_TO_SHOW} more) <IoChevronDown className="ml-1 w-4 h-4" />
+                    Show More ({permissions.length - PERMISSIONS_TO_SHOW} more){" "}
+                    <IoChevronDown className="ml-1 w-4 h-4" />
                   </>
                 )}
               </button>

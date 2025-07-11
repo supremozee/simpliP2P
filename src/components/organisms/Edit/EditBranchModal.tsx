@@ -25,30 +25,37 @@ interface EditBranchModalProps {
 const EditBranchModal = ({ isOpen, onClose, branch }: EditBranchModalProps) => {
   const { currentOrg } = useStore();
   const { editBranch, isUpdateBranch } = useEditBranch();
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<EditBranchFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EditBranchFormData>({
     resolver: zodResolver(EditBranchSchema),
     defaultValues: {
       name: branch.name || "",
-    }
+    },
   });
-  
+
   const onSubmit = async (data: EditBranchFormData) => {
     const updateData: EditBranch = {
       name: data.name,
     };
-    
+
     await editBranch(currentOrg, branch.id as string, updateData);
     onClose();
   };
-  
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="mx-auto w-full bg-white p-6 rounded-2xl shadow-xl">
         <div className="flex items-center gap-2 mb-6">
           <h1 className="text-[18px] font-bold">Edit Branch</h1>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 gap-4"
+        >
           <div>
             <InputField
               required
@@ -57,18 +64,22 @@ const EditBranchModal = ({ isOpen, onClose, branch }: EditBranchModalProps) => {
               {...register("name")}
               placeholder="Input branch name"
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
           </div>
           <div className="flex justify-end gap-3 mt-3">
-            <Button 
+            <Button
               onClick={onClose}
               type="button"
-              className="px-5 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300"
+              className="px-5 py-2 bg-gray-200 #181819 hover:bg-gray-300"
             >
               <span className="text-[12px]">Cancel</span>
             </Button>
             <Button type="submit" className="px-5 py-2">
-              <span className="text-white text-[12px]">{isUpdateBranch? `Updating...` : `Update Branch`}</span>
+              <span className="text-white text-[12px]">
+                {isUpdateBranch ? `Updating...` : `Update Branch`}
+              </span>
             </Button>
           </div>
         </form>

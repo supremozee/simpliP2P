@@ -29,19 +29,26 @@ const AddItemSchema = z.object({
 type AddItemFormData = z.infer<typeof AddItemSchema>;
 
 const AddNewItem = () => {
-  const {isDisabled} = useGetRequisitions()
+  const { isDisabled } = useGetRequisitions();
   const { currentOrg, pr, loading } = useStore();
   const { addItemsToRequisition } = useAddItemsToRequistion();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors }, reset, watch, setValue} = useForm<AddItemFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm<AddItemFormData>({
     resolver: zodResolver(AddItemSchema),
     defaultValues: {
       currency: "NGN",
     },
   });
   const [isOpen, setIsOpen] = useState(false);
-  const {uploadFile, loading:imageLoading} = useFileManager()
-  const productRef = useRef<HTMLInputElement>(null)
+  const { uploadFile, loading: imageLoading } = useFileManager();
+  const productRef = useRef<HTMLInputElement>(null);
   const selectedCurrency = watch("currency", "NGN");
   const handleFileChange = async () => {
     const file = productRef.current?.files?.[0];
@@ -50,10 +57,10 @@ const AddNewItem = () => {
         alert("File size must be less than 5MB");
         return;
       }
-      const response= await uploadFile(file);
+      const response = await uploadFile(file);
       setImagePreview(response?.url);
     }
-  }
+  };
   const onSubmit = async (data: AddItemFormData) => {
     try {
       const imageUrl = imagePreview ?? "";
@@ -62,7 +69,7 @@ const AddNewItem = () => {
       setImagePreview(null);
     } catch (error) {
       console.error("Error adding item:", error);
-    } 
+    }
   };
 
   return (
@@ -77,19 +84,15 @@ const AddNewItem = () => {
         <span className="sm:text-sm text-[9px ]">Add New Item</span>
       </Button>
 
-      <Modal 
-        onClose={() => setIsOpen(false)} 
+      <Modal
+        onClose={() => setIsOpen(false)}
         isOpen={isOpen}
         title="Add New Item"
         contentClassName="max-w-2xl"
       >
         <div className="p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <input
-              type="hidden"
-              {...register("pr_id")}
-              value={pr?.id}
-            />
+            <input type="hidden" {...register("pr_id")} value={pr?.id} />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -101,7 +104,9 @@ const AddNewItem = () => {
                   {...register("item_name")}
                 />
                 {errors.item_name && (
-                  <p className="mt-1 text-sm text-red-500">{errors.item_name.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.item_name.message}
+                  </p>
                 )}
               </div>
 
@@ -114,7 +119,9 @@ const AddNewItem = () => {
                   {...register("pr_quantity", { valueAsNumber: true })}
                 />
                 {errors.pr_quantity && (
-                  <p className="mt-1 text-sm text-red-500">{errors.pr_quantity.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.pr_quantity.message}
+                  </p>
                 )}
               </div>
               <div>
@@ -122,7 +129,9 @@ const AddNewItem = () => {
                   label="Currency"
                   options={currencies}
                   {...register("currency")}
-                  onChange={(selectCurrency) => setValue("currency", selectCurrency)}
+                  onChange={(selectCurrency) =>
+                    setValue("currency", selectCurrency)
+                  }
                   value={selectedCurrency}
                   error={errors.currency?.message}
                   required
@@ -138,62 +147,76 @@ const AddNewItem = () => {
                   {...register("unit_price", { valueAsNumber: true })}
                 />
                 {errors.unit_price && (
-                  <p className="mt-1 text-sm text-red-500">{errors.unit_price.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.unit_price.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium #181819">
                 Item Image
               </label>
-              {imageLoading ? <LoaderSpinner/> :<div 
-                className={cn(
-                  "relative border-2 border-dashed rounded-lg cursor-pointer transition-colors",
-                  "hover:bg-gray-50 group",
-                  imagePreview ? "h-64" : "h-48",
-                  errors.image_url ? "border-red-300" : "border-gray-300"
-                )}
-                onClick={() => document.getElementById("image_url")?.click()}
-              >
-                {imagePreview ? (
-                  <>
-                    <Image
-                      src={imagePreview}
-                      alt="Item Preview"
-                      fill
-                      className="object-contain p-4"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <p className="text-white text-sm">Click to change image</p>
+              {imageLoading ? (
+                <LoaderSpinner />
+              ) : (
+                <div
+                  className={cn(
+                    "relative border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                    "hover:bg-gray-50 group",
+                    imagePreview ? "h-64" : "h-48",
+                    errors.image_url ? "border-red-300" : "border-gray-300"
+                  )}
+                  onClick={() => document.getElementById("image_url")?.click()}
+                >
+                  {imagePreview ? (
+                    <>
+                      <Image
+                        src={imagePreview}
+                        alt="Item Preview"
+                        fill
+                        className="object-contain p-4"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <p className="text-white text-sm">
+                          Click to change image
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <FaImage className="w-12 h-12 text-gray-400" />
+                      <p className="mt-2 text-sm text-gray-500">
+                        Click to upload image
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        JPG, PNG up to 5MB
+                      </p>
                     </div>
-                  </>
-                ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <FaImage className="w-12 h-12 text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-500">Click to upload image</p>
-                    <p className="text-xs text-gray-400">JPG, PNG up to 5MB</p>
-                  </div>
-                )}
-                <input
-                  id="image_url"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  {...register("image_url")}
-                  onChange={handleFileChange}
-                  ref={productRef}
-                />
-              </div>}
+                  )}
+                  <input
+                    id="image_url"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    {...register("image_url")}
+                    onChange={handleFileChange}
+                    ref={productRef}
+                  />
+                </div>
+              )}
               {errors.image_url && (
-                <p className="text-sm text-red-500">{errors.image_url.message}</p>
+                <p className="text-sm text-red-500">
+                  {errors.image_url.message}
+                </p>
               )}
             </div>
 
             <div className="flex justify-end gap-3">
               <Button
                 type="button"
-                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+                className="px-4 py-2 text-sm #181819 bg-gray-100 hover:bg-gray-200 rounded-lg"
                 onClick={() => {
                   reset();
                   setImagePreview(null);

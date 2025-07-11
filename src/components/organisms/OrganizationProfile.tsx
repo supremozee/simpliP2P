@@ -1,20 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Input from '../atoms/Input';
-import useFetchOrganizationById from '@/hooks/useFetchOrganizationById';
-import useUpdateOrganization from '@/hooks/useUpdateOrganization';
-import useStore from '@/store';
-import Button from '../atoms/Button';
-import Image from 'next/image';
-import { MdModeEdit } from 'react-icons/md';
-import useUploadOrganizationLogo from '@/hooks/useUploadOrganizationLogo';
-import useUserPermissions from '@/hooks/useUserPermissions';
-import useNotify from '@/hooks/useNotify';
-import LoaderSpinner from '../atoms/LoaderSpinner';
-import useGetUser from '@/hooks/useGetUser';
-import { cn } from '@/utils/cn';
+import React, { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Input from "../atoms/Input";
+import useFetchOrganizationById from "@/hooks/useFetchOrganizationById";
+import useUpdateOrganization from "@/hooks/useUpdateOrganization";
+import useStore from "@/store";
+import Button from "../atoms/Button";
+import Image from "next/image";
+import { MdModeEdit } from "react-icons/md";
+import useUploadOrganizationLogo from "@/hooks/useUploadOrganizationLogo";
+import useUserPermissions from "@/hooks/useUserPermissions";
+import useNotify from "@/hooks/useNotify";
+import LoaderSpinner from "../atoms/LoaderSpinner";
+import useGetUser from "@/hooks/useGetUser";
+import { cn } from "@/utils/cn";
 
 const OrganizationSchema = z.object({
   name: z.string().min(1, "Organization name is required"),
@@ -25,27 +25,37 @@ type OrganizationFormType = z.infer<typeof OrganizationSchema>;
 
 const OrganizationProfile = () => {
   const { currentOrg } = useStore();
-  const { data, isLoading, isError, error } = useFetchOrganizationById(currentOrg);
+  const { data, isLoading, isError, error } =
+    useFetchOrganizationById(currentOrg);
   const { updateOrganization } = useUpdateOrganization(currentOrg);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { uploadOrganizationLogo, loading: isUploading, errorMessage: uploadError } = useUploadOrganizationLogo();
+  const {
+    uploadOrganizationLogo,
+    loading: isUploading,
+    errorMessage: uploadError,
+  } = useUploadOrganizationLogo();
   const { getUserPermissions } = useUserPermissions();
   const { error: showError, success: showSuccess } = useNotify();
   const { isCreator } = getUserPermissions();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<OrganizationFormType>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<OrganizationFormType>({
     resolver: zodResolver(OrganizationSchema),
     defaultValues: {
-      name: '',
-      address: '',
-    }
+      name: "",
+      address: "",
+    },
   });
 
-  const handleUploadLogo = async() => {
+  const handleUploadLogo = async () => {
     const file = fileInputRef.current?.files?.[0];
-    if(file) {
+    if (file) {
       try {
         setIsImageLoading(true);
         await uploadOrganizationLogo(file, currentOrg);
@@ -54,16 +64,18 @@ const OrganizationProfile = () => {
         setIsImageLoading(false);
       }
     }
-  }
+  };
 
   const organisation = data?.data;
-  const {user} = useGetUser();
-  const getUserRole = user?.data?.user_organisations?.find((org) => org.org_id === currentOrg);
+  const { user } = useGetUser();
+  const getUserRole = user?.data?.user_organisations?.find(
+    (org) => org.org_id === currentOrg
+  );
 
   useEffect(() => {
     if (organisation) {
-      setValue('name', organisation.name || '');
-      setValue('address', organisation.address || '');
+      setValue("name", organisation.name || "");
+      setValue("address", organisation.address || "");
     }
   }, [organisation, setValue]);
 
@@ -79,7 +91,9 @@ const OrganizationProfile = () => {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
         <p className="font-medium">Error loading organization</p>
-        <p className="text-sm mt-1">{error?.message || 'An unexpected error occurred'}</p>
+        <p className="text-sm mt-1">
+          {error?.message || "An unexpected error occurred"}
+        </p>
       </div>
     );
   }
@@ -93,9 +107,12 @@ const OrganizationProfile = () => {
     try {
       setIsUpdating(true);
       await updateOrganization(formData);
-      showSuccess('Organization profile updated successfully');
+      showSuccess("Organization profile updated successfully");
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update organization profile';
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to update organization profile";
       showError(message);
     } finally {
       setIsUpdating(false);
@@ -105,7 +122,9 @@ const OrganizationProfile = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800">Organization Profile</h2>
+        <h2 className="text-xl font-semibold text-primary">
+          Organization Profile
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -117,7 +136,9 @@ const OrganizationProfile = () => {
             {...register("name")}
             disabled={!isCreator}
           />
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+          )}
 
           <Input
             type="text"
@@ -135,31 +156,37 @@ const OrganizationProfile = () => {
             {...register("address")}
             disabled={!isCreator}
           />
-          {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>}
+          {errors.address && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.address.message}
+            </p>
+          )}
 
           <Input
             type="text"
             label="Organization Code"
             placeholder="Enter Organization Code"
             value={organisation?.tenant_code}
-            name='tenant_code'
+            name="tenant_code"
             disabled={true}
           />
         </div>
 
         <div className="flex flex-col items-center space-y-4">
           <div className="relative w-[300px] h-[300px]">
-            <div className={cn(
-              "w-full h-full rounded-full flex justify-center flex-col items-center overflow-hidden",
-              "border-4 border-gray-100 shadow-lg"
-            )}>
+            <div
+              className={cn(
+                "w-full h-full rounded-full flex justify-center flex-col items-center overflow-hidden",
+                "border-4 border-gray-100 shadow-lg"
+              )}
+            >
               {isImageLoading ? (
                 <div className="w-full h-full flex items-center justify-center bg-gray-50">
                   <LoaderSpinner size="lg" />
                 </div>
               ) : (
                 <Image
-                  src={(getUserRole?.logo) || "/logo-black.png"}
+                  src={getUserRole?.logo || "/logo-black.png"}
                   alt="Organization Logo"
                   width={200}
                   height={200}
@@ -205,7 +232,7 @@ const OrganizationProfile = () => {
             className="px-6 py-2 text-white bg-primary hover:bg-primary/90 rounded-lg"
             disabled={isUpdating || isUploading}
           >
-            {isUpdating ? 'Saving Changes...' : 'Save Changes'}
+            {isUpdating ? "Saving Changes..." : "Save Changes"}
           </Button>
         </div>
       )}

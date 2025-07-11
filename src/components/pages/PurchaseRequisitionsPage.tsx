@@ -28,20 +28,21 @@ interface CompletionProps {
 const PurchaseRequisitionsPage = () => {
   const [activeTab, setActiveTab] = useState("ALL");
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
-  const {currentOrg, setType, startDate, endDate} = useStore();
+  const { currentOrg, setType, startDate, endDate } = useStore();
   const [prNumber, setPrNumber] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
-  const { data: prItemData, isLoading: isLineItemsLoading } = useFetchItemsByPrNumber(currentOrg, prNumber);
-  const {data} = useFetchDepartment(currentOrg);
+  const { data: prItemData, isLoading: isLineItemsLoading } =
+    useFetchItemsByPrNumber(currentOrg, prNumber);
+  const { data } = useFetchDepartment(currentOrg);
 
   const lineItems = prItemData?.data?.data;
-  
+
   // Set export type for requisitions
   useEffect(() => {
-    setType('requisitions');
+    setType("requisitions");
   }, [setType]);
-  
+
   const tabNames = [
     "ALL",
     "PENDING",
@@ -50,10 +51,10 @@ const PurchaseRequisitionsPage = () => {
     "REQUEST_MODIFICATION",
     "SAVED APPROVAL",
   ];
-  
-  const {setPr, setIsOpen, setHidePrText, isOpen } = useStore();
+
+  const { setPr, setIsOpen, setHidePrText, isOpen } = useStore();
   const { error } = useNotify();
-  
+
   const {
     allRequisitions,
     savedRequisitions,
@@ -75,10 +76,10 @@ const PurchaseRequisitionsPage = () => {
     deselectAll,
     isSelected,
   } = useExportSelected();
-  
+
   const handleViewRequisition = ({ pr_number, id }: CompletionProps) => {
     if (pr_number && id) {
-      setHidePrText(`You are viewing requisition: ${pr_number}`);  
+      setHidePrText(`You are viewing requisition: ${pr_number}`);
       setPr({ pr_number, id });
 
       setIsOpen(true);
@@ -92,11 +93,9 @@ const PurchaseRequisitionsPage = () => {
     if (expandedRows.length > 0 && !expandedRows.includes(prNumber)) {
       setExpandedRows([]);
     }
-    
+
     setPrNumber(prNumber);
-    setExpandedRows(prev =>
-      prev.includes(prNumber) ? [] : [prNumber]
-    );
+    setExpandedRows((prev) => (prev.includes(prNumber) ? [] : [prNumber]));
   };
 
   const handleSearch = (query: string) => {
@@ -104,7 +103,7 @@ const PurchaseRequisitionsPage = () => {
   };
 
   const handleFilter = (filterType: string, value: string) => {
-    if (filterType === 'department') {
+    if (filterType === "department") {
       setDepartmentFilter(value);
     }
     // Add other filter type handlers as needed
@@ -112,7 +111,7 @@ const PurchaseRequisitionsPage = () => {
 
   const filterRequisitions = () => {
     const requisitions = (() => {
-      switch (activeTab)  {
+      switch (activeTab) {
         case "ALL":
           return allRequisitions;
         case "PENDING":
@@ -129,27 +128,34 @@ const PurchaseRequisitionsPage = () => {
           return [];
       }
     })();
-    return requisitions.filter(req => {
-      const matchesSearch = !searchQuery || 
+    return requisitions.filter((req) => {
+      const matchesSearch =
+        !searchQuery ||
         req.pr_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        req.department?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        req.department?.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         req.requestor_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        req.request_description.toLowerCase().includes(searchQuery.toLowerCase());
-      
+        req.request_description
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
       // Department filter
-      const matchesDepartment = departmentFilter === 'all' || 
-        (req.department?.name && req.department.name.toLowerCase() === departmentFilter.toLowerCase());
-      
+      const matchesDepartment =
+        departmentFilter === "all" ||
+        (req.department?.name &&
+          req.department.name.toLowerCase() === departmentFilter.toLowerCase());
+
       // Date range filter
       let matchesDateRange = true;
       if (startDate || endDate) {
         const createdDate = new Date(req.created_at);
-        
+
         if (startDate) {
           const filterStartDate = new Date(startDate);
           matchesDateRange = matchesDateRange && createdDate >= filterStartDate;
         }
-        
+
         if (endDate) {
           const filterEndDate = new Date(endDate);
           // Set time to end of day for end date
@@ -157,23 +163,23 @@ const PurchaseRequisitionsPage = () => {
           matchesDateRange = matchesDateRange && createdDate <= filterEndDate;
         }
       }
-      
+
       return matchesSearch && matchesDepartment && matchesDateRange;
     });
   };
-  
+
   const filterOptions = [
-    { 
-      label: "Department", 
-      value: "department", 
+    {
+      label: "Department",
+      value: "department",
       options: [
         { label: "All", value: "all" },
-       ...( data?.data?.departments.map((department) => ({
+        ...(data?.data?.departments.map((department) => ({
           label: department.name,
           value: department.name,
         })) || []),
-      ] 
-    }
+      ],
+    },
   ];
 
   const handleSelectAll = () => {
@@ -181,11 +187,11 @@ const PurchaseRequisitionsPage = () => {
     if (selectedItems.length === filteredReqs.length) {
       deselectAll();
     } else {
-      selectAll(filteredReqs.map(req => req.id));
+      selectAll(filteredReqs.map((req) => req.id));
     }
   };
-  
-  const headers:string | any = [
+
+  const headers: string | any = [
     <ExportCheckBox
       handleSelectAll={handleSelectAll}
       selectedItems={selectedItems}
@@ -195,7 +201,7 @@ const PurchaseRequisitionsPage = () => {
     "PR No.",
     "PR date",
     "Supplier",
-    "Department", 
+    "Department",
     "Requestor",
     "Total Qty",
     "Estimated Cost",
@@ -222,7 +228,7 @@ const PurchaseRequisitionsPage = () => {
     />
   );
 
-  const tabnamesToRender = tabNames.map(name =>
+  const tabnamesToRender = tabNames.map((name) =>
     name === "REQUEST_MODIFICATION" ? "REQUEST MODIFICATION" : name
   );
 
@@ -231,13 +237,18 @@ const PurchaseRequisitionsPage = () => {
       case "ALL":
         return allRequisitions.length;
       case "PENDING":
-        return pendingRequisitions.filter(req => req.status === "PENDING").length;
+        return pendingRequisitions.filter((req) => req.status === "PENDING")
+          .length;
       case "APPROVED":
-        return approvedRequisitions.filter(req => req.status === "APPROVED").length;
+        return approvedRequisitions.filter((req) => req.status === "APPROVED")
+          .length;
       case "REJECTED":
-        return rejectedRequisitions.filter(req => req.status === "REJECTED").length;
+        return rejectedRequisitions.filter((req) => req.status === "REJECTED")
+          .length;
       case "REQUEST_MODIFICATION":
-        return requestRequisitions.filter(req => req.status === "REQUESTED MODIFICATION").length;
+        return requestRequisitions.filter(
+          (req) => req.status === "REQUESTED MODIFICATION"
+        ).length;
       case "SAVED APPROVAL":
         return savedRequisitions.length;
       default:
@@ -246,7 +257,7 @@ const PurchaseRequisitionsPage = () => {
   };
 
   const tabCounts = tabNames.map(getTabCount);
-  
+
   if (
     isLoadingSavedRequisitions ||
     isPendingLoading ||
@@ -254,34 +265,39 @@ const PurchaseRequisitionsPage = () => {
     isRejectedLoading ||
     isRequestLoading ||
     isAllRequisitionsLoading
-  ) return <TableSkeleton />;
+  )
+    return <TableSkeleton />;
 
   return (
     <>
       <InitializeRequisition />
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Purchase Requisitions</h1>
-        <p className="text-gray-600">Manage and track all purchase requisitions in your organization</p>
+        <h1 className="text-2xl font-bold text-primary mb-1">
+          Purchase Requisitions
+        </h1>
+        <p className="text-gray-600">
+          Manage and track all purchase requisitions in your organization
+        </p>
       </div>
 
       <ActionBar
         onSearch={handleSearch}
         showDate
-        type="requisitions" 
+        type="requisitions"
         filterOptions={filterOptions}
         onFilter={handleFilter}
       />
-      
+
       <Tabs
         tabNames={tabnamesToRender}
         active={activeTab}
         setActive={setActiveTab}
         counts={tabCounts}
       />
-      
+
       {selectedItems.length > 0 && (
         <div className="mb-4 mt-4">
-          <SelectedItemForExport 
+          <SelectedItemForExport
             selectedItems={selectedItems}
             items={filterRequisitions()}
             deselectAll={deselectAll}
@@ -289,7 +305,7 @@ const PurchaseRequisitionsPage = () => {
           />
         </div>
       )}
-      
+
       <TableShadowWrapper>
         <table className="w-full table-auto text-center border-collapse">
           <TableHead headers={headers} />
@@ -300,7 +316,7 @@ const PurchaseRequisitionsPage = () => {
           />
         </table>
       </TableShadowWrapper>
-      
+
       {isOpen && <ViewRequisitions />}
     </>
   );

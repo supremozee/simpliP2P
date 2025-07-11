@@ -20,19 +20,30 @@ import { useMemo } from "react";
 const FetchItemByPrNumber = () => {
   const { currentOrg, pr } = useStore();
   const { isDisabled, showForSavedOnly } = useGetRequisitions();
-  const { data, error, isLoading, isError } = useFetchItemsByPrNumber(currentOrg, pr?.pr_number || "", 100, 1);
+  const { data, error, isLoading, isError } = useFetchItemsByPrNumber(
+    currentOrg,
+    pr?.pr_number || "",
+    100,
+    1
+  );
   const products = useMemo(() => data?.data?.data || [], [data]);
   const { removeItem } = useRemoveItem();
-  
+
   // Calculate totals
   const totals = useMemo(() => {
-    if (!products.length) return { quantity: 0, cost: 0, currency: 'USD' };
-    
-    const totalQuantity = products.reduce((acc, item) => acc + item.pr_quantity, 0);
-    const totalCost = products.reduce((acc, item) => acc + (item.pr_quantity * item.unit_price), 0);
+    if (!products.length) return { quantity: 0, cost: 0, currency: "USD" };
+
+    const totalQuantity = products.reduce(
+      (acc, item) => acc + item.pr_quantity,
+      0
+    );
+    const totalCost = products.reduce(
+      (acc, item) => acc + item.pr_quantity * item.unit_price,
+      0
+    );
     // Get currency from first item (assuming all items have same currency)
-    const currency = products[0]?.currency || 'USD';
-    
+    const currency = products[0]?.currency || "USD";
+
     return { quantity: totalQuantity, cost: totalCost, currency };
   }, [products]);
 
@@ -41,23 +52,33 @@ const FetchItemByPrNumber = () => {
   };
 
   if (isLoading) return <TableSkeleton />;
-  if (isError) return <ErrorComponent text={error?.message || "Failed to fetch products."} />;
+  if (isError)
+    return (
+      <ErrorComponent text={error?.message || "Failed to fetch products."} />
+    );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const headers: string | any = ["Item Image", "Item Name", "Unit Price", "Currency", "Quantity", (showForSavedOnly && "Actions")];
+  const headers: string | any = [
+    "Item Image",
+    "Item Name",
+    "Unit Price",
+    "Currency",
+    "Quantity",
+    showForSavedOnly && "Actions",
+  ];
   const renderRow = (item: AllItems, index: number) => {
     const rowData = [
-        item.image_url ? (
-          <Image
-            src={item.image_url || "/logo-black.png"}
-            alt={item.item_name}
-            width={25}
-            height={25}
-            className="object-cover rounded-full w-[30px] h-[30px] bg-cover"
-          />
-        ) : (
-          <span className="text-gray-500">No Image</span>
-        ),
+      item.image_url ? (
+        <Image
+          src={item.image_url || "/logo-black.png"}
+          alt={item.item_name}
+          width={25}
+          height={25}
+          className="object-cover rounded-full w-[30px] h-[30px] bg-cover"
+        />
+      ) : (
+        <span className="text-gray-500">No Image</span>
+      ),
       item.item_name,
       format_price(item.unit_price, item.currency),
       item.currency,
@@ -67,11 +88,13 @@ const FetchItemByPrNumber = () => {
           key={item.id}
           type="button"
           disabled={!!isDisabled}
-          onClick={() => handleRemove(item.id)} className="bg-[#F10000] text-white p-2 flex justify-center items-center max-w-8 rounded-full">
+          onClick={() => handleRemove(item.id)}
+          className="bg-[#F10000] text-white p-2 flex justify-center items-center max-w-8 rounded-full"
+        >
           <FaTimes />
         </Button>
-)
-    ]
+      ),
+    ];
     return (
       <TableRow
         key={item.id}
@@ -79,8 +102,8 @@ const FetchItemByPrNumber = () => {
         index={index}
         className={`transition-colors`}
       />
-    )
-  }
+    );
+  };
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto">
@@ -93,17 +116,23 @@ const FetchItemByPrNumber = () => {
           />
         </table>
       </div>
-      
+
       {products.length > 0 && (
         <div className="flex flex-col sm:flex-row justify-end gap-4 px-4 py-3 bg-gray-50 rounded-md border border-gray-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
             <div className="flex items-center">
-              <span className="text-gray-600 font-medium mr-2">Total Quantity:</span>
-              <span className="font-bold text-gray-800">{totals.quantity.toLocaleString()}</span>
+              <span className="text-gray-600 font-medium mr-2">
+                Total Quantity:
+              </span>
+              <span className="font-bold text-primary">
+                {totals.quantity.toLocaleString()}
+              </span>
             </div>
-            
+
             <div className="flex items-center">
-              <span className="text-gray-600 font-medium mr-2">Estimated Cost:</span>
+              <span className="text-gray-600 font-medium mr-2">
+                Estimated Cost:
+              </span>
               <span className="font-bold text-primary">
                 {format_price(totals.cost, totals.currency)}
               </span>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface TableHeadProps {
   headers: (string | React.ReactNode)[];
@@ -7,12 +7,15 @@ interface TableHeadProps {
 
 const TableHead: React.FC<TableHeadProps> = ({ headers, index }) => {
   return (
-    <thead className="sticky top-0 z-50" >
-      <tr className="bg-gradient-to-r from-gray-50 to-gray-100 shadow-sm" key={index}>
+    <thead className="sticky top-0 z-50">
+      <tr
+        className="bg-gradient-to-r from-gray-50 to-gray-100 shadow-sm"
+        key={index}
+      >
         {headers.map((header, idx) => (
-          <th 
+          <th
             key={idx}
-            className="border-b border-gray-200 px-4 py-3 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider "
+            className="border-b border-gray-200 px-4 py-3 text-left font-semibold text-xs #181819 uppercase tracking-wider "
           >
             {header}
           </th>

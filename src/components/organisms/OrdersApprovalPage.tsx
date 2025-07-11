@@ -11,16 +11,21 @@ import { motion } from "framer-motion";
 import { format_price } from "@/utils/helpers";
 import { Order } from "@/types";
 
-type SortField = 'date' | 'amount' | 'supplier';
-type SortOrder = 'asc' | 'desc';
+type SortField = "date" | "amount" | "supplier";
+type SortOrder = "asc" | "desc";
 
 const OrdersApprovalPage = () => {
   const { currentOrg, setIsOpen, isOpen, setPr } = useStore();
-  const { data: pendingData, isLoading: pendingLoading } = useFetchAllOrders(currentOrg, "PENDING");
+  const { data: pendingData, isLoading: pendingLoading } = useFetchAllOrders(
+    currentOrg,
+    "PENDING"
+  );
   const [searchQuery, setSearchQuery] = useState("");
-  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
-  const [sortField, setSortField] = useState<SortField>('date');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [timeFilter, setTimeFilter] = useState<
+    "all" | "today" | "week" | "month"
+  >("all");
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [selectedOrderId, setSelectedOrderId] = useState<string>("");
 
   const pendingOrders = pendingData?.data.orders || [];
@@ -29,16 +34,20 @@ const OrdersApprovalPage = () => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    const monthAgo = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      today.getDate()
+    );
 
-    return orders.filter(order => {
+    return orders.filter((order) => {
       const orderDate = new Date(order.created_at);
       switch (timeFilter) {
-        case 'today':
+        case "today":
           return orderDate >= today;
-        case 'week':
+        case "week":
           return orderDate >= weekAgo;
-        case 'month':
+        case "month":
           return orderDate >= monthAgo;
         default:
           return true;
@@ -50,36 +59,42 @@ const OrdersApprovalPage = () => {
     return [...orders].sort((a, b) => {
       let comparison = 0;
       switch (sortField) {
-        case 'date':
-          comparison = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case "date":
+          comparison =
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           break;
-        case 'amount':
+        case "amount":
           comparison = Number(b.total_amount) - Number(a.total_amount);
           break;
-        case 'supplier':
-          comparison = (a.supplier?.full_name || '').localeCompare(b.supplier?.full_name || '');
+        case "supplier":
+          comparison = (a.supplier?.full_name || "").localeCompare(
+            b.supplier?.full_name || ""
+          );
           break;
       }
-      return sortOrder === 'asc' ? -comparison : comparison;
+      return sortOrder === "asc" ? -comparison : comparison;
     });
   };
 
   const filteredOrders = sortOrders(
     filterByTime(
-      pendingOrders.filter(order => 
-        order.po_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.supplier?.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.total_amount.toString().includes(searchQuery)
+      pendingOrders.filter(
+        (order) =>
+          order.po_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order.supplier?.full_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          order.total_amount.toString().includes(searchQuery)
       )
     )
   );
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('desc');
+      setSortOrder("desc");
     }
   };
 
@@ -98,8 +113,12 @@ const OrdersApprovalPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Purchase Order Approvals</h1>
-          <p className="text-sm text-gray-500 mt-1">Review and approve purchase orders for your organization</p>
+          <h1 className="text-2xl font-semibold text-primary">
+            Purchase Order Approvals
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Review and approve purchase orders for your organization
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -137,22 +156,40 @@ const OrdersApprovalPage = () => {
               </div>
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => handleSort('date')}
-                  className={`flex items-center gap-1 text-sm ${sortField === 'date' ? 'text-primary font-bold' : 'text-gray-500'} hover:text-primary transition-colors`}
+                  onClick={() => handleSort("date")}
+                  className={`flex items-center gap-1 text-sm ${
+                    sortField === "date"
+                      ? "text-primary font-bold"
+                      : "text-gray-500"
+                  } hover:text-primary transition-colors`}
                 >
-                  Date {sortField === 'date' && (sortOrder === 'asc' ? <BsArrowUp /> : <BsArrowDown />)}
+                  Date{" "}
+                  {sortField === "date" &&
+                    (sortOrder === "asc" ? <BsArrowUp /> : <BsArrowDown />)}
                 </button>
                 <button
-                  onClick={() => handleSort('amount')}
-                  className={`flex items-center gap-1 text-sm ${sortField === 'amount' ? 'text-primary font-bold' : 'text-gray-500'} hover:text-primary transition-colors`}
+                  onClick={() => handleSort("amount")}
+                  className={`flex items-center gap-1 text-sm ${
+                    sortField === "amount"
+                      ? "text-primary font-bold"
+                      : "text-gray-500"
+                  } hover:text-primary transition-colors`}
                 >
-                  Amount {sortField === 'amount' && (sortOrder === 'asc' ? <BsArrowUp /> : <BsArrowDown />)}
+                  Amount{" "}
+                  {sortField === "amount" &&
+                    (sortOrder === "asc" ? <BsArrowUp /> : <BsArrowDown />)}
                 </button>
                 <button
-                  onClick={() => handleSort('supplier')}
-                  className={`flex items-center gap-1 text-sm ${sortField === 'supplier' ? 'text-primary font-bold' : 'text-gray-500'} hover:text-primary transition-colors`}
+                  onClick={() => handleSort("supplier")}
+                  className={`flex items-center gap-1 text-sm ${
+                    sortField === "supplier"
+                      ? "text-primary font-bold"
+                      : "text-gray-500"
+                  } hover:text-primary transition-colors`}
                 >
-                  Supplier {sortField === 'supplier' && (sortOrder === 'asc' ? <BsArrowUp /> : <BsArrowDown />)}
+                  Supplier{" "}
+                  {sortField === "supplier" &&
+                    (sortOrder === "asc" ? <BsArrowUp /> : <BsArrowDown />)}
                 </button>
               </div>
             </div>
@@ -162,7 +199,7 @@ const OrdersApprovalPage = () => {
           </div>
         </div>
 
-        {(!pendingLoading && filteredOrders.length > 0) ? (
+        {!pendingLoading && filteredOrders.length > 0 ? (
           <div className="divide-y divide-gray-100">
             {filteredOrders.map((order) => (
               <motion.div
@@ -174,7 +211,7 @@ const OrdersApprovalPage = () => {
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === "Enter" || e.key === " ") {
                     handleOrderClick(order);
                   }
                 }}
@@ -183,12 +220,17 @@ const OrdersApprovalPage = () => {
                   <div className="space-y-4 flex-grow">
                     <div className="flex items-center gap-4">
                       <div className="px-4 py-2 bg-primary text-white rounded-lg group-hover:bg-primary/90 transition-colors">
-                        <span className="text-sm font-medium">PO-{order?.po_number.split('-').pop()}</span>
+                        <span className="text-sm font-medium">
+                          PO-{order?.po_number.split("-").pop()}
+                        </span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium text-gray-800">{order.supplier?.full_name}</h3>
+                        <h3 className="text-lg font-medium text-primary">
+                          {order.supplier?.full_name}
+                        </h3>
                         <p className="text-sm text-gray-500">
-                          Created on {new Date(order.created_at).toLocaleDateString()}
+                          Created on{" "}
+                          {new Date(order.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -197,20 +239,27 @@ const OrdersApprovalPage = () => {
                       <div>
                         <p className="text-sm text-gray-500">Total Amount</p>
                         <p className="text-lg font-semibold text-primary flex items-center gap-1">
-                          <span className="text-sm font-medium">{order.currency}</span>
-                          {format_price(Number(order.total_amount), order?.currency)}
+                          <span className="text-sm font-medium">
+                            {order.currency}
+                          </span>
+                          {format_price(
+                            Number(order.total_amount),
+                            order?.currency
+                          )}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Items</p>
-                        <p className="text-lg font-semibold text-gray-700">
+                        <p className="text-lg font-semibold #181819">
                           {order.purchase_requisition.total_items || 0}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Needed By</p>
-                        <p className="text-lg font-semibold text-gray-700">
-                          {new Date(order.purchase_requisition.needed_by_date).toLocaleDateString()}
+                        <p className="text-lg font-semibold #181819">
+                          {new Date(
+                            order.purchase_requisition.needed_by_date
+                          ).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -221,7 +270,9 @@ const OrdersApprovalPage = () => {
                       {order.status}
                     </span>
                     <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-sm text-primary">Click to review →</span>
+                      <span className="text-sm text-primary">
+                        Click to review →
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -234,9 +285,13 @@ const OrdersApprovalPage = () => {
             <div className="bg-gray-100 rounded-full p-4 mb-4">
               <IoFilterOutline className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-800">No Pending Orders</h3>
+            <h3 className="text-lg font-medium text-primary">
+              No Pending Orders
+            </h3>
             <p className="text-sm text-gray-500 mt-1">
-              {searchQuery ? "No orders match your search criteria" : "There are no orders pending approval"}
+              {searchQuery
+                ? "No orders match your search criteria"
+                : "There are no orders pending approval"}
             </p>
           </div>
         )}
@@ -245,4 +300,4 @@ const OrdersApprovalPage = () => {
   );
 };
 
-export default OrdersApprovalPage; 
+export default OrdersApprovalPage;

@@ -1,7 +1,7 @@
-import React from 'react';
-import { cn } from '@/utils/cn';
-import { IoClose } from 'react-icons/io5';
-import Button from '../Button';
+import React from "react";
+import { cn } from "@/utils/cn";
+import { IoClose } from "react-icons/io5";
+import Button from "../Button";
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,18 +11,18 @@ interface ModalProps {
   showCloseIcon?: boolean;
 }
 
-const ChildrenModal: React.FC<ModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  children, 
+const ChildrenModal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
   title,
-  showCloseIcon = true
+  showCloseIcon = true,
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed z-[9999] flex " 
+    <div
+      className="fixed z-[9999] flex "
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -38,8 +38,8 @@ const ChildrenModal: React.FC<ModalProps> = ({
       >
         {showCloseIcon && (
           <Button
-            type='button'
-              onClick={onClose}
+            type="button"
+            onClick={onClose}
             className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
             aria-label="Close modal"
           >
@@ -49,13 +49,11 @@ const ChildrenModal: React.FC<ModalProps> = ({
 
         {title && (
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+            <h2 className="text-xl font-semibold text-primary">{title}</h2>
           </div>
         )}
 
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
       <style jsx>{`
         .animate-slide-in {

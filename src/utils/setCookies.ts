@@ -32,9 +32,9 @@ export const getCookies = () => {
 };
 
 export const clearCookies = () => {
-  const domain = window.location.hostname === 'localhost' ? 'localhost' : '.simplip2p.vercel.app';
+  const domain =  window.location.hostname === 'localhost'
+      ? 'localhost'
+      : window.location.hostname
   Cookies.remove("accessToken", { path: "/", domain });
   Cookies.remove("refreshToken", { path: "/", domain });
-  // localStorage.removeItem("accessToken");
-  // localStorage.removeItem("refreshToken");
 };

@@ -11,7 +11,7 @@ import Head from "next/head";
 export default function Home() {
   const router = useRouter();
   const { user, isLoading } = useGetUser();
-  const { orgName, currentOrg, setOrganizationByAdmin, setOrganizationByUser } = useStore();
+  const { orgName } = useStore();
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
@@ -27,19 +27,11 @@ export default function Home() {
 
     const routeAuthenticatedUser = async () => {
       try {
-        if (user?.data?.user_organisations) {
-          const adminOrgs = user.data.user_organisations.filter(org => org.is_creator === true);
-          const memberOrgs = user.data.user_organisations.filter(org => org.is_creator === false);
-          
-          setOrganizationByAdmin(adminOrgs);
-          setOrganizationByUser(memberOrgs);
-
-          const targetOrg = orgName || (currentOrg || adminOrgs[0]?.org_id || memberOrgs[0]?.org_id);
-          if (targetOrg) {
-            router.push(`/${targetOrg}/dashboard`);
+    
+          if (orgName) {
+            router.push(`/${orgName}/dashboard`);
           } else {
             router.push("/create-organization");
-          }
         }
       } catch (error) {
         console.error("Error processing organization data:", error);
@@ -48,7 +40,7 @@ export default function Home() {
     };
 
     routeAuthenticatedUser();
-  }, [authChecked, isLoading, user, router, orgName, currentOrg, setOrganizationByAdmin, setOrganizationByUser]);
+  }, [authChecked, isLoading, user, router, orgName]);
 
   return (
     <>

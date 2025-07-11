@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { IoChevronDownSharp, IoCloseCircle } from 'react-icons/io5';
+import React, { useState } from "react";
+import { IoChevronDownSharp, IoCloseCircle } from "react-icons/io5";
 
 export interface MultiSelectOption<T = string> {
   label: string;
@@ -16,7 +16,10 @@ interface MultiSelectProps<T = string> {
   error?: string;
   placeholder?: string;
   className?: string;
-  customOptionComponent?: React.FC<{ data: MultiSelectOption<T>; isSelected: boolean }>;
+  customOptionComponent?: React.FC<{
+    data: MultiSelectOption<T>;
+    isSelected: boolean;
+  }>;
   isMulti?: boolean;
 }
 
@@ -26,21 +29,21 @@ function MultiSelect<T = string>({
   value,
   onChange,
   error,
-  placeholder = 'Select options...',
+  placeholder = "Select options...",
   className,
   customOptionComponent: CustomOption,
   isMulti = false,
 }: MultiSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const isSelected = (option: MultiSelectOption<T>) => 
-    value.some(v => v.value === option.value);
+  const isSelected = (option: MultiSelectOption<T>) =>
+    value.some((v) => v.value === option.value);
 
   const toggleOption = (option: MultiSelectOption<T>) => {
     if (isMulti) {
       const newValue = isSelected(option)
-        ? value.filter(v => v.value !== option.value)
+        ? value.filter((v) => v.value !== option.value)
         : [...value, option];
       onChange(newValue);
     } else {
@@ -49,22 +52,26 @@ function MultiSelect<T = string>({
     }
   };
 
-  const removeOption = (optionToRemove: MultiSelectOption<T>, e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    const newValue = value.filter(v => v.value !== optionToRemove.value);
+  const removeOption = (
+    optionToRemove: MultiSelectOption<T>,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    const newValue = value.filter((v) => v.value !== optionToRemove.value);
     onChange(newValue);
   };
 
-  const filteredOptions = options.filter(option => 
-    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.options?.some(subOption => 
-      subOption.label.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const filteredOptions = options.filter(
+    (option) =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      option.options?.some((subOption) =>
+        subOption.label.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   const renderOption = (option: MultiSelectOption<T>) => {
     const selected = isSelected(option);
-    
+
     if (CustomOption) {
       return (
         <div
@@ -96,22 +103,20 @@ function MultiSelect<T = string>({
 
   return (
     <div className={`relative ${className}`}>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-      </label>
+      <label className="block text-sm font-medium #181819 mb-1">{label}</label>
       <div
         className="border rounded-lg p-2 min-h-[38px] bg-white cursor-pointer flex items-center justify-between"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex flex-wrap gap-1">
           {value.length > 0 ? (
-            value.map(v => (
+            value.map((v) => (
               <span
                 key={String(v.value)}
                 className="bg-gray-100 px-2 py-1 rounded-md text-sm flex items-center gap-1 group"
               >
                 {v.label}
-                <IoCloseCircle 
+                <IoCloseCircle
                   className="w-4 h-4 text-gray-400 cursor-pointer hover:text-red-500 transition-colors"
                   onClick={(e) => removeOption(v, e)}
                 />
@@ -121,12 +126,12 @@ function MultiSelect<T = string>({
             <span className="text-gray-400">{placeholder}</span>
           )}
         </div>
-        <IoChevronDownSharp className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <IoChevronDownSharp
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </div>
-      
-      {error && (
-        <p className="mt-1 text-sm text-red-500">{error}</p>
-      )}
+
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
 
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -136,15 +141,15 @@ function MultiSelect<T = string>({
               className="w-full p-2 border rounded-md"
               placeholder="Search..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              onClick={e => e.stopPropagation()}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
           <div className="p-1">
-            {filteredOptions.map(option => (
+            {filteredOptions.map((option) => (
               <React.Fragment key={String(option.value)}>
                 {renderOption(option)}
-                {option.options?.map(subOption => (
+                {option.options?.map((subOption) => (
                   <div key={String(subOption.value)} className="ml-4">
                     {renderOption(subOption)}
                   </div>
@@ -158,4 +163,4 @@ function MultiSelect<T = string>({
   );
 }
 
-export default MultiSelect; 
+export default MultiSelect;

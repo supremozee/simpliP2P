@@ -29,14 +29,9 @@ const LineItems: React.FC<LineItemsProps> = ({
   lineItems,
   currency = "USD",
   headersLength,
-  reqId
+  reqId,
 }) => {
-  const expandedHeading = [
-    "Item",
-    "Quantity",
-    "Unit Price",
-    "Cost",
-  ];
+  const expandedHeading = ["Item", "Quantity", "Unit Price", "Cost"];
 
   return (
     <motion.tr
@@ -46,13 +41,18 @@ const LineItems: React.FC<LineItemsProps> = ({
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <td colSpan={headersLength} className="bg-gray-50 border-b border-gray-300">
+      <td
+        colSpan={headersLength}
+        className="bg-gray-50 border-b border-gray-300"
+      >
         <div className="p-4">
           <div className="flex items-center mb-4">
             <div className="w-1 h-5 bg-primary mr-2"></div>
-            <h3 className="font-semibold text-gray-800">Line Items for {prNumber}</h3>
+            <h3 className="font-semibold text-primary">
+              Line Items for {prNumber}
+            </h3>
           </div>
-          
+
           {isLoading ? (
             <div className="animate-pulse space-y-3 py-2">
               <div className="h-8 bg-gray-200 rounded w-full"></div>
@@ -72,9 +72,12 @@ const LineItems: React.FC<LineItemsProps> = ({
                         item.item_name,
                         item.pr_quantity,
                         format_price(item.unit_price, currency),
-                        format_price((item.unit_price * item.pr_quantity), currency)
+                        format_price(
+                          item.unit_price * item.pr_quantity,
+                          currency
+                        ),
                       ]}
-                      className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                      className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                       index={index}
                     />
                   )}
@@ -84,7 +87,9 @@ const LineItems: React.FC<LineItemsProps> = ({
             </div>
           ) : (
             <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-              <p className="text-gray-500">No line items available for this requisition</p>
+              <p className="text-gray-500">
+                No line items available for this requisition
+              </p>
             </div>
           )}
         </div>

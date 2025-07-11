@@ -25,19 +25,19 @@ interface RequisitionRowProps {
 }
 
 const getStatusStyle = (status: string) => {
-  switch(status) {
-    case 'PENDING':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    case 'APPROVED':
-      return 'bg-green-100 text-green-800 border-green-300';
-    case 'REJECTED':
-      return 'bg-red-100 text-red-800 border-red-300';
-    case 'REQUESTED MODIFICATION':
-      return 'bg-blue-100 text-blue-800 border-blue-300';
-    case 'SAVED_FOR_LATER':
-      return 'bg-gray-100 text-gray-800 border-gray-300';
+  switch (status) {
+    case "PENDING":
+      return "bg-yellow-100 text-yellow-800 border-yellow-300";
+    case "APPROVED":
+      return "bg-green-100 text-green-800 border-green-300";
+    case "REJECTED":
+      return "bg-red-100 text-red-800 border-red-300";
+    case "REQUESTED MODIFICATION":
+      return "bg-blue-100 text-blue-800 border-blue-300";
+    case "SAVED_FOR_LATER":
+      return "bg-gray-100 text-primary border-gray-300";
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-300';
+      return "bg-gray-100 text-primary border-gray-300";
   }
 };
 
@@ -59,54 +59,80 @@ const RequisitionRow: React.FC<RequisitionRowProps> = ({
       <TableRow
         key={req.id}
         data={[
-          <div key={`select-${req.id}`} className="flex items-center justify-center">
-            <button 
+          <div
+            key={`select-${req.id}`}
+            className="flex items-center justify-center"
+          >
+            <button
               onClick={() => toggleSelectItem(req.id)}
               className="flex items-center justify-center w-5 h-5 focus:outline-none"
-              aria-label={isSelected(req.id) ? "Deselect requisition" : "Select requisition"}
+              aria-label={
+                isSelected(req.id)
+                  ? "Deselect requisition"
+                  : "Select requisition"
+              }
             >
               {isSelected(req.id) ? (
                 <MdCheckBox size={20} className="text-primary" />
               ) : (
-                <MdCheckBoxOutlineBlank size={20} className="text-gray-400 hover:text-gray-600" />
+                <MdCheckBoxOutlineBlank
+                  size={20}
+                  className="text-gray-400 hover:text-gray-600"
+                />
               )}
             </button>
           </div>,
           `${req.pr_number}`,
-          new Date(req.created_at.split("T")[0]).toLocaleDateString('en-US', {year:'numeric', month: 'short', day: 'numeric'}),
+          new Date(req.created_at.split("T")[0]).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
           req.supplier?.full_name,
           req.department?.name,
           req.requestor_name,
           req.quantity,
           format_price(Number(req.estimated_cost), req.currency, "currency"),
-          <span key={`date-${req.id}`} className="whitespace-nowrap">{req.needed_by_date}</span>,
-          <span 
-            key={`status-${req.id}`} 
-            className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${getStatusStyle(req.status)}`}
+          <span key={`date-${req.id}`} className="whitespace-nowrap">
+            {req.needed_by_date}
+          </span>,
+          <span
+            key={`status-${req.id}`}
+            className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${getStatusStyle(
+              req.status
+            )}`}
           >
             {req.status}
           </span>,
-          <div className="flex w-full justify-center items-center" key={`action-${req.id}`}>
-            <Button 
+          <div
+            className="flex w-full justify-center items-center"
+            key={`action-${req.id}`}
+          >
+            <Button
               key={req.id}
-              onClick={() => handleViewRequisition({ pr_number: req.pr_number, id: req.id })} 
+              onClick={() =>
+                handleViewRequisition({ pr_number: req.pr_number, id: req.id })
+              }
               className={cn(
                 "p-2 px-3 rounded-md transition-colors z-20",
-                activeTab === "SAVED APPROVAL" || req.status === "SAVED_FOR_LATER" 
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : req.status === "PENDING" 
-                    ? 'bg-yellow-600 hover:bg-yellow-700'
-                    : req.status === "APPROVED" 
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-gray-600 hover:bg-gray-700'
+                activeTab === "SAVED APPROVAL" ||
+                  req.status === "SAVED_FOR_LATER"
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : req.status === "PENDING"
+                  ? "bg-yellow-600 hover:bg-yellow-700"
+                  : req.status === "APPROVED"
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-gray-600 hover:bg-gray-700"
               )}
             >
               <p className="text-white text-xs">
-                {(activeTab === "SAVED APPROVAL" || req.status === "SAVED_FOR_LATER") 
-                  ? "Complete" 
-                  : (activeTab === "REQUEST_MODIFICATION" || req.status === "REQUESTED MODIFICATION") 
-                    ? "View Request" 
-                    : "View Details"}
+                {activeTab === "SAVED APPROVAL" ||
+                req.status === "SAVED_FOR_LATER"
+                  ? "Complete"
+                  : activeTab === "REQUEST_MODIFICATION" ||
+                    req.status === "REQUESTED MODIFICATION"
+                  ? "View Request"
+                  : "View Details"}
               </p>
             </Button>
           </div>,
@@ -117,22 +143,26 @@ const RequisitionRow: React.FC<RequisitionRowProps> = ({
             <Button
               className={cn(
                 "p-2 rounded-full transition-colors flex items-center justify-center",
-                expandedRows.includes(req.pr_number) 
-                  ? "bg-secondary/90 hover:bg-secondary" 
+                expandedRows.includes(req.pr_number)
+                  ? "bg-secondary/90 hover:bg-secondary"
                   : "bg-secondary hover:bg-secondary/90"
               )}
               onClick={() => toggleRow(req.pr_number)}
             >
-              {expandedRows.includes(req.pr_number) 
-                ? <HiChevronUp className="text-white" /> 
-                : <HiChevronDown className="text-white" />}
+              {expandedRows.includes(req.pr_number) ? (
+                <HiChevronUp className="text-white" />
+              ) : (
+                <HiChevronDown className="text-white" />
+              )}
             </Button>
           </div>,
         ]}
-        className={`${expandedRows.includes(req.pr_number) ? "border-b-0" : ""} ${isSelected(req.id) ? 'bg-blue-50' : ''}`}
+        className={`${
+          expandedRows.includes(req.pr_number) ? "border-b-0" : ""
+        } ${isSelected(req.id) ? "bg-blue-50" : ""}`}
         index={index}
       />
-      
+
       {expandedRows.includes(req.pr_number) && (
         <LineItems
           prNumber={req.pr_number}

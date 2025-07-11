@@ -17,22 +17,29 @@ import { format_price } from "@/utils/helpers";
 
 const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
   const { isOpen, setIsOpen, currentOrg } = useStore();
-  const { data, isLoading, isError } = useFetchAllOrderById(currentOrg, order_id);
+  const { data, isLoading, isError } = useFetchAllOrderById(
+    currentOrg,
+    order_id
+  );
   const { updateOrderStatus, loading } = useUpdateOrderStatus();
   const [isRejectModalOpen, setIsRejectModalOpen] = useState<boolean>(false);
   const [showConfirmApproval, setShowConfirmApproval] = useState(false);
 
   if (isLoading) {
     return (
-        <div className="flex justify-center items-center h-screen absolute inset-0  z-50">
-          <LoaderSpinner size="lg" text="Loading order details..." />
-        </div>
+      <div className="flex justify-center items-center h-screen absolute inset-0  z-50">
+        <LoaderSpinner size="lg" text="Loading order details..." />
+      </div>
     );
   }
 
   if (isError) {
     return (
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} contentClassName="max-w-5xl">
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        contentClassName="max-w-5xl"
+      >
         <div className="p-6 text-center">
           <div className="text-red-500 mb-2">Error fetching order details</div>
           <Button onClick={() => setIsOpen(false)}>Close</Button>
@@ -44,16 +51,15 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
   const order = data?.data.order;
 
   const handleApprove = async () => {
-    await updateOrderStatus(currentOrg, order_id, { status: 'APPROVED' });
+    await updateOrderStatus(currentOrg, order_id, { status: "APPROVED" });
     setIsOpen(false);
   };
 
   const handleReject = async () => {
-    await updateOrderStatus(currentOrg, order_id, { status: 'REJECTED' });
+    await updateOrderStatus(currentOrg, order_id, { status: "REJECTED" });
     setIsRejectModalOpen(false);
     setIsOpen(false);
   };
-
 
   return (
     <>
@@ -65,28 +71,37 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
           handleConfirm={handleReject}
         />
       )}
-      <Modal 
-        isOpen={isOpen} 
+      <Modal
+        isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         contentClassName="max-w-5xl"
       >
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">Purchase Order Review</h2>
-              <p className="text-sm text-gray-500">PO Number: {order?.po_number}</p>
+              <h2 className="text-2xl font-bold text-primary">
+                Purchase Order Review
+              </h2>
+              <p className="text-sm text-gray-500">
+                PO Number: {order?.po_number}
+              </p>
             </div>
             <div className="flex flex-col items-end">
-              <span className={cn(
-                "px-3 py-1 rounded-full text-sm font-medium",
-                order?.status === "PENDING" ? "bg-yellow-100 text-yellow-800" :
-                order?.status === "APPROVED" ? "bg-green-100 text-green-800" :
-                "bg-red-100 text-red-800"
-              )}>
+              <span
+                className={cn(
+                  "px-3 py-1 rounded-full text-sm font-medium",
+                  order?.status === "PENDING"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : order?.status === "APPROVED"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                )}
+              >
                 {order?.status}
               </span>
               <span className="text-sm text-gray-500 mt-1">
-                Created: {new Date(order?.created_at ?? "").toLocaleDateString()}
+                Created:{" "}
+                {new Date(order?.created_at ?? "").toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -97,21 +112,27 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <IoDocumentTextOutline className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-gray-800">Order Details</h3>
+                  <h3 className="font-semibold text-primary">Order Details</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Description</p>
-                    <p className="text-sm font-medium">{order?.purchase_requisition?.request_description}</p>
+                    <p className="text-sm font-medium">
+                      {order?.purchase_requisition?.request_description}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Quantity</p>
-                    <p className="text-sm font-medium">{order?.purchase_requisition?.quantity}</p>
+                    <p className="text-sm font-medium">
+                      {order?.purchase_requisition?.quantity}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Needed By</p>
                     <p className="text-sm font-medium">
-                      {new Date(order?.purchase_requisition?.needed_by_date ?? "").toLocaleDateString()}
+                      {new Date(
+                        order?.purchase_requisition?.needed_by_date ?? ""
+                      ).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -120,21 +141,29 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <FaUserTie className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-gray-800">Supplier Information</h3>
+                  <h3 className="font-semibold text-primary">
+                    Supplier Information
+                  </h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Supplier Name</p>
-                    <p className="text-sm font-medium">{order?.supplier?.full_name}</p>
+                    <p className="text-sm font-medium">
+                      {order?.supplier?.full_name}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Contact</p>
-                    <p className="text-sm font-medium">{order?.supplier?.phone}</p>
+                    <p className="text-sm font-medium">
+                      {order?.supplier?.phone}
+                    </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-sm font-medium">{order?.supplier?.email}</p>
+                    <p className="text-sm font-medium">
+                      {order?.supplier?.email}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
@@ -142,12 +171,18 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
                       {order?.supplier?.address ? (
                         <>
                           {order.supplier.address.street}
-                          {order.supplier.address.city && `, ${order.supplier.address.city}`}
-                          {order.supplier.address.state && `, ${order.supplier.address.state}`}
-                          {order.supplier.address.country && `, ${order.supplier.address.country}`}
-                          {order.supplier.address.zip_code && ` ${order.supplier.address.zip_code}`}
+                          {order.supplier.address.city &&
+                            `, ${order.supplier.address.city}`}
+                          {order.supplier.address.state &&
+                            `, ${order.supplier.address.state}`}
+                          {order.supplier.address.country &&
+                            `, ${order.supplier.address.country}`}
+                          {order.supplier.address.zip_code &&
+                            ` ${order.supplier.address.zip_code}`}
                         </>
-                      ) : 'No address provided'}
+                      ) : (
+                        "No address provided"
+                      )}
                     </p>
                   </div>
                 </div>
@@ -156,14 +191,21 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <FaFileInvoiceDollar className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-gray-800">Financial Details</h3>
+                  <h3 className="font-semibold text-primary">
+                    Financial Details
+                  </h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Total Amount</p>
                     <p className="text-lg font-semibold text-primary flex items-center gap-1">
-                      <span className="text-sm font-medium">{order?.currency}</span>
-                      {format_price(Number(order?.total_amount), order?.currency)}
+                      <span className="text-sm font-medium">
+                        {order?.currency}
+                      </span>
+                      {format_price(
+                        Number(order?.total_amount),
+                        order?.currency
+                      )}
                     </p>
                   </div>
                 </div>
@@ -175,7 +217,9 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <BsClockHistory className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-gray-800">Approval Timeline</h3>
+                  <h3 className="font-semibold text-primary">
+                    Approval Timeline
+                  </h3>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -195,7 +239,9 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
 
               {order?.attachment && (
                 <div className="bg-white rounded-lg border border-gray-200 p-4">
-                  <h3 className="font-semibold text-gray-800 mb-4">Attachments</h3>
+                  <h3 className="font-semibold text-primary mb-4">
+                    Attachments
+                  </h3>
                   <div className="relative h-48 rounded-lg overflow-hidden">
                     <Image
                       src={order.attachment}
@@ -208,7 +254,7 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
               )}
 
               <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <h3 className="font-semibold text-gray-800 mb-4">Actions</h3>
+                <h3 className="font-semibold text-primary mb-4">Actions</h3>
                 <div className="flex flex-col gap-3">
                   <Button
                     className="w-full bg-primary text-white py-2 rounded-lg flex justify-center items-center"
@@ -237,7 +283,7 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
           </div>
 
           <div className="mt-6">
-            <CommentSection entity_id={order_id} entity_type="purchase_order"/>
+            <CommentSection entity_id={order_id} entity_type="purchase_order" />
           </div>
         </div>
       </Modal>
@@ -249,13 +295,16 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
           contentClassName="max-w-md"
         >
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Approval</h3>
+            <h3 className="text-lg font-semibold text-primary mb-4">
+              Confirm Approval
+            </h3>
             <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to approve this purchase order? This action cannot be undone.
+              Are you sure you want to approve this purchase order? This action
+              cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <Button
-                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg"
+                className="px-4 py-2 text-sm #181819 bg-gray-100 rounded-lg"
                 onClick={() => setShowConfirmApproval(false)}
               >
                 Cancel

@@ -2,8 +2,30 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['res.cloudinary.com', 'randomuser.me', 'api-simplip2p.onrender.com', 'example.com']
-  }
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'api-simplip2p.onrender.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'randomuser.me',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'backend-19ny.onrender.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
+module.exports = nextConfig;
 export default nextConfig;

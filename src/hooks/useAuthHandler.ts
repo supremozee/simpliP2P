@@ -4,7 +4,7 @@ import useStore from '@/store';
 import Cookies from 'js-cookie';
 import isAuthenticated from './isAuthenticated';
 import { FetchMembersResponse} from '@/types';
-
+  import { useCallback } from 'react';
 /**
  * Hook to handle authentication events across the application
  * Listens for auth events like session expiration and handles redirects
@@ -16,14 +16,13 @@ export default function useAuthHandler(options = { redirectOnExpire: true }) {
   const router = useRouter();
   const { 
     setPr,
-    setOrganizationByAdmin, 
-    setOrganizationByUser,
     setMembers,
     setCurrentOrg,
     setOrgName
   } = useStore();
 
-  const clearUserData = () => {
+
+  const clearUserData = useCallback(() => {
     const emptyPr = {
       pr_number: '',
       id: ''
@@ -43,36 +42,27 @@ export default function useAuthHandler(options = { redirectOnExpire: true }) {
     };
     
     setPr(emptyPr);
-    setOrganizationByAdmin([]);
-    setOrganizationByUser([]);
     setMembers(emptyMembers);
     setCurrentOrg("");
     setOrgName("");
-  };
+  }, [setPr, setMembers, setCurrentOrg, setOrgName]);
 
   useEffect(() => {
     const handleSessionExpired = () => {
       clearUserData();
-      
       console.warn('Your session has expired. Please log in again.');
-      
       if (options.redirectOnExpire) {
         router.push('/login?expired=true');
       }
     };
 
-    const handleTokenRefresh = () => {
-    };
 
     window.addEventListener('auth:sessionExpired', handleSessionExpired);
-    window.addEventListener('auth:tokenRefreshed', handleTokenRefresh);
-
     const checkAuthState = () => {
       const isValid = isAuthenticated();
       if (!isValid && options.redirectOnExpire) {
         Cookies.remove('accessToken');
         clearUserData();
-        
         const pathname = window.location.pathname;
         const isAuthPath = /^\/(login|register|forgot-password|reset-password)/.test(pathname);
         
@@ -86,20 +76,12 @@ export default function useAuthHandler(options = { redirectOnExpire: true }) {
 
     return () => {
       window.removeEventListener('auth:sessionExpired', handleSessionExpired);
-      window.removeEventListener('auth:tokenRefreshed', handleTokenRefresh);
     };
-  }, [router, options.redirectOnExpire]);
+  }, [router, options.redirectOnExpire, clearUserData]);
 
-  /**
-   * Check if current user is authenticated
-   */
   const checkAuth = () => {
     return isAuthenticated();
   };
-
-  /**
-   * Manually trigger a logout
-   */
   const logout = () => {
     Cookies.remove('accessToken');
     clearUserData();
@@ -108,6 +90,7 @@ export default function useAuthHandler(options = { redirectOnExpire: true }) {
 
   return {
     isAuthenticated: checkAuth,
-    logout
+    logout,
+    clearUserData
   };
 }

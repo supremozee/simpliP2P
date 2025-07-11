@@ -1,6 +1,6 @@
 "use client";
-import { useState, useRef, ChangeEvent } from 'react';
-import Image from 'next/image';
+import { useState, useRef, ChangeEvent } from "react";
+import Image from "next/image";
 import { FaImage } from "react-icons/fa";
 import { cn } from "@/utils/cn";
 import useFileManager from "@/hooks/useFileManager";
@@ -14,9 +14,9 @@ interface FileUploadProps {
   accept?: string;
   error?: string;
   id?: string;
-  size?:number;
+  size?: number;
   fileTypes?: string[];
-  sizeHelpText?:string
+  sizeHelpText?: string;
 }
 
 const FileUpload = ({
@@ -30,7 +30,6 @@ const FileUpload = ({
   size = 10 * 1024 * 1024,
   fileTypes = ["png", "svg"],
   sizeHelpText = "Max size: 10MB",
-
 }: FileUploadProps) => {
   const [preview, setPreview] = useState<string | null>(defaultImage);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,45 +37,48 @@ const FileUpload = ({
   const [validationError, setValidationError] = useState<string | null>(null);
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log(file)
+    console.log(file);
     if (file && file.size > size) {
       setValidationError(`File size exceeds ${sizeHelpText}`);
       return;
     }
-    const extension = file && file?.name.split('.').pop()?.toLowerCase();
+    const extension = file && file?.name.split(".").pop()?.toLowerCase();
     if (file && !fileTypes.includes(extension || "")) {
-      setValidationError(`Invalid file type. Allowed types: ${fileTypes.join(", ")}`);
+      setValidationError(
+        `Invalid file type. Allowed types: ${fileTypes.join(", ")}`
+      );
       return;
     }
     setValidationError(null);
-    setPreview(null); 
+    setPreview(null);
     if (!file) return;
-    
+
     try {
       const response = await uploadFile(file);
       setPreview(response.url);
       onFileUploaded(response.url);
     } catch (err) {
-      console.error('Error uploading file:', err);
+      console.error("Error uploading file:", err);
     }
   };
 
   return (
     <div className="flex flex-col w-full">
-      {label && 
-      (
-      <div className="flex items-center justify-between mb-2">
-          <label htmlFor={id} className="mb-2 text-sm font-medium text-gray-700">{label}</label>
+      {label && (
+        <div className="flex items-center justify-between mb-2">
+          <label htmlFor={id} className="mb-2 text-sm font-medium #181819">
+            {label}
+          </label>
           <span className="text-xs text-gray-500">{sizeHelpText}</span>
-      </div>
+        </div>
       )}
-      
+
       {loading ? (
         <div className={`flex items-center justify-center ${height}`}>
           <LoaderSpinner />
         </div>
       ) : (
-        <label 
+        <label
           htmlFor={id}
           className={cn(
             "flex flex-col items-center justify-center w-full border-2 cursor-pointer border-dashed rounded-lg",
@@ -97,11 +99,11 @@ const FileUpload = ({
               <FaImage className="text-gray-400 text-4xl mb-2" />
               <p className="text-sm text-gray-500">Click to upload file</p>
               <p className="text-xs text-gray-400 mt-1">
-                Accepted formats: {fileTypes.join(', ')}
+                Accepted formats: {fileTypes.join(", ")}
               </p>
             </div>
           )}
-          
+
           <input
             id={id}
             ref={fileInputRef}
@@ -112,7 +114,7 @@ const FileUpload = ({
           />
         </label>
       )}
-       {(validationError || error) && (
+      {(validationError || error) && (
         <p className="text-red-500 text-sm mt-1">{validationError || error}</p>
       )}
     </div>

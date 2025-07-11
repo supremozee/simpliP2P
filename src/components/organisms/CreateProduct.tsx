@@ -33,13 +33,28 @@ const CreateProductSchema = z.object({
 
 type ProductFormData = z.infer<typeof CreateProductSchema>;
 
-const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => {
+const CreateProduct = ({
+  add,
+  custom,
+}: {
+  add?: boolean;
+  custom?: boolean;
+}) => {
   const { currentOrg } = useStore();
-  const { createProduct, loading, errorMessage, successCreate } = useCreateProduct();
-  const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
+  const { createProduct, loading, errorMessage, successCreate } =
+    useCreateProduct();
+  const { data: categoryData, isLoading: categoryLoading } =
+    useFetchCategories(currentOrg);
   const [isOpen, setIsOpen] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<ProductFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm<ProductFormData>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
       currency: "NGN",
@@ -64,7 +79,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
       stockQty: Number(data.stockQty),
       stockQtyAlert: Number(data.stockQtyAlert || 0),
     };
-    
+
     await createProduct(formattedData, currentOrg);
     setTimeout(() => {
       reset();
@@ -85,16 +100,22 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
         </button>
       ) : (
         <Button
-          className={cn("px-10 text-white py-2 bg-primary rounded-md justify-center flex items-center",
-            custom && "w-full text-[#305D88] sm:py-7 rounded-[15px] flex gap-5 bg-white sm:justify-start justify-center items-center shadow-lg drop-shadow"
+          className={cn(
+            "px-10 text-white py-2 bg-primary rounded-md justify-center flex items-center",
+            custom &&
+              "w-full text-[#305D88] sm:py-7 rounded-[15px] flex gap-5 bg-white sm:justify-start justify-center items-center shadow-lg drop-shadow"
           )}
           onClick={() => setIsOpen(true)}
         >
           {!custom && <MdAdd className="mr-2" size={28} />}
-          <span className={cn("text-[14px] font-bold", custom && "text-[16px]")}>Create New Inventory</span>
+          <span
+            className={cn("text-[14px] font-bold", custom && "text-[16px]")}
+          >
+            Create New Inventory
+          </span>
         </Button>
       )}
-      
+
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
         <div className="py-4 sm:px-10 h-auto max-h-[90vh]">
           <h2 className="text-xl font-bold mb-4">Add Inventory Product</h2>
@@ -102,7 +123,10 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
             Fill in the product information below
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="sm:grid sm:grid-cols-2 gap-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="sm:grid sm:grid-cols-2 gap-4"
+          >
             <div>
               <Input
                 type="text"
@@ -111,17 +135,23 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 placeholder="Product Code"
                 {...register("productCode")}
               />
-              {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
+              {errors.productCode && (
+                <p className="text-red-500 text-sm">
+                  {errors.productCode.message}
+                </p>
+              )}
             </div>
             <div>
               <Input
-              required
+                required
                 type="text"
                 label="Product Name"
                 placeholder="Input product name"
                 {...register("name")}
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </div>
             <div className="col-span-2">
               <TextAreaField
@@ -132,7 +162,11 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 rows={3}
                 {...register("description")}
               ></TextAreaField>
-              {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+              {errors.description && (
+                <p className="text-red-500 text-sm">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -143,21 +177,27 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 placeholder="Input unit price"
                 {...register("unitPrice")}
               />
-              {errors.unitPrice && <p className="text-red-500 text-sm">{errors.unitPrice.message}</p>}
+              {errors.unitPrice && (
+                <p className="text-red-500 text-sm">
+                  {errors.unitPrice.message}
+                </p>
+              )}
             </div>
             <div>
               <Select
                 label="Currency"
                 options={currencies}
                 {...register("currency")}
-                onChange={(selectCurrency) => setValue("currency", selectCurrency)}
+                onChange={(selectCurrency) =>
+                  setValue("currency", selectCurrency)
+                }
                 value={selectedCurrency}
                 error={errors.currency?.message}
                 required
                 placeholder="Select currency"
               />
             </div>
-            
+
             <div>
               <div className="flex flex-col">
                 <Input
@@ -171,14 +211,20 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                   Current stock level in inventory
                 </span>
               </div>
-              {errors.stockQty && <p className="text-red-500 text-sm">{errors.stockQty.message}</p>}
+              {errors.stockQty && (
+                <p className="text-red-500 text-sm">
+                  {errors.stockQty.message}
+                </p>
+              )}
             </div>
             <div>
               <Select
                 label="UOM"
                 options={UOM}
                 {...register("unitOfMeasure")}
-                onChange={(selectedUOM) => setValue("unitOfMeasure", selectedUOM)}
+                onChange={(selectedUOM) =>
+                  setValue("unitOfMeasure", selectedUOM)
+                }
                 value={selectedUOM}
                 error={errors.unitOfMeasure?.message}
                 required
@@ -198,13 +244,19 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                   Minimum quantity before restock notification
                 </span>
               </div>
-              {errors.stockQtyAlert && <p className="text-red-500 text-sm">{errors.stockQtyAlert.message}</p>}
+              {errors.stockQtyAlert && (
+                <p className="text-red-500 text-sm">
+                  {errors.stockQtyAlert.message}
+                </p>
+              )}
             </div>
-            
-            <div onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}>
+
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
               <Select
                 label="Category"
                 options={categories}
@@ -212,14 +264,14 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 value={category}
                 required
                 error={errors.category?.message}
-                onChange={(selectCategory) => setValue("category", selectCategory)}
-                loading={categoryLoading}
-                component={
-                  <CreateCategory add={true} />
+                onChange={(selectCategory) =>
+                  setValue("category", selectCategory)
                 }
+                loading={categoryLoading}
+                component={<CreateCategory add={true} />}
               />
             </div>
-        <div className="col-span-2 mt-6">
+            <div className="col-span-2 mt-6">
               <FileUpload
                 label="Upload Item Image"
                 onFileUploaded={handleFileUploaded}
@@ -230,7 +282,7 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
 
             <div className="flex justify-end my-6 space-x-4 col-span-1 sm:col-span-2">
               <Button
-                className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300"
+                className="px-4 py-2 bg-white #181819 rounded-lg border border-gray-300"
                 onClick={() => {
                   reset();
                   setIsOpen(false);
@@ -242,13 +294,17 @@ const CreateProduct = ({ add, custom }: { add?: boolean, custom?: boolean }) => 
                 type="submit"
                 className="px-5 py-[0.5px] flex justify-center items-center text-white rounded-lg"
               >
-                <span className="text-[12px]">{loading ? "Creating..." : "Create Product"}</span>
+                <span className="text-[12px]">
+                  {loading ? "Creating..." : "Create Product"}
+                </span>
               </Button>
             </div>
           </form>
 
           {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
-          {successCreate && <p className="text-green-500 mt-4">Product created successfully</p>}
+          {successCreate && (
+            <p className="text-green-500 mt-4">Product created successfully</p>
+          )}
         </div>
       </Modal>
     </>

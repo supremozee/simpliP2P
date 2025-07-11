@@ -2,11 +2,11 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Input from '../atoms/Input'; 
-import Button from '../atoms/Button';
+import Input from "../atoms/Input";
+import Button from "../atoms/Button";
 import Modal from "../atoms/Modal";
 import { ModalProps, ProductData } from "@/types";
-import useStore from '@/store';
+import useStore from "@/store";
 import { useEffect } from "react";
 import useUpdateProduct from "@/hooks/useUpdateProduct";
 import useFetchProductById from "@/hooks/useFetchProductById";
@@ -15,7 +15,7 @@ import useFetchCategories from "@/hooks/useFetchCategories";
 import CreateCategory from "./CreateCategory";
 import { UOM } from "@/constants";
 
-const currencies:any = [
+const currencies: any = [
   { id: "NGN", name: "NGN - Nigerian Naira" },
   { id: "USD", name: "USD - US Dollar" },
   { id: "EUR", name: "EUR - Euro" },
@@ -23,7 +23,7 @@ const currencies:any = [
   { id: "JPY", name: "JPY - Japanese Yen" },
   { id: "GHS", name: "GHS - Ghanaian Cedi" },
   { id: "KES", name: "KES - Kenyan Shilling" },
-  { id: "ZAR", name: "ZAR - South African Rand" }
+  { id: "ZAR", name: "ZAR - South African Rand" },
 ] as const;
 
 const UpdateProductSchema = z.object({
@@ -35,7 +35,7 @@ const UpdateProductSchema = z.object({
   stockQtyAlert: z.number().min(0, "Stock alert must be 0 or greater"),
   category: z.string().min(1, "Category is required"),
   stockQty: z.number().min(0, "Stock quantity must be 0 or greater"),
-   unitOfMeasure: z.string().optional(),
+  unitOfMeasure: z.string().optional(),
 });
 
 type UpdateProductFormData = z.infer<typeof UpdateProductSchema>;
@@ -44,13 +44,27 @@ interface UpdateProductProps extends ModalProps {
   productId: string;
 }
 
-const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, productId }) => {
+const UpdateProduct: React.FC<UpdateProductProps> = ({
+  showModal,
+  setShowModal,
+  productId,
+}) => {
   const { currentOrg } = useStore();
   const { updateProduct } = useUpdateProduct();
-  const { data, isLoading, isError } = useFetchProductById(currentOrg, productId);
-  const { data: categoryData, isLoading: categoryLoading } = useFetchCategories(currentOrg);
+  const { data, isLoading, isError } = useFetchProductById(
+    currentOrg,
+    productId
+  );
+  const { data: categoryData, isLoading: categoryLoading } =
+    useFetchCategories(currentOrg);
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<UpdateProductFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<UpdateProductFormData>({
     resolver: zodResolver(UpdateProductSchema),
     defaultValues: {
       name: "",
@@ -102,21 +116,30 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
     <Modal onClose={toggleModal} isOpen={showModal}>
       <div className="px-4 py-6 sm:px-10">
         <h2 className="text-xl font-bold mb-4">Update Product</h2>
-        <p className="text-gray-500 mb-6">Update the product&apos;s information below</p>
+        <p className="text-gray-500 mb-6">
+          Update the product&apos;s information below
+        </p>
 
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                  <Input
-                    type="text"
-                    label="Product Code"
-                    placeholder="Product Code"
-                    {...register("productCode")}
-                  />
-                  {errors.productCode && <p className="text-red-500 text-sm">{errors.productCode.message}</p>}
-                </div>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            <div>
+              <Input
+                type="text"
+                label="Product Code"
+                placeholder="Product Code"
+                {...register("productCode")}
+              />
+              {errors.productCode && (
+                <p className="text-red-500 text-sm">
+                  {errors.productCode.message}
+                </p>
+              )}
+            </div>
             <div>
               <Input
                 type="text"
@@ -125,7 +148,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                 placeholder="Enter product name"
                 {...register("name")}
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </div>
 
             <div className="sm:col-span-2">
@@ -136,19 +161,27 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                 placeholder="Enter product description"
                 {...register("description")}
               />
-              {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+              {errors.description && (
+                <p className="text-red-500 text-sm">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
 
             <div>
-            <Input
-                  type="number"
-                  label="Unit Price"
-                  className="mt-1 w-full"
-                  min={0}
-                  placeholder="Enter stock quantity"
-                  {...register("unitPrice", { valueAsNumber: true })}
-                />
-              {errors.unitPrice && <p className="text-red-500 text-sm">{errors.unitPrice.message}</p>}
+              <Input
+                type="number"
+                label="Unit Price"
+                className="mt-1 w-full"
+                min={0}
+                placeholder="Enter stock quantity"
+                {...register("unitPrice", { valueAsNumber: true })}
+              />
+              {errors.unitPrice && (
+                <p className="text-red-500 text-sm">
+                  {errors.unitPrice.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -159,7 +192,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                 value={watch("currency")}
                 error={errors.currency?.message}
                 required
-                onChange={(value)=> setValue("currency", value)}
+                onChange={(value) => setValue("currency", value)}
                 placeholder="Select currency"
               />
             </div>
@@ -178,14 +211,20 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                   Current stock level in inventory
                 </span>
               </div>
-              {errors.stockQty && <p className="text-red-500 text-sm">{errors.stockQty.message}</p>}
+              {errors.stockQty && (
+                <p className="text-red-500 text-sm">
+                  {errors.stockQty.message}
+                </p>
+              )}
             </div>
             <div>
               <Select
                 label="UOM"
                 options={UOM}
                 {...register("unitOfMeasure")}
-                onChange={(selectedUOM) => setValue("unitOfMeasure", selectedUOM)}
+                onChange={(selectedUOM) =>
+                  setValue("unitOfMeasure", selectedUOM)
+                }
                 value={selectedUOM}
                 error={errors.unitOfMeasure?.message}
                 required
@@ -206,7 +245,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                   Minimum quantity before restock notification
                 </span>
               </div>
-              {errors.stockQtyAlert && <p className="text-red-500 text-sm">{errors.stockQtyAlert.message}</p>}
+              {errors.stockQtyAlert && (
+                <p className="text-red-500 text-sm">
+                  {errors.stockQtyAlert.message}
+                </p>
+              )}
             </div>
 
             <div className="relative">
@@ -214,7 +257,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
                 label="Category"
                 options={categories}
                 {...register("category")}
-                onChange={(selectCategory) => setValue("category", selectCategory)}
+                onChange={(selectCategory) =>
+                  setValue("category", selectCategory)
+                }
                 value={selectedCategory}
                 error={errors.category?.message}
                 loading={categoryLoading}
@@ -227,7 +272,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ showModal, setShowModal, 
             <div className="flex justify-end mt-6 space-x-4 col-span-1 sm:col-span-2">
               <Button
                 type="button"
-                className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300"
+                className="px-4 py-2 bg-white #181819 rounded-lg border border-gray-300"
                 onClick={toggleModal}
               >
                 Cancel

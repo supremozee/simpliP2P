@@ -1,23 +1,25 @@
-import React, { useEffect } from 'react';
-import Modal from '../atoms/Modal';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Input from '../atoms/Input';
-import Button from '../atoms/Button';
-import useStore from '@/store';
-import useEditMember from '@/hooks/useEditMembers';
-import useDeactivateMember from '@/hooks/useDeactivateMembers';
-import useFetchMemberById from '@/hooks/useFetchMemberById';
-import useReactivateMember from '@/hooks/useReactivateMembers';
-import { IoShieldCheckmark } from 'react-icons/io5';
-import { Permission, UserMember } from '@/types';
-import PermissionSelect from '../molecules/PermissionSelect';
-import LoaderSpinner from '../atoms/LoaderSpinner';
+import React, { useEffect } from "react";
+import Modal from "../atoms/Modal";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Input from "../atoms/Input";
+import Button from "../atoms/Button";
+import useStore from "@/store";
+import useEditMember from "@/hooks/useEditMembers";
+import useDeactivateMember from "@/hooks/useDeactivateMembers";
+import useFetchMemberById from "@/hooks/useFetchMemberById";
+import useReactivateMember from "@/hooks/useReactivateMembers";
+import { IoShieldCheckmark } from "react-icons/io5";
+import { Permission, UserMember } from "@/types";
+import PermissionSelect from "../molecules/PermissionSelect";
+import LoaderSpinner from "../atoms/LoaderSpinner";
 
 const EditMemberSchema = z.object({
   role: z.string().min(1, "Role is required"),
-  permissions: z.array(z.custom<Permission>()).min(1, "At least one permission is required")
+  permissions: z
+    .array(z.custom<Permission>())
+    .min(1, "At least one permission is required"),
 });
 
 type EditMemberData = z.infer<typeof EditMemberSchema>;
@@ -28,20 +30,34 @@ interface EditMemberProps {
   memberId: string;
 }
 
-const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowModal, memberId }) => {
+const EditMemberForm: React.FC<EditMemberProps> = ({
+  showModal = false,
+  setShowModal,
+  memberId,
+}) => {
   const { currentOrg, selectedMemberId } = useStore();
   const { editMember, loading } = useEditMember();
   const { deactivateMember } = useDeactivateMember();
   const { reactivateMember } = useReactivateMember();
-  const { data, isLoading:memberLoading } = useFetchMemberById(currentOrg, memberId);
+  const { data, isLoading: memberLoading } = useFetchMemberById(
+    currentOrg,
+    memberId
+  );
   const member = data?.data?.member as UserMember | undefined;
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<EditMemberData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm<EditMemberData>({
     resolver: zodResolver(EditMemberSchema),
     defaultValues: {
       role: "",
-      permissions: []
-    }
+      permissions: [],
+    },
   });
 
   // Update form when member data is loaded
@@ -49,7 +65,7 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
     if (member) {
       reset({
         role: member.role,
-        permissions: member.permissions
+        permissions: member.permissions,
       });
     }
   }, [member, reset]);
@@ -71,7 +87,7 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
     setShowModal(false);
   };
 
-  if(memberLoading) return <LoaderSpinner/>;
+  if (memberLoading) return <LoaderSpinner />;
 
   return (
     <Modal
@@ -84,7 +100,9 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
           <div className="flex items-center gap-3">
             <IoShieldCheckmark className="w-6 h-6 text-primary" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Edit Member</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Edit Member
+              </h2>
               <p className="text-sm text-gray-500">
                 Update member role and permissions
               </p>
@@ -134,7 +152,7 @@ const EditMemberForm: React.FC<EditMemberProps> = ({ showModal = false, setShowM
             <div className="flex gap-3">
               <Button
                 type="button"
-                className="px-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 #181819 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
                 onClick={() => setShowModal(false)}
               >
                 Cancel

@@ -32,7 +32,7 @@ const SettingsPage = () => {
   const tabs = [
     "Organization Profile",
     "Member Management",
-    "Administrative Control"
+    "Administrative Control",
   ];
 
   const renderContent = () => {
@@ -51,23 +51,20 @@ const SettingsPage = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white shadow-sm rounded-xl p-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Organization Settings</h1>
+        <h1 className="text-2xl font-semibold text-primary">
+          Organization Settings
+        </h1>
         <p className="text-gray-500 mt-1">
-          Manage your organization&apos;s profile, members, and administrative settings
+          Manage your organization&apos;s profile, members, and administrative
+          settings
         </p>
       </div>
 
       <div className="bg-white shadow-sm rounded-xl">
         <div className="border-b border-gray-200 p-2">
-          <Tabs
-            tabNames={tabs}
-            active={activeTab}
-            setActive={setActiveTab}
-          />
+          <Tabs tabNames={tabs} active={activeTab} setActive={setActiveTab} />
         </div>
-        <div className="p-6">
-          {renderContent()}
-        </div>
+        <div className="p-6">{renderContent()}</div>
       </div>
     </div>
   );

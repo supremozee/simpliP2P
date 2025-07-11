@@ -17,7 +17,7 @@ const OrganizationMembers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { selectedMemberId, setSelectedMemberId, currentOrg } = useStore();
   const { data, isLoading } = useFetchMembers(currentOrg);
-  
+
   const tabs = ["Active Members", "Pending Invitations", "Deactivated"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
@@ -25,34 +25,38 @@ const OrganizationMembers = () => {
   const filteredMembers = useMemo(() => {
     if (!data?.data?.users) return [];
 
-    return data.data.users.filter((user) => {
-      const matchesSearch = (
-        user.first_name.toLowerCase() +
-        " " +
-        user.last_name.toLowerCase() +
-        " " +
-        user.email.toLowerCase() +
-        " " +
-        user.role.toLowerCase()
-      ).includes(searchQuery.toLowerCase());
+    return data.data.users
+      .filter((user) => {
+        const matchesSearch = (
+          user.first_name.toLowerCase() +
+          " " +
+          user.last_name.toLowerCase() +
+          " " +
+          user.email.toLowerCase() +
+          " " +
+          user.role.toLowerCase()
+        ).includes(searchQuery.toLowerCase());
 
-      switch (activeTab) {
-        case "Active Members":
-          return user.accepted_invitation && !user.deactivated_at && matchesSearch;
-        case "Pending Invitations":
-          return !user.accepted_invitation && matchesSearch;
-        case "Deactivated":
-          return user.deactivated_at && matchesSearch;
-        default:
-          return false;
-      }
-    }).sort((a, b) => {
-      // Sort by role priority
-      const roleOrder = { "Admin": 1, "Manager": 2, "Supervisor": 3, "Staff": 4 };
-      const roleA = roleOrder[a.role as keyof typeof roleOrder] || 5;
-      const roleB = roleOrder[b.role as keyof typeof roleOrder] || 5;
-      return roleA - roleB;
-    });
+        switch (activeTab) {
+          case "Active Members":
+            return (
+              user.accepted_invitation && !user.deactivated_at && matchesSearch
+            );
+          case "Pending Invitations":
+            return !user.accepted_invitation && matchesSearch;
+          case "Deactivated":
+            return user.deactivated_at && matchesSearch;
+          default:
+            return false;
+        }
+      })
+      .sort((a, b) => {
+        // Sort by role priority
+        const roleOrder = { Admin: 1, Manager: 2, Supervisor: 3, Staff: 4 };
+        const roleA = roleOrder[a.role as keyof typeof roleOrder] || 5;
+        const roleB = roleOrder[b.role as keyof typeof roleOrder] || 5;
+        return roleA - roleB;
+      });
   }, [data?.data?.users, activeTab, searchQuery]);
 
   const handleEditMember = (memberId: string) => {
@@ -75,7 +79,9 @@ const OrganizationMembers = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800">Organization Members</h2>
+          <h2 className="text-xl font-semibold text-primary">
+            Organization Members
+          </h2>
           <p className="text-sm text-gray-500 mt-1">
             Manage your organization&apos;s team members and their roles
           </p>
@@ -101,11 +107,7 @@ const OrganizationMembers = () => {
           />
           <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         </div>
-        <Tabs
-          tabNames={tabs}
-          active={activeTab}
-          setActive={setActiveTab}
-        />
+        <Tabs tabNames={tabs} active={activeTab} setActive={setActiveTab} />
       </div>
 
       {/* Members Grid */}
@@ -124,7 +126,7 @@ const OrganizationMembers = () => {
             email={user.email}
             role={user.role}
             permissions={user.permissions}
-            imageUrl={user?.profile_picture || '/logo-black.png'}
+            imageUrl={user?.profile_picture || "/logo-black.png"}
             online_status={user.online_status}
             showPending={!user.accepted_invitation}
             isDeactivated={!!user.deactivated_at}

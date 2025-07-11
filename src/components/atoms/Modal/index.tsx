@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { cn } from '@/utils/cn';
-import { IoClose } from 'react-icons/io5';
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
+import { cn } from "@/utils/cn";
+import { IoClose } from "react-icons/io5";
 
 interface ModalProps {
   isOpen: boolean;
@@ -15,36 +15,37 @@ interface ModalProps {
   domId?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  children, 
-  width = 'auto', 
-  height = 'auto', 
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+  width = "auto",
+  height = "auto",
   contentClassName,
   title,
-  domId = 'modal-root',
-  showCloseIcon = true
+  domId = "modal-root",
+  showCloseIcon = true,
 }) => {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg" 
-      onClick={(e)=>{e.stopPropagation() 
-        onClose()
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose();
       }}
     >
       <div
@@ -58,11 +59,11 @@ const Modal: React.FC<ModalProps> = ({
       >
         {showCloseIcon && (
           <button
-            type='button'
-            onClick={(e)=> {
+            type="button"
+            onClick={(e) => {
               e.preventDefault();
-              e.stopPropagation()
-              onClose()
+              e.stopPropagation();
+              onClose();
             }}
             className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 z-10"
             aria-label="Close modal"
@@ -73,15 +74,13 @@ const Modal: React.FC<ModalProps> = ({
 
         {title && (
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+            <h2 className="text-xl font-semibold text-primary">{title}</h2>
           </div>
         )}
 
-        <div className={cn(
-          "p-6",
-          title ? "pt-4" : "pt-6"
-        )}
-        onClick={(e) => e.stopPropagation()}  
+        <div
+          className={cn("p-6", title ? "pt-4" : "pt-6")}
+          onClick={(e) => e.stopPropagation()}
         >
           {children}
         </div>

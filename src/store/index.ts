@@ -1,4 +1,4 @@
-import {  FetchMembersResponse,  UserOrganisation } from '@/types';
+import {  FetchMembersResponse } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -31,10 +31,6 @@ interface SimpliP2PStore {
    setSelectedMemberId: (memberId: string)=>void
   supplierId: string;
   setSupplierId:(orgId: string)=>void;
- organizationByAdmin: UserOrganisation[];
- setOrganizationByAdmin: (organizationData: UserOrganisation[]) => void;
- organizationByUser: UserOrganisation[];
- setOrganizationByUser: (organizationData: UserOrganisation[]) => void;
  members: FetchMembersResponse | null;
  setMembers: (members: FetchMembersResponse) => void;
  onToggle: boolean;
@@ -53,6 +49,8 @@ interface SimpliP2PStore {
   setIsUpdateSupplierOpen: (value: boolean) => void;
   isActive: boolean;
   setIsActive: (isActive: boolean) => void;
+  userId: string;
+  setUserId: (userId:string)=>void
 }
 
 const useStore = create<SimpliP2PStore>()(
@@ -111,18 +109,14 @@ const useStore = create<SimpliP2PStore>()(
       setSelectedMemberId: (memberId: string) => {
         set({ selectedMemberId: memberId });
       },
+      userId: "",
+      setUserId: (userId:string)=> {
+        set({userId: userId})
+      },
       supplierId: "",
       setSupplierId: (supplierId: string) => {
         set({ supplierId: supplierId });
       },
-     organizationByUser: [],
-     setOrganizationByUser: (organizationData: UserOrganisation[]) => {
-        set({ organizationByUser: organizationData });
-      },
-      organizationByAdmin: [],
-      setOrganizationByAdmin: (organizationData: UserOrganisation[]) => {
-         set({ organizationByAdmin: organizationData });
-       },
        members: null,
        setMembers: (members) => set({ members }),
        onToggle: false,
@@ -147,9 +141,8 @@ const useStore = create<SimpliP2PStore>()(
         onToggle: state.onToggle,
         currentOrg: state.currentOrg,
         orgName: state.orgName,
-        organizationByAdmin: state.organizationByAdmin,
-        organizationByUser: state.organizationByUser,
-        isActive: state.isActive
+        isActive: state.isActive,
+        userId:state.userId
       }),
     }
   )

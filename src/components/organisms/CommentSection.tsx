@@ -13,15 +13,28 @@ interface CommentComponentProps {
   entity_id: string;
 }
 
-const CommentSection: React.FC<CommentComponentProps> = ({ entity_type, entity_id }) => {
-    const {currentOrg} = useStore()
+const CommentSection: React.FC<CommentComponentProps> = ({
+  entity_type,
+  entity_id,
+}) => {
+  const { currentOrg } = useStore();
   const [commentText, setCommentText] = useState<string>("");
-  const { createComment, loading: commentLoading, errorMessage: commentError } = useCreateComment();
-  const { data, isLoading, isError } = useFetchSingleComment(currentOrg, entity_id);
+  const {
+    createComment,
+    loading: commentLoading,
+    errorMessage: commentError,
+  } = useCreateComment();
+  const { data, isLoading, isError } = useFetchSingleComment(
+    currentOrg,
+    entity_id
+  );
 
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
-    await createComment({ entity_type, entity_id, text: commentText }, currentOrg);
+    await createComment(
+      { entity_type, entity_id, text: commentText },
+      currentOrg
+    );
     setCommentText("");
   };
 
@@ -30,22 +43,26 @@ const CommentSection: React.FC<CommentComponentProps> = ({ entity_type, entity_i
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h3 className="text-[#333333] font-bold text-sm mb-2">Comments</h3>
+        <h3 className="text-primary font-bold text-sm mb-2">Comments</h3>
         {isLoading ? (
-          <p className="text-sm text-gray-500">Loading comments...</p>
+          <p className="text-sm text-foreground">Loading comments...</p>
         ) : isError ? (
           <p className="text-sm text-red-500">Error loading comments.</p>
         ) : comments.length > 0 ? (
           comments.map((comment: AllComment) => (
-            <div key={comment?.id} className="p-2 bg-gray-50 rounded-md">
-              <p className="text-sm text-gray-700">{comment?.text}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                By @{comment?.created_by?.first_name + " "  + comment?.created_by?.last_name} on {new Date(comment?.created_at).toLocaleString()}
+            <div key={comment?.id} className="p-2 bg-tertiary rounded-sm">
+              <p className="text-sm text-foreground font-bold">{comment?.text}</p>
+              <p className="text-xs text-foreground/90 mt-1">
+                By @
+                {comment?.created_by?.first_name +
+                  " " +
+                  comment?.created_by?.last_name}{" "}
+                on {new Date(comment?.created_at).toLocaleString()}
               </p>
             </div>
           ))
         ) : (
-          <p className="text-sm text-gray-500">No comments yet.</p>
+          <p className="text-sm text-foreground">No comments yet.</p>
         )}
       </div>
 
@@ -56,7 +73,7 @@ const CommentSection: React.FC<CommentComponentProps> = ({ entity_type, entity_i
           placeholder="Add a comment..."
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md text-sm resize-none"
+          className="w-full p-2 border border-tertiary rounded-md text-sm resize-none"
           rows={3}
         />
         <Button
@@ -67,7 +84,9 @@ const CommentSection: React.FC<CommentComponentProps> = ({ entity_type, entity_i
           <FaPaperPlane size={14} color="black" />
           <span className="text-[12px] text-primary">Send</span>
         </Button>
-        {commentError && <p className="text-red-500 text-xs mt-2">{commentError}</p>}
+        {commentError && (
+          <p className="text-red-600 text-xs mt-2">{commentError}</p>
+        )}
       </div>
     </div>
   );

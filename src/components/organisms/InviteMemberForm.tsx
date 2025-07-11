@@ -1,20 +1,20 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Modal from '../atoms/Modal';
-import Input from '../atoms/Input';
-import Button from '../atoms/Button';
-import useInviteMember from '@/hooks/useInviteMember';
-import useStore from '@/store';
-import { IoShieldCheckmark } from 'react-icons/io5';
-import { Permission } from '@/types';
-import Select from '../atoms/Select';
-import CreateBranch from './CreateBranch';
-import CreateDepartment from './CreateDepartment';
-import useFetchDepartment from '@/hooks/useFetchDepartments';
-import useFetchBranch from '@/hooks/useFetchBranch';
-import PermissionSelect from '../molecules/PermissionSelect';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Modal from "../atoms/Modal";
+import Input from "../atoms/Input";
+import Button from "../atoms/Button";
+import useInviteMember from "@/hooks/useInviteMember";
+import useStore from "@/store";
+import { IoShieldCheckmark } from "react-icons/io5";
+import { Permission } from "@/types";
+import Select from "../atoms/Select";
+import CreateBranch from "./CreateBranch";
+import CreateDepartment from "./CreateDepartment";
+import useFetchDepartment from "@/hooks/useFetchDepartments";
+import useFetchBranch from "@/hooks/useFetchBranch";
+import PermissionSelect from "../molecules/PermissionSelect";
 
 const InviteFormSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -23,7 +23,9 @@ const InviteFormSchema = z.object({
   role: z.string().min(1, "Role is required"),
   branch_id: z.string().min(1, "Branch is required"),
   department_id: z.string().min(1, "Department is required"),
-  permission: z.array(z.custom<Permission>()).min(1, "Permission level is required")
+  permission: z
+    .array(z.custom<Permission>())
+    .min(1, "Permission level is required"),
 });
 
 type InviteFormData = z.infer<typeof InviteFormSchema>;
@@ -33,14 +35,26 @@ interface InviteProps {
   setShowModal: (showModal: boolean) => void;
 }
 
-const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowModal }) => {
+const InviteMemberForm: React.FC<InviteProps> = ({
+  showModal = false,
+  setShowModal,
+}) => {
   const { inviteMember, loading } = useInviteMember();
   const { currentOrg } = useStore();
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<InviteFormData>({
-    resolver: zodResolver(InviteFormSchema)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm<InviteFormData>({
+    resolver: zodResolver(InviteFormSchema),
   });
-  const { data: departmentData, isLoading: loadingData } = useFetchDepartment(currentOrg);
-  const { data: branchData, isLoading: branchLoading } = useFetchBranch(currentOrg);
+  const { data: departmentData, isLoading: loadingData } =
+    useFetchDepartment(currentOrg);
+  const { data: branchData, isLoading: branchLoading } =
+    useFetchBranch(currentOrg);
   const departments = departmentData?.data?.departments || [];
   const branches = branchData?.data?.branches || [];
   const departmentId = watch("department_id");
@@ -48,16 +62,19 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
   const permissions = watch("permission") || [];
 
   const onSubmit = async (data: InviteFormData) => {
-    await inviteMember({
-      first_name: data.first_name,
-      last_name: data.last_name,
-      email: data.email,
-      role: data.role,
-      branch_id: data.branch_id,
-      department_id: data.department_id,
-      permissions: data.permission
-    }, currentOrg);
-    
+    await inviteMember(
+      {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        role: data.role,
+        branch_id: data.branch_id,
+        department_id: data.department_id,
+        permissions: data.permission,
+      },
+      currentOrg
+    );
+
     reset();
     setShowModal(false);
   };
@@ -73,7 +90,9 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
           <div className="flex items-center gap-3">
             <IoShieldCheckmark className="w-6 h-6 text-primary" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Invite Team Member</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Invite Team Member
+              </h2>
               <p className="text-sm text-gray-500">
                 Add a new member to your organization
               </p>
@@ -91,7 +110,9 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
                 {...register("first_name")}
               />
               {errors.first_name && (
-                <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.first_name.message}
+                </p>
               )}
             </div>
 
@@ -103,7 +124,9 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
                 {...register("last_name")}
               />
               {errors.last_name && (
-                <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.last_name.message}
+                </p>
               )}
             </div>
           </div>
@@ -116,7 +139,9 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
               {...register("email")}
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -142,9 +167,7 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
               error={errors.department_id?.message}
               loading={loadingData}
               onChange={(value) => setValue("department_id", value)}
-              component={
-                <CreateDepartment add={true} />
-              }
+              component={<CreateDepartment add={true} />}
             />
           </div>
 
@@ -171,7 +194,7 @@ const InviteMemberForm: React.FC<InviteProps> = ({ showModal = false, setShowMod
           <div className="flex justify-end gap-3">
             <Button
               type="button"
-              className="px-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 #181819 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
               onClick={() => setShowModal(false)}
             >
               Cancel
