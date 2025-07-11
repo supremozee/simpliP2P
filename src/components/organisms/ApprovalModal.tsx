@@ -87,8 +87,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
       status: "APPROVED",
       approval_justification: requisition?.justification || "",
       budget_id: selectedBudget,
-      supplier_id: selectedSupplier,
-      action_type: selectedActionType as "approve" | "approve_and_create_po",
+      supplier_id: (selectedSupplier ? selectedSupplier : requisition?.supplier?.id) ?? "" ,
+      action_type: selectedActionType as "approve" | "approve_and_create_po"
     });
     setShowConfirmApproval(false);
     setIsOpen(false);
@@ -97,11 +97,11 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
   const handleReject = async () => {
     if (!selectedBudget) return;
     await updateRequisitionStatus(currentOrg, pr_id, {
-      status: "REJECTED",
+      status: 'REJECTED', 
       approval_justification: requisition?.justification || "",
       budget_id: selectedBudget,
-      supplier_id: selectedSupplier,
-      action_type: "reject",
+      supplier_id: (selectedSupplier ? selectedSupplier : requisition?.supplier?.id) ?? "" ,
+      action_type: "reject"
     });
     setIsRejectModalOpen(false);
     setIsOpen(false);
@@ -351,10 +351,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                     <Select
                       label="Select Supplier"
                       options={supplier || []}
-                      value={selectedSupplier || requisition?.supplier?.id}
-                      onChange={(selectedOption) =>
-                        setSelectedSupplier(selectedOption)
-                      }
+                      value={selectedSupplier ? selectedSupplier : requisition?.supplier?.id}
+                      onChange={(selectedOption) => setSelectedSupplier(selectedOption)}
                       required
                       placeholder="Select a Supplier"
                     />
