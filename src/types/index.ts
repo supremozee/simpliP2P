@@ -110,6 +110,14 @@ export interface UserProfileResponse {
   export interface LogoutAll {
     userId: string;
   }
+
+  export interface VerifySubDomainHeader {
+    x_signature:string;
+    x_timestamp:string;
+  }
+   export interface VerifySubDomain {
+   subdomain:string
+  }
   export interface ResetResponse {
     status: string;
     message: string;
@@ -384,6 +392,7 @@ export interface Owner {
     currency?:string;
     status?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | "SAVED_FOR_LATER" | "INITIALIZED"
   }
+
   export interface Requisition {
     department: {
       id:string
@@ -405,8 +414,8 @@ export interface Owner {
     justification: string;
     needed_by_date: string;
     total_items: number,
-    organisation: Organisation;
-    created_by: CreatedBy;
+    organisation?: Organisation;
+    created_by?: CreatedBy;
     pr_number: string;
     approval_justification: string | null;
     id: string;
@@ -415,6 +424,23 @@ export interface Owner {
     deleted_at: string | null;
     status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | 'SAVED_FOR_LATER' | 'INITIALIZED'
     items: RequisitionItems[];
+  }
+  export interface OrderRequisitionType {
+    requestor_phone: string;
+    requestor_email:string;
+    requestor_name: string;
+    request_description: string;
+    quantity: number;
+    currency:string;
+    estimated_cost: number;
+    justification: string;
+    needed_by_date: string;
+    total_items: number,
+    pr_number: string;
+    approval_justification: string | null;
+    id: string;
+    // status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'REQUESTED MODIFICATION' | 'SAVED_FOR_LATER' | 'INITIALIZED'
+    items?: RequisitionItems[];
   }
   export interface CreatePurchaseRequisitionData {
     department: string;

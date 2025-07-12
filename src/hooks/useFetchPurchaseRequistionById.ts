@@ -1,10 +1,13 @@
-import { auth } from '@/api/auths';
-import {FetchPurchaseRequisitionById } from '@/types';
-import { useQuery } from '@tanstack/react-query';
+import { auth } from "@/helpers/auths";
+import { FetchPurchaseRequisitionById } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 
-const useFetchPurchaseRequisitionById = (orgId: string, reqId:string) => {
-  const { data, error, isLoading, isError } = useQuery<FetchPurchaseRequisitionById, Error>({
-    queryKey: ['fetchRequisitionById', orgId, reqId],
+const useFetchPurchaseRequisitionById = (orgId: string, reqId: string) => {
+  const { data, error, isLoading, isError } = useQuery<
+    FetchPurchaseRequisitionById,
+    Error
+  >({
+    queryKey: ["fetchRequisitionById", orgId, reqId],
     queryFn: () => auth.fetchRequisitionById(orgId, reqId),
     refetchOnWindowFocus: false,
     enabled: !!orgId && !!orgId,

@@ -1,6 +1,7 @@
 import useStore from "@/store";
 import Cookies from "js-cookie";
-import { ApiError, AuthError, NetworkError } from "./errors";
+import { ApiError } from "next/dist/server/api-utils";
+import { ApiErrorGeneral, AuthError, NetworkError } from "./errors";
 
 /**
  * Standard API request handler with authentication and error handling
@@ -13,7 +14,6 @@ export const apiRequest = async (url: string, init: RequestInit = {}, responseTy
   const token = Cookies.get('accessToken');
   const { setError } = useStore.getState();
   
-  // Configure headers with authentication if token exists
   const config: RequestInit = {
     ...init,
     headers: {
@@ -37,47 +37,40 @@ export const apiRequest = async (url: string, init: RequestInit = {}, responseTy
         if (response.status === 401) {
           Cookies.remove('accessToken');
           window.dispatchEvent(new CustomEvent('auth:sessionExpired'));
-          throw new AuthError(errorMessage, response.status);
+          throw  AuthError(errorMessage, response.status);
         }
         
         if (response.status === 403 || response.status === 400) {
           setError(true);
-          throw new ApiError(errorMessage, response.status);
+          throw  ApiErrorGeneral(errorMessage, response.status);
         }
         
         if (response.status >= 500) {
-          throw new ApiError(errorMessage, response.status);
+          throw  ApiErrorGeneral(errorMessage, response.status);
         }
         
-        // Handle other error cases
-        throw new ApiError(errorMessage, response.status);
+        throw ApiErrorGeneral( errorMessage, response.status);
       } else {
-        // Non-JSON error response
-        throw new ApiError(`Server error: ${response.statusText}`, response.status);
+        throw  ApiErrorGeneral( `Server error: ${response.statusText}`, response.status);
       }
     }
     
-    // Handle successful response based on expected response type
     if (responseType === 'blob') {
       return await response.blob();
     }
     
-    // Default to JSON handling
     if (contentType?.includes('application/json')) {
       return await response.json();
     }
     
-    // Handle non-JSON successful responses
     return { success: true, status: response.status };
     
   } catch (error) {
-    // Rethrow AuthErrors and ApiErrors as is
     if (error instanceof AuthError || error instanceof ApiError) {
       throw error;
     }
     
-    // Handle network and other errors
-    throw new NetworkError(
+    throw  NetworkError(
       error instanceof Error ? error.message : String(error)
     );
   }

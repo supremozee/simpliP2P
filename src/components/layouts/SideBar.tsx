@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { forwardRef, useEffect } from "react";
 import { cn } from "@/utils/cn";
-import LogoutButton from "../molecules/LogoutButton";
+// import LogoutButton from "../molecules/LogoutButton";
 import SidebarHeader from "../molecules/SideBarHeader";
 import {useSidebarLogic} from "@/hooks/useSideBarLogic";
 import { motion } from "framer-motion";
@@ -98,9 +98,9 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
               ))}
             </div>
 
-            <div className="border-t border-gray-100 p-4">
+            {/* <div className="border-t border-gray-100 p-4">
               <LogoutButton onClick={toggleSidebar} isCollapsed={isCollapsed} />
-            </div>
+            </div> */}
           </div>
         </motion.aside>
 

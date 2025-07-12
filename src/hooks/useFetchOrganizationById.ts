@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import { OrganizationResponse } from '@/types';
-import { auth } from '@/api/auths';
+import { useQuery } from "@tanstack/react-query";
+import { OrganizationResponse } from "@/types";
+import { auth } from "@/helpers/auths";
 
 const useFetchOrganizationById = (orgId: string) => {
   return useQuery<OrganizationResponse, Error>({
-    queryKey: ['organizationById', orgId],
+    queryKey: ["organizationById", orgId],
     queryFn: () => auth.organizationById(orgId),
     enabled: !!orgId,
     refetchOnWindowFocus: false,

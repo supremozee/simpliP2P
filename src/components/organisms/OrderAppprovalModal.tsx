@@ -9,11 +9,11 @@ import CommentSection from "./CommentSection";
 import useUpdateOrderStatus from "@/hooks/useUpdateOrderStatus";
 import Image from "next/image";
 import { IoDocumentTextOutline } from "react-icons/io5";
-import { FaFileInvoiceDollar, FaUserTie } from "react-icons/fa";
 import { BsClockHistory } from "react-icons/bs";
 import { cn } from "@/utils/cn";
 import LoaderSpinner from "../atoms/LoaderSpinner";
-import { format_price } from "@/utils/helpers";
+import OrderTable from "./OrderTable";
+import { FaUserTie } from "react-icons/fa";
 
 const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
   const { isOpen, setIsOpen, currentOrg } = useStore();
@@ -187,29 +187,7 @@ const OrderApprovalModal = ({ order_id }: { order_id: string }) => {
                   </div>
                 </div>
               </div>
-
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <FaFileInvoiceDollar className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-primary">
-                    Financial Details
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Amount</p>
-                    <p className="text-lg font-semibold text-primary flex items-center gap-1">
-                      <span className="text-sm font-medium">
-                        {order?.currency}
-                      </span>
-                      {format_price(
-                        Number(order?.total_amount),
-                        order?.currency
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {order?.purchase_requisition &&<OrderTable requisition={order?.purchase_requisition} />}
             </div>
 
             {/* Right Column - Approval Actions */}

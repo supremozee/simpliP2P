@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { ViewPOResponse } from "@/types";
 
 /**
@@ -11,7 +11,7 @@ import { ViewPOResponse } from "@/types";
  */
 export default function useViewPO(token: string, orderId: string) {
   const { data, error, isLoading, isError } = useQuery<ViewPOResponse, Error>({
-    queryKey: ['viewPO', orderId],
+    queryKey: ["viewPO", orderId],
     queryFn: () => auth.viewPO(token, orderId),
     enabled: !!orderId,
     refetchOnWindowFocus: false,

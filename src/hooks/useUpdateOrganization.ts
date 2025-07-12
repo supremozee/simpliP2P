@@ -1,9 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { auth } from '@/api/auths';
-import { Organization } from '@/types';
-import useStore from '@/store';
-import useNotify from './useNotify';
-import { sanitize } from '@/utils/helpers';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { auth } from "@/helpers/auths";
+import { Organization } from "@/types";
+import useStore from "@/store";
+import useNotify from "./useNotify";
+import { sanitize } from "@/utils/helpers";
 
 const useUpdateOrganization = (orgId: string) => {
   const queryClient = useQueryClient();
@@ -19,11 +19,11 @@ const useUpdateOrganization = (orgId: string) => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: (response: any) => {
-      const sanitizedOrgName = sanitize(response?.data?.name)
+      const sanitizedOrgName = sanitize(response?.data?.name);
       setLoading(false);
       setOrgName(sanitizedOrgName);
       success(response?.message);
-      queryClient.invalidateQueries({ queryKey: ['organizationById', orgId] });
+      queryClient.invalidateQueries({ queryKey: ["organizationById", orgId] });
     },
     onError: (error) => {
       setLoading(false);

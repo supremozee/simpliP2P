@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { updateRequisitionStatus } from "@/types";
 
 export default function useUpdateRequisitionStatus() {
@@ -11,21 +11,29 @@ export default function useUpdateRequisitionStatus() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { success: notifySuccess, error: notifyError } = useNotify();
   const queryClient = useQueryClient();
-  
+
   const { mutateAsync: updateRequisitionStatusMutation } = useMutation({
-    mutationFn: async ({ orgId, reqId, data }: { orgId: string; reqId: string; data: updateRequisitionStatus }) => {
+    mutationFn: async ({
+      orgId,
+      reqId,
+      data,
+    }: {
+      orgId: string;
+      reqId: string;
+      data: updateRequisitionStatus;
+    }) => {
       return auth.updateRequisitionStatus(orgId, reqId, data);
     },
     onMutate: () => {
       setLoading(true);
       setErrorMessage(null);
     },
-    onSuccess: (response:any) => {
+    onSuccess: (response: any) => {
       setLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['fetchRequisitionById'] });
-      queryClient.invalidateQueries({ queryKey: ['organizationDashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchRequisition'] });
-      if (response && response.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["fetchRequisitionById"] });
+      queryClient.invalidateQueries({ queryKey: ["organizationDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchRequisition"] });
+      if (response && response.status === "success") {
         notifySuccess(response?.message);
       } else {
         setErrorMessage(response?.message);
@@ -34,7 +42,10 @@ export default function useUpdateRequisitionStatus() {
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during requisition status update. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during requisition status update. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },
@@ -43,7 +54,11 @@ export default function useUpdateRequisitionStatus() {
     },
   });
 
-  const updateRequisitionStatus = async (orgId: string, reqId: string, data: updateRequisitionStatus) => {
+  const updateRequisitionStatus = async (
+    orgId: string,
+    reqId: string,
+    data: updateRequisitionStatus
+  ) => {
     updateRequisitionStatusMutation({ orgId, reqId, data });
   };
 

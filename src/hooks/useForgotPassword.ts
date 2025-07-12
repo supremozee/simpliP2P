@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import useNotify from './useNotify';
-import { auth } from '@/api/auths';
-import { forgotData } from '@/types';
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import useNotify from "./useNotify";
+import { auth } from "@/helpers/auths";
+import { forgotData } from "@/types";
 
 const useForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -20,17 +20,24 @@ const useForgotPassword = () => {
     },
     onSuccess: (response) => {
       setLoading(false);
-      if (response.status === 'success') {
-        setSuccessMessage(response.message || 'Password reset link sent successfully');
-        notifySuccess(response.message || 'Password reset link sent successfully');
+      if (response.status === "success") {
+        setSuccessMessage(
+          response.message || "Password reset link sent successfully"
+        );
+        notifySuccess(
+          response.message || "Password reset link sent successfully"
+        );
       } else {
-        setErrorMessage(response.message || 'Password reset failed');
-        notifyError(response.message || 'Password reset failed');
+        setErrorMessage(response.message || "Password reset failed");
+        notifyError(response.message || "Password reset failed");
       }
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during password reset. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during password reset. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },

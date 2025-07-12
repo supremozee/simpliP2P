@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { CreateBudget } from "@/types";
 
 export default function useCreateBudget() {
@@ -13,7 +13,13 @@ export default function useCreateBudget() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: createBudgetMutation } = useMutation({
-    mutationFn: async ({ data, orgId }: { data: CreateBudget; orgId: string }) => {
+    mutationFn: async ({
+      data,
+      orgId,
+    }: {
+      data: CreateBudget;
+      orgId: string;
+    }) => {
       return auth.createBudget(orgId, data);
     },
     onMutate: () => {
@@ -22,8 +28,8 @@ export default function useCreateBudget() {
     },
     onSuccess: (response: any) => {
       setLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['fetchBudget'] });
-      if (response && response.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["fetchBudget"] });
+      if (response && response.status === "success") {
         notifySuccess(response?.message);
       } else {
         setErrorMessage(response?.message);
@@ -32,7 +38,10 @@ export default function useCreateBudget() {
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred while creating the budget. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred while creating the budget. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },

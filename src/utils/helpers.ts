@@ -13,7 +13,7 @@ export function useFetchData<T, E = Error>(
   });
 }
 export function format_price(price: number, currency?: string, show?:string) {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-NG', {
     style: show as 'decimal' | 'currency' | 'percent' | undefined,
     currency: currency,
     minimumFractionDigits: 0

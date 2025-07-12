@@ -4,6 +4,7 @@ import useGetUser from "@/hooks/useGetUser";
 import useNotify from "@/hooks/useNotify";
 import { usePathname, useRouter } from 'next/navigation';
 import { sanitize } from '@/utils/helpers';
+import useStore from '@/store';
 
 interface CheckIdValidityProps {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ const CheckIdValidity: React.FC<CheckIdValidityProps> = ({ children }) => {
   const { error } = useNotify();
   const router = useRouter();
   const [isValid, setIsValid] = useState<boolean>(false);
-
+  const {userId} = useStore()
   useEffect(() => {
     const checkValidity = async () => {
       if (!user) {
@@ -26,25 +27,25 @@ const CheckIdValidity: React.FC<CheckIdValidityProps> = ({ children }) => {
         return;
       }
 
-      // Check if the user has access to the organization
       const findValidName = user.data.user_organisations?.find((org) => sanitize(org.name) === orgName);
       const sanitizedOrgName = sanitize(findValidName?.name || "")
       const isValidName = sanitizedOrgName === orgName;
+        if (!userId) {
+          router.replace(`${orgName}/invalid-org`);
+          return;
+        }
+        if (!isValidName) {
+          setIsValid(false);
+          router.push(`/${userId}`);
+          return;
+        }
 
-      if (!isValidName) {
-        setIsValid(false);
-        router.push(`/${orgName}/invalid-org`);
-        return;
-      }
-
-      // If everything is valid
       setIsValid(true);
     };
 
     checkValidity();
-  }, [user, orgName, error, router]); // Removed `isValid` from dependencies
+  }, [user, orgName, error, router, userId]); 
 
-  // Render children only if isValid is true
   return isValid ? <>{children}</> : null;
 };
 

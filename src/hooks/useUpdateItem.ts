@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { auth } from '@/api/auths';
-import {  UpdateData } from '@/types';
-import useStore from '@/store';
-import useNotify from './useNotify';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { auth } from "@/helpers/auths";
+import { UpdateData } from "@/types";
+import useStore from "@/store";
+import useNotify from "./useNotify";
 
 const useUpdateItem = (orgId: string) => {
   const queryClient = useQueryClient();
@@ -20,8 +20,12 @@ const useUpdateItem = (orgId: string) => {
     onSuccess: (response: any) => {
       setLoading(false);
       success(response?.message);
-      queryClient.invalidateQueries({ queryKey: ['fetchItemsByPrNumber', orgId] });
-      queryClient.invalidateQueries({ queryKey: ['fetchRequisitionSavedForLater', orgId] });
+      queryClient.invalidateQueries({
+        queryKey: ["fetchItemsByPrNumber", orgId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["fetchRequisitionSavedForLater", orgId],
+      });
     },
     onError: (error) => {
       setLoading(false);

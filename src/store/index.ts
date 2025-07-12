@@ -1,7 +1,7 @@
 import {  FetchMembersResponse } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-
+import Cookies from 'js-cookie';
 interface PrData {
   pr_number: string;
   id: string;
@@ -96,6 +96,15 @@ const useStore = create<SimpliP2PStore>()(
       orgName: "",
       setOrgName: (name: string) => {
         set({ orgName: name });
+        if (name) {
+          Cookies.set("orna", name, {
+            path: "/",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
+          });
+        } else {
+          Cookies.remove("orna", { path: "/" });
+        }
       },
       productId: "",
       setProductId: (productId: string) => {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { CreateSupplierData } from "@/types";
 
 export default function useCreateSupplier() {
@@ -11,11 +11,17 @@ export default function useCreateSupplier() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successCreate, setSuccessCreate] = useState(false);
   const { success: notifySuccess, error: notifyError } = useNotify();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const { mutateAsync: createSupplierMutation } = useMutation({
-    mutationFn: async ({ data, orgId }: { data: CreateSupplierData; orgId: string }) => {
-        return auth.createSupplier(data, orgId);
-      },
+    mutationFn: async ({
+      data,
+      orgId,
+    }: {
+      data: CreateSupplierData;
+      orgId: string;
+    }) => {
+      return auth.createSupplier(data, orgId);
+    },
     onMutate: () => {
       setLoading(true);
       setErrorMessage(null);
@@ -23,9 +29,9 @@ export default function useCreateSupplier() {
     },
     onSuccess: (response: any) => {
       setLoading(false);
-      queryClient.invalidateQueries({queryKey: ['fetchSuppliers']});
-      queryClient.invalidateQueries({queryKey: ['organizationDashboard']});
-      if (response && response.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["fetchSuppliers"] });
+      queryClient.invalidateQueries({ queryKey: ["organizationDashboard"] });
+      if (response && response.status === "success") {
         notifySuccess(response?.message);
         setSuccessCreate(true);
       } else {
@@ -35,7 +41,10 @@ export default function useCreateSupplier() {
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during supplier creation. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during supplier creation. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },
@@ -48,5 +57,11 @@ export default function useCreateSupplier() {
     createSupplierMutation({ data, orgId });
   };
 
-  return { createSupplier, loading, errorMessage, successCreate, setSuccessCreate };
+  return {
+    createSupplier,
+    loading,
+    errorMessage,
+    successCreate,
+    setSuccessCreate,
+  };
 }

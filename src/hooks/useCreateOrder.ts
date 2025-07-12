@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { PurchaseOrder } from "@/types";
 
 export default function useCreateOrder() {
@@ -11,9 +11,15 @@ export default function useCreateOrder() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { success: notifySuccess, error: notifyError } = useNotify();
   const queryClient = useQueryClient();
-  
+
   const { mutateAsync: createOrderMutation } = useMutation({
-    mutationFn: async ({ data, orgId }: { data: PurchaseOrder; orgId: string }) => {
+    mutationFn: async ({
+      data,
+      orgId,
+    }: {
+      data: PurchaseOrder;
+      orgId: string;
+    }) => {
       return auth.createOrder(orgId, data);
     },
     onMutate: () => {
@@ -22,9 +28,9 @@ export default function useCreateOrder() {
     },
     onSuccess: (response) => {
       setLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['organizationDashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchOrders'] });
-      if (response && response.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["organizationDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchOrders"] });
+      if (response && response.status === "success") {
         notifySuccess(response?.message);
       } else {
         setErrorMessage(response?.message);
@@ -33,7 +39,10 @@ export default function useCreateOrder() {
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during order creation. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during order creation. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },
@@ -42,7 +51,7 @@ export default function useCreateOrder() {
     },
   });
 
-  const createOrder = async (orgId: string, data: PurchaseOrder,) => {
+  const createOrder = async (orgId: string, data: PurchaseOrder) => {
     createOrderMutation({ data, orgId });
   };
 

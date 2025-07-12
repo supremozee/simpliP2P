@@ -1,49 +1,59 @@
-"use client"
+"use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { auth } from '@/api/auths';
-import { User, LoginFormData, LoginResponse } from '@/types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import useNotify from './useNotify';
-import { useRouter, usePathname } from 'next/navigation';
-import useStore from '@/store';
+import { auth } from "@/helpers/auths";
+import { User, LoginFormData, LoginResponse } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import useNotify from "./useNotify";
+import { useRouter, usePathname } from "next/navigation";
+import useStore from "@/store";
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
-  // const {clearUserData} = useAuthHandler()
-  const [loginResponse, setLoginRespone] = useState<User | null>(null)
+  const [loginResponse, setLoginRespone] = useState<User | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { success: notifySuccess, error: notifyError } = useNotify();
-  const {setUserId}=useStore()
-const router = useRouter()
-const pathname = usePathname();
-const queryClient =  useQueryClient()
-useEffect(() => {
-  if (!['/login', '/register', '/reset-password', '/forgot-password', '/verify-email'].includes(pathname)) {
-  }
-}, [pathname]);
+  const { setUserId, orgName} = useStore();
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (
+      ![
+        "/login",
+        "/register",
+        "/reset-password",
+        "/forgot-password",
+        "/auth",
+      ].includes(pathname)
+    ) {
+    }
+  }, [pathname]);
   const { mutateAsync: loginMutation } = useMutation({
-    mutationKey: ['loginMutation'],
+    mutationKey: ["loginMutation"],
     mutationFn: auth.login,
     onMutate: () => {
       setLoading(true);
       setErrorMessage(null);
-      setLoginRespone(null)
+      setLoginRespone(null);
     },
-    onSuccess: (response:LoginResponse) => {
+    onSuccess: (response: LoginResponse) => {
       setLoading(false);
-      if (response?.status === 'success') {
+      if (response?.status === "success") {
         notifySuccess("Successfully logged in");
-        queryClient.invalidateQueries({queryKey: ['organizationById']})
-        queryClient.invalidateQueries({queryKey: ['customer']})
-        setLoginRespone(response?.data?.user)
-        setUserId(response?.data?.user?.id)
-          router.push(`/${response.data.user.id}`);
+        queryClient.invalidateQueries({ queryKey: ["organizationById"] });
+        queryClient.invalidateQueries({ queryKey: ["customer"] });
+        setLoginRespone(response?.data?.user);
+        setUserId(response?.data?.user?.id);
+        router.push(orgName ? `${orgName}/dashboard` : `${response.data.user.id}`);
       }
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during login. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during login. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },
@@ -60,7 +70,7 @@ useEffect(() => {
     loading,
     errorMessage,
     login,
-    loginResponse
+    loginResponse,
   };
 };
 

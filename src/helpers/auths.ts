@@ -52,12 +52,13 @@ import { forgotData,
                          ExportSelected,
                          EditDepartment,
                          EditBranch,
-                         EditCategory} 
+                         EditCategory,
+                         VerifySubDomainHeader} 
                          from "@/types"
 import { apiRequest } from "./apiRequest"
 import { setCookies } from "@/utils/setCookies"
 import { AUTH_ENDPOINTS, ORGANIZATION_ENDPOINTS, USER_ENDPOINTS } from "./route";
-import { deleteConfig, getConfig, patchConfig, postConfig, putConfig } from "./apiUtils";
+import { deleteConfig, getConfig, patchConfig, postConfig, postVerifySubdomainConfig, putConfig } from "./apiUtils";
 import Cookies from "js-cookie";
 const auth = {
   register: async (registerData: RegisterFormData): Promise<RegisterResponse> => {
@@ -457,6 +458,9 @@ const auth = {
     }
   
     return await response.json();
+  },
+  verifySubDomain:async(subDomain:string, X:VerifySubDomainHeader)=> {
+     return await apiRequest(`${AUTH_ENDPOINTS.VERIFY_SUBDOMAIN}`, postVerifySubdomainConfig(subDomain, X));
   }
 };
 

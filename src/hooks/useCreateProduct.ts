@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
 import { ProductData, ProductResponse } from "@/types";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 
 export default function useCreateProduct() {
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,13 @@ export default function useCreateProduct() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: createProductMutation } = useMutation({
-    mutationFn: async ({ data, orgId }: { data: ProductData; orgId: string }) => {
+    mutationFn: async ({
+      data,
+      orgId,
+    }: {
+      data: ProductData;
+      orgId: string;
+    }) => {
       return auth.createProduct(orgId, data);
     },
     onMutate: () => {
@@ -24,9 +30,9 @@ export default function useCreateProduct() {
     },
     onSuccess: (response: ProductResponse) => {
       setLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['fetchProducts'] });
-      queryClient.invalidateQueries({ queryKey: ['organizationDashboard'] });
-      if (response && response.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["fetchProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["organizationDashboard"] });
+      if (response && response.status === "success") {
         notifySuccess(response.message);
         setSuccessCreate(true);
       } else {
@@ -36,7 +42,10 @@ export default function useCreateProduct() {
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during product creation. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during product creation. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },
@@ -49,5 +58,11 @@ export default function useCreateProduct() {
     await createProductMutation({ data, orgId });
   };
 
-  return { createProduct, loading, errorMessage, successCreate, setSuccessCreate };
+  return {
+    createProduct,
+    loading,
+    errorMessage,
+    successCreate,
+    setSuccessCreate,
+  };
 }

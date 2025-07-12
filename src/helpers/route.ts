@@ -11,7 +11,8 @@ export const AUTH_ENDPOINTS = {
   INITIATE_GOOGLE: `${BASE_URL}/auth/google/initiate`,
   GOOGLE_CALLBACK: `${BASE_URL}/auth/google/callback`,
   LOGOUT:`${BASE_URL}/auth/logout`,
-  LOGOUT_ALL: `${BASE_URL}/auth/logout-all`
+  LOGOUT_ALL: `${BASE_URL}/auth/logout-all`,
+  VERIFY_SUBDOMAIN: `${BASE_URL}/subdomains/verify`
 };
 
 export const USER_ENDPOINTS = {

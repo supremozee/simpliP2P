@@ -1,13 +1,11 @@
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import useStore from "@/store";
 import { Logout } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import useNotify from "./useNotify";
 import { useRouter } from "next/navigation";
 import { clearCookies } from "@/utils/setCookies";
-import useAuthHandler from "./useAuthHandler";
 const useLogout = () => {
-  const { clearUserData } = useAuthHandler();
   const { setLoading } = useStore();
   const router = useRouter();
   const { success, error } = useNotify();
@@ -21,7 +19,6 @@ const useLogout = () => {
       router.push("/login");
       setLoading(false);
       clearCookies();
-      clearUserData()
     },
     onError: (response) => {
       error(response?.message);

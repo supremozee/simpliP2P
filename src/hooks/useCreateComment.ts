@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useNotify from "./useNotify";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { Comment } from "@/types";
 
 export default function useCreateComment() {
@@ -22,8 +22,8 @@ export default function useCreateComment() {
     },
     onSuccess: (response: any) => {
       setLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['singleComment'] });
-      if (response && response.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["singleComment"] });
+      if (response && response.status === "success") {
         notifySuccess(response?.message);
       } else {
         setErrorMessage(response?.message);
@@ -32,7 +32,10 @@ export default function useCreateComment() {
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred while creating the comment. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred while creating the comment. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },

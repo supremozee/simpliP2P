@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
-import useNotify from './useNotify';
-import { auth } from '@/api/auths';
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import useNotify from "./useNotify";
+import { auth } from "@/helpers/auths";
 
 const useUploadProfilePicture = () => {
   const [loading, setLoading] = useState(false);
@@ -17,16 +17,19 @@ const useUploadProfilePicture = () => {
     },
     onSuccess: (response) => {
       setLoading(false);
-      if (response.status === 'success') {
+      if (response.status === "success") {
         notifySuccess("Profile picture uploaded successfully");
       } else {
-        setErrorMessage(response.message || 'Profile picture upload failed');
-        notifyError(response.message || 'Profile picture upload failed');
+        setErrorMessage(response.message || "Profile picture upload failed");
+        notifyError(response.message || "Profile picture upload failed");
       }
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during profile picture upload. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during profile picture upload. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },

@@ -1,5 +1,5 @@
 "use client";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { ProductResponse } from "@/types";
 import { useFetchData } from "@/utils/helpers";
 

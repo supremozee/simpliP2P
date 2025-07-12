@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import useNotify from "./useNotify";
-import { auth } from "@/api/auths";
+import { auth } from "@/helpers/auths";
 import { RegisterFormData } from "@/types";
 
 export default function useRegister() {
@@ -21,17 +21,20 @@ export default function useRegister() {
     },
     onSuccess: (response) => {
       setLoading(false);
-      if (response && response.status === 'success') {
+      if (response && response.status === "success") {
         notifySuccess("Successfully registered");
         setSuccessSignup(true);
       } else {
-        setErrorMessage(response?.message || 'Registration failed');
-        notifyError(response?.message || 'Registration failed');
+        setErrorMessage(response?.message || "Registration failed");
+        notifyError(response?.message || "Registration failed");
       }
     },
     onError: (err: any) => {
       setLoading(false);
-      const message = err.response?.data?.message || err.message || 'An error occurred during registration. Please try again.';
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during registration. Please try again.";
       setErrorMessage(message);
       notifyError(message);
     },

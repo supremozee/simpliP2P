@@ -1,61 +1,73 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import isAuthenticated from "@/hooks/isAuthenticated";
 import useGetUser from "@/hooks/useGetUser";
 import Loader from "../molecules/Loader";
 import ErrorComponent from "../molecules/ErrorComponent";
+import isAuthenticated from "@/hooks/isAuthenticated";
 import useAuthHandler from "@/hooks/useAuthHandler";
+import useStore from "@/store";
+import { sanitize } from "@/utils/helpers";
 
 const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isLoading, error } = useGetUser();
+  const { user, isLoading } = useGetUser();
+
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [hasCheckedAccess, setHasCheckedAccess] = useState(false);
-
+  const [hasAccess, setHasAccess] = useState(false);
+  const { orgName, userId } = useStore();
+ 
   useAuthHandler();
+  const handleOrganizationCheck = useCallback(async () => {
+    if (isLoading || hasAccess) return;
+    if (!isAuthenticated()) {
+      router.replace("/login");
+    }
+    if (!user) {
+      setErrorMessage("Failed to load user data. Please try again.");
+      setShowError(true);
+      return;
+    }
+  
+    const userOrgs = user?.data.user_organisations || [];
+    const findOrgName = user?.data?.user_organisations.find(
+      (org) => sanitize(org.name) === orgName
+    );
+    if (!findOrgName) {
+      router.replace(`/${userId}`);
+    }
+    if (userOrgs.length === 0 && !pathname.includes("create-organization")) {
+      router.replace("/create-organization");
+      return;
+    }
+
+    setHasAccess(true);
+  }, [isLoading, hasAccess, user, pathname, router, orgName, userId]);
 
   useEffect(() => {
-    const checkAccess = async () => {
-      const accessStatus = isAuthenticated();
-      const returnPath = encodeURIComponent(pathname);
-      if (!accessStatus) {
-        setErrorMessage(error?.message || "Session expired... redirecting to login.");
-        setShowError(true);
-        router.push(`/login?returnTo=${returnPath}`);
-        return;
-      } 
+    handleOrganizationCheck();
+  }, [handleOrganizationCheck]);
 
-      //I am coming back to this, it is giving return back issue
-      // if(error) {
-      //   setErrorMessage(error?.message || "An error occurred while fetching user data.");
-      //   setShowError(true);
-      //   router.push(`/login?returnTo=${returnPath}`);
-      //   return;
-      // }
-        if (user?.data?.user_organisations.length === 0  && !pathname.includes('create-organization')) {
-          setTimeout(()=> {
-            alert("You have no organisation, you will be redirected to create one!")
-            router.push("/create-organization");
-          }, 1000)
-          return;
-      } 
-      setHasCheckedAccess(true);
-    };
-
-    if (!isLoading && user && !hasCheckedAccess) {
-      checkAccess();
-    }
-  }, [isLoading, error, router, user, hasCheckedAccess, pathname]);
-
-  if (isLoading || !user || !hasCheckedAccess) {
-    return <Loader />;
+  if (isLoading || (!hasAccess && !showError)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-tertiary">
+        <div className="bg-white p-8 rounded-2xl shadow-sm">
+          <Loader />
+        </div>
+      </div>
+    );
   }
 
   if (showError) {
-    return <ErrorComponent text={errorMessage} />;
+    return (
+      <ErrorComponent
+        text={errorMessage}
+        error={showError}
+        onRetry={() => window.location.reload()}
+      />
+    );
   }
 
   return <>{children}</>;

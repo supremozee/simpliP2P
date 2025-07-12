@@ -1,3 +1,5 @@
+import { VerifySubDomainHeader } from "@/types";
+
 // apiUtils.ts
 export const postConfig = <T>(data: T, oid?: string) => {
   const headers: Record<string, string> = {
@@ -7,11 +9,26 @@ export const postConfig = <T>(data: T, oid?: string) => {
   if (oid) {
     headers.oid = oid;
   }
-
   return {
     method: "POST" as const,
     headers,
     body: JSON.stringify(data),
+  };
+};
+export const postVerifySubdomainConfig = (subDomain:string, X:VerifySubDomainHeader) => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if(X) {
+    headers["x-signature"] = X.x_signature;
+    headers["x-timestamp"] = X.x_timestamp
+  }
+
+  return {
+    method: "POST" as const,
+    headers,
+    body:JSON.stringify(subDomain)
   };
 };
   
