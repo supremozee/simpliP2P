@@ -1,4 +1,4 @@
-import { VerifySubDomainHeader } from "@/types";
+import { VerifySubDomain, VerifySubDomainHeader } from "@/types";
 
 // apiUtils.ts
 export const postConfig = <T>(data: T, oid?: string) => {
@@ -15,7 +15,7 @@ export const postConfig = <T>(data: T, oid?: string) => {
     body: JSON.stringify(data),
   };
 };
-export const postVerifySubdomainConfig = (subDomain:string, X:VerifySubDomainHeader) => {
+export const postVerifySubdomainConfig = (subDomain:VerifySubDomain, X:VerifySubDomainHeader) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };

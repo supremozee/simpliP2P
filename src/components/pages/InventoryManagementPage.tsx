@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
-import useFetchProducts from "@/hooks/useFetchProducts";
+import React, { useState, useMemo, useEffect } from "react";
+import useProductsData from "@/hooks/useProductsData";
+import useFetchCategories from "@/hooks/useFetchCategories";
 import useStore from "@/store";
 import TableSkeleton from "../atoms/Skeleton/Table";
 import ErrorComponent from "../molecules/ErrorComponent";
@@ -20,10 +21,9 @@ import UpdateProduct from "../organisms/UpdateProduct";
 import TableHead from "../atoms/TableHead";
 import TableBody from "../atoms/TableBody";
 import TableRow from "../molecules/TableRow";
-import { FetchProduct } from "@/types";
+import { FetchProduct, Category } from "@/types";
 import { format_price } from "@/utils/helpers";
 import Image from "next/image";
-import Pagination from "../molecules/Pagination";
 import ActionBar from "../molecules/ActionBar";
 import TableShadowWrapper from "../atoms/TableShadowWrapper";
 import useExportSelected from "@/hooks/useExportSelected";
@@ -31,20 +31,52 @@ import SelectedItemForExport from "../organisms/SelectedItemForExport";
 import ExportCheckBox from "../molecules/ExportCheckBox";
 import BulkUploadModal from "../organisms/BulkUploadModal";
 import Button from "../atoms/Button";
+import Pagination from "../molecules/Pagination";
 
-const InventoryManagement = () => {
-  const { currentOrg, setProductId, productId } = useStore();
-  const [currentPage, setCurrentPage] = useState(1);
-  const { data, isLoading, isError } = useFetchProducts(currentOrg, 1, 100);
+interface InventoryManagementProps {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+const InventoryManagement: React.FC<InventoryManagementProps> = ({
+  searchParams = {},
+}) => {
+  const { currentOrg, setProductId, productId, setType } = useStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
+    {}
+  );
+
+  // Extract pagination parameters from URL
+  const page = searchParams?.["page"] ?? "1";
+  const perPage = searchParams?.["per_page"] ?? "20";
+  const currentPage = Math.max(
+    1,
+    Number(Array.isArray(page) ? page[0] : page) || 1
+  );
+  const itemsPerPage = Math.max(
+    1,
+    Number(Array.isArray(perPage) ? perPage[0] : perPage) || 20
+  );
+
+  // Use the new optimized dual fetch hook
+  const {
+    paginatedData,
+    allData,
+    isPaginatedLoading,
+    isAllDataLoading,
+    isError,
+  } = useProductsData(currentOrg, currentPage, itemsPerPage);
+
+  // Fetch categories for filtering
+  const { data: categoriesData } = useFetchCategories(currentOrg);
+
   const { deleteProduct } = useDeleteProduct();
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
   );
   const [openUpdateProductModal, setOpenUpdateProductModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [openBulkUploadModal, setOpenBulkUploadModal] = useState(false);
-  const getProducts = data?.data || [];
 
   const {
     selectedItems,
@@ -54,17 +86,143 @@ const InventoryManagement = () => {
     isSelected,
   } = useExportSelected();
 
+  useEffect(() => {
+    setType("products");
+  }, [setType]);
+
+  // Generate filter options from all products data
+  const filterOptions = useMemo(() => {
+    const options = [];
+
+    // Category filter
+    if (categoriesData?.data?.categories) {
+      options.push({
+        label: "Category",
+        value: "category",
+        options: [
+          { label: "All", value: "all" },
+          ...categoriesData.data.categories.map((category: Category) => ({
+            label: category.name,
+            value: category.name,
+          })),
+        ],
+      });
+    }
+
+    // Stock status filter
+    options.push({
+      label: "Stock Status",
+      value: "stockStatus",
+      options: [
+        { label: "All", value: "all" },
+        { label: "In Stock", value: "in_stock" },
+        { label: "Low Stock", value: "low_stock" },
+        { label: "Out of Stock", value: "out_of_stock" },
+      ],
+    });
+
+    return options;
+  }, [categoriesData?.data?.categories]);
+
+  const handleFilter = (filterType: string, value: string) => {
+    setActiveFilters((prev) => {
+      const newFilters = { ...prev };
+
+      // If "all" is selected, remove the filter (clear it)
+      if (value === "all") {
+        delete newFilters[filterType];
+      } else {
+        newFilters[filterType] = value;
+      }
+
+      return newFilters;
+    });
+  };
+
+  const handleClearFilter = (filterType: string) => {
+    setActiveFilters((prev) => {
+      const newFilters = { ...prev };
+      delete newFilters[filterType];
+      return newFilters;
+    });
+  };
+
+  const handleClearAllFilters = () => {
+    setActiveFilters({});
+  };
+
+  // Filter products based on search and active filters
+  const filteredProducts = useMemo(() => {
+    if (!paginatedData?.data) return [];
+
+    let products = paginatedData.data;
+
+    // Apply search filter
+    if (searchQuery) {
+      products = products.filter((prod: FetchProduct) => {
+        return (
+          prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prod.productCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prod.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      });
+    }
+
+    // Apply active filters
+    Object.entries(activeFilters).forEach(([filterType, filterValue]) => {
+      if (filterValue && filterValue !== "all") {
+        switch (filterType) {
+          case "category":
+            products = products.filter(
+              (product: FetchProduct) => product.category?.name === filterValue
+            );
+            break;
+          case "stockStatus":
+            products = products.filter((product: FetchProduct) => {
+              switch (filterValue) {
+                case "in_stock":
+                  return product.stockQty > product.stockQtyAlert * 2;
+                case "low_stock":
+                  return (
+                    product.stockQty <= product.stockQtyAlert * 2 &&
+                    product.stockQty > product.stockQtyAlert
+                  );
+                case "out_of_stock":
+                  return product.stockQty <= product.stockQtyAlert;
+                default:
+                  return true;
+              }
+            });
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    return products;
+  }, [paginatedData?.data, searchQuery, activeFilters]);
+
+  // Search across all products for comprehensive results
+  const searchAllProducts = useMemo(() => {
+    if (!searchQuery || !allData?.data) return [];
+
+    const searchLower = searchQuery.toLowerCase();
+    return allData.data.filter((product: FetchProduct) => {
+      return (
+        product.name.toLowerCase().includes(searchLower) ||
+        product.productCode?.toLowerCase().includes(searchLower) ||
+        product.category?.name?.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [allData?.data, searchQuery]);
+
+  // Show search results count
+  const searchResultsCount = searchQuery ? searchAllProducts.length : 0;
+
   const handleSearch = (search: string) => {
     setSearchQuery(search);
   };
-
-  const filterProduct = getProducts.filter((prod) => {
-    return (
-      !searchQuery ||
-      prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prod.productCode?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
 
   const handleDelete = (productId: string) => {
     deleteProduct(currentOrg, productId);
@@ -81,25 +239,22 @@ const InventoryManagement = () => {
     setOpenConfirmDeleteModal(true);
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
   const handleSelectAll = () => {
-    if (selectedItems.length === filterProduct.length) {
-      deselectAll();
-    } else {
-      selectAll(filterProduct.map((product) => product.id));
+    if (filteredProducts && filteredProducts.length > 0) {
+      if (selectedItems.length === filteredProducts.length) {
+        deselectAll();
+      } else {
+        selectAll(filteredProducts.map((product: FetchProduct) => product.id));
+      }
     }
   };
 
-  if (isLoading) return <TableSkeleton />;
+  // Show loading if either query is loading
+  if (isPaginatedLoading || isAllDataLoading) return <TableSkeleton />;
   if (isError) return <ErrorComponent text="No Inventory found" />;
 
-  const products = filterProduct || [];
-  const totalItems = data?.metadata?.total || products.length;
-  const pageSize = data?.metadata?.pageSize || 100;
-  const totalPages = data?.metadata?.totalPages;
+  const products = filteredProducts || [];
+  const totalPages = paginatedData?.metadata?.totalPages || 1;
 
   const tableHeaders: string[] | any = [
     <ExportCheckBox
@@ -241,8 +396,9 @@ const InventoryManagement = () => {
           product={{
             id: selectedProductId,
             name:
-              products.find((product) => product.id === selectedProductId)
-                ?.name || "Product",
+              products.find(
+                (product: FetchProduct) => product.id === selectedProductId
+              )?.name || "Product",
           }}
           handleConfirm={() => handleDelete(selectedProductId)}
         />
@@ -264,10 +420,31 @@ const InventoryManagement = () => {
         <div className="w-full sm:w-auto">
           <ActionBar
             type="products"
-            onSearch={(search) => handleSearch(search)}
+            onSearch={handleSearch}
+            filterOptions={filterOptions}
+            onFilter={handleFilter}
+            activeFilters={activeFilters}
+            onClearFilter={handleClearFilter}
+            onClearAllFilters={handleClearAllFilters}
           />
         </div>
       </div>
+
+      {searchQuery && (
+        <div className="mb-4">
+          <div className="px-4 py-2 bg-blue-50 border-l-4 border-blue-400 rounded-r-md">
+            <p className="text-sm text-blue-700">
+              Found {searchResultsCount} results across all products for &ldquo;
+              {searchQuery}&rdquo;
+              {searchResultsCount > filteredProducts.length && (
+                <span className="ml-2 text-blue-600">
+                  (Showing {filteredProducts.length} on current page)
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div className="flex flex-wrap gap-2">
@@ -276,7 +453,7 @@ const InventoryManagement = () => {
               Total Products:
             </span>
             <span className="bg-primary text-white px-2 py-1 rounded-md text-xs sm:text-sm">
-              {products.length}
+              {allData?.data?.length || 0}
             </span>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-2 flex items-center">
@@ -284,7 +461,9 @@ const InventoryManagement = () => {
               Low Stock Items:
             </span>
             <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs sm:text-sm">
-              {products.filter((p) => p.stockQty <= p.stockQtyAlert).length}
+              {allData?.data?.filter(
+                (p: FetchProduct) => p.stockQty <= p.stockQtyAlert
+              ).length || 0}
             </span>
           </div>
         </div>
@@ -307,7 +486,7 @@ const InventoryManagement = () => {
         <div className="mb-4">
           <SelectedItemForExport
             selectedItems={selectedItems}
-            items={filterProduct}
+            items={filteredProducts}
             deselectAll={deselectAll}
             entityType="products"
           />
@@ -327,11 +506,11 @@ const InventoryManagement = () => {
       <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
         <div className="w-full items-center">
           <Pagination
-            totalPages={totalPages || 1}
-            currentPage={currentPage}
-            totalItems={totalItems}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
+            page={String(currentPage)}
+            perPage={String(itemsPerPage)}
+            hasNextPage={currentPage < totalPages}
+            hasPrevPage={currentPage > 1}
+            totalPages={totalPages}
           />
         </div>
       </div>

@@ -5,6 +5,10 @@ export interface ModalProps {
   supplierId?:string
   add?:boolean;
 }
+export interface SearchParamsType  {
+    PAGE:string,
+    PER_PAGE:string,
+}
 
 export interface NavLink {
   label: string;

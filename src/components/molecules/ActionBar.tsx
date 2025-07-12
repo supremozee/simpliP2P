@@ -157,7 +157,6 @@ const ActionBar: React.FC<ActionBarTypes> = ({
     if (onClearAllFilters) {
       onClearAllFilters();
     } else {
-      // Default implementation if onClearAllFilters not provided
       Object.keys(activeFilters).forEach((filterType) => {
         if (onFilter) onFilter(filterType, "all");
       });
@@ -168,7 +167,6 @@ const ActionBar: React.FC<ActionBarTypes> = ({
 
   const handleApplyDateFilter = () => {
     toggleDatePicker();
-    // You could trigger a refetch or refresh here if needed
   };
 
   return (

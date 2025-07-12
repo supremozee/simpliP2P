@@ -220,9 +220,8 @@ const ApprovalModal = ({ pr_id }: { pr_id: string }) => {
                   </div>
                 </div>
               </div>
-            </div>
             {requisition && <OrderTable requisition={requisition} />}
-
+            </div>
             {/* Right Column - Approval Actions */}
             <div className="space-y-6">
               <div className="bg-white rounded-lg border border-gray-200 p-4">

@@ -10,14 +10,17 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SK || ""
   );
   const orgName = request.cookies.get("orgName")?.value;
-  const host = request.headers.get("host");
-  const subdomain = host?.split(".")[0] || "";
+  // const host = request.headers.get("host"); // Currently unused but may be needed for future subdomain logic
+  const subdomain = "azeezend.simplip2p.com";
   const X = {
     x_signature: signature,
     x_timestamp: timestamp,
   };
-  const isValidSubdomain = auth.verifySubDomain(subdomain, X);
-  console.log(JSON.stringify(isValidSubdomain, null, 2), "running");
+  const subDomain = {
+    subdomain: subdomain,
+  };
+  const isValidSubdomain = auth.verifySubDomain(subDomain, X);
+  console.log(JSON.stringify(isValidSubdomain), "running");
   const { pathname } = request.nextUrl;
   const publicPaths = ["/login", "/register", "/forgot-password", "/"];
   const isPublicPath =
@@ -46,9 +49,9 @@ export async function middleware(request: NextRequest) {
   ) {
     return NextResponse.redirect(new URL(`/${orgName}/dashboard`, request.url));
   }
-  if (subdomain === "app" || subdomain === "www") {
-    return NextResponse.next();
-  }
+  // if (subdomain === "app" || subdomain === "www") {
+  //   return NextResponse.next();
+  // }``
   return NextResponse.next();
 }
 

@@ -14,7 +14,7 @@ const getDomain = () => {
 export const setCookies = (accessToken: string, refreshToken: string) => {
   const cookieOptions = {
     path: "/",
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     domain:getDomain()
   };

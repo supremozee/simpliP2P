@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "A procurement system",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

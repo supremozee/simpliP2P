@@ -1,96 +1,58 @@
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
-import Button from "../atoms/Button";
-import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 interface PaginationProps {
+  page: string;
+  perPage: string;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
   totalPages: number;
-  currentPage: number;
-  totalItems: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
-  currentPage,
-  onPageChange,
+const Pagination = ({
+  page,
+  perPage,
+  hasNextPage,
+  hasPrevPage,
   totalPages,
-}) => {
-  if (totalPages <= 1) return null;
-  const getVisiblePageNumbers = () => {
-    const pages = [];
-    const maxButtons = 5;
-
-    let startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, startPage + maxButtons - 1);
-
-    if (endPage === totalPages) {
-      startPage = Math.max(1, endPage - maxButtons + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  };
-
+}: PaginationProps) => {
+  const pathname = usePathname();
   return (
-    <div className="flex justify-center items-center mt-4">
-      {/* Previous button */}
-      <Button
-        className="px-3 py-2 rounded-md"
-        onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        kind="tertiary"
-        aria-label="Previous page"
-      >
-        <IoChevronBack
-          className={currentPage === 1 ? "text-gray-400" : "text-primary"}
-        />
-      </Button>
-
-      {/* Page numbers - desktop view */}
-      <div className="hidden sm:flex mx-2">
-        {getVisiblePageNumbers().map((page) => (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`
-              w-8 h-8 mx-1 flex items-center justify-center rounded-md
-              ${
-                currentPage === page
-                  ? "bg-primary text-white"
-                  : "#181819 hover:bg-gray-100"
-              }
-            `}
-            aria-current={currentPage === page ? "page" : undefined}
-          >
-            {page}
-          </button>
-        ))}
+    <div className="flex justify-center mt-8">
+      <div className="flex space-x-2">
+        <Link
+          href={`${pathname}?page=${Number(page) - 1}&per_page=${perPage}`}
+          className={`flex items-center px-4 py-2 rounded-l-md border border-tertiary bg-white hover:bg-tertiary transition-colors ${
+            !hasPrevPage ? " cursor-not-allowed opacity-50" : ""
+          }`}
+        >
+          <FaArrowLeft />
+        </Link>
+        {[...Array(totalPages)].map((_, index) => {
+          const currentPage = index + 1;
+          return (
+            <Link
+              href={`${pathname}?page=${currentPage}&per_page=${perPage}`}
+              key={`page-${index}`}
+              className={`px-4 py-2 border border-tertiary bg-white text-primary hover:bg-tertiary transition-colors ${
+                Number(page) === currentPage ? "bg-tertiary font-semibold" : ""
+              }`}
+            >
+              {currentPage}
+            </Link>
+          );
+        })}
+        <Link
+          href={`${pathname}?page=${Number(page) + 1}&per_page=${perPage}`}
+          className={`flex items-center px-4 py-2 rounded-r-md border border-tertiary bg-white hover:bg-tertiary transition-colors ${
+            !hasNextPage ? "cursor-not-allowed opacity-50" : ""
+          }`}
+        >
+          <FaArrowRight />
+        </Link>
       </div>
-
-      {/* Mobile view */}
-      <div className="sm:hidden mx-2 text-sm #181819">
-        {currentPage} / {totalPages}
-      </div>
-
-      {/* Next button */}
-      <Button
-        className="px-3 py-2 rounded-md"
-        onClick={() =>
-          currentPage < totalPages && onPageChange(currentPage + 1)
-        }
-        disabled={currentPage === totalPages}
-        kind="tertiary"
-        aria-label="Next page"
-      >
-        <IoChevronForward
-          className={
-            currentPage === totalPages ? "text-gray-400" : "text-primary"
-          }
-        />
-      </Button>
     </div>
   );
 };

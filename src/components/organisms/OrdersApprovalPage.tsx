@@ -40,7 +40,7 @@ const OrdersApprovalPage = () => {
       today.getDate()
     );
 
-    return orders.filter((order) => {
+    return orders.filter((order: Order) => {
       const orderDate = new Date(order.created_at);
       switch (timeFilter) {
         case "today":
@@ -79,7 +79,7 @@ const OrdersApprovalPage = () => {
   const filteredOrders = sortOrders(
     filterByTime(
       pendingOrders.filter(
-        (order) =>
+        (order: Order) =>
           order.po_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
           order.supplier?.full_name
             .toLowerCase()

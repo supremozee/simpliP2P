@@ -117,7 +117,7 @@ const ViewRequisitions = () => {
   useEffect(() => {
     if (savedRequisitions) {
       const saved = savedRequisitions.find(
-        (req) => req?.pr_number === pr?.pr_number
+        (req: Requisition) => req?.pr_number === pr?.pr_number
       );
       if (saved) setRequisitionValues(saved);
     }
@@ -126,7 +126,7 @@ const ViewRequisitions = () => {
   useEffect(() => {
     if (pendingRequisitions) {
       const pending = pendingRequisitions.find(
-        (req) => req?.pr_number === pr?.pr_number
+        (req: Requisition) => req?.pr_number === pr?.pr_number
       );
       if (pending) setRequisitionValues(pending);
     }
@@ -135,7 +135,7 @@ const ViewRequisitions = () => {
   useEffect(() => {
     if (approvedRequisitions) {
       const approved = approvedRequisitions.find(
-        (req) => req?.pr_number === pr?.pr_number
+        (req: Requisition) => req?.pr_number === pr?.pr_number
       );
       if (approved) setRequisitionValues(approved);
     }
@@ -144,7 +144,7 @@ const ViewRequisitions = () => {
   useEffect(() => {
     if (rejectedRequisitions) {
       const rejected = rejectedRequisitions.find(
-        (req) => req?.pr_number === pr?.pr_number
+        (req: Requisition) => req?.pr_number === pr?.pr_number
       );
       if (rejected) setRequisitionValues(rejected);
     }
@@ -153,7 +153,7 @@ const ViewRequisitions = () => {
   useEffect(() => {
     if (requestRequisitions) {
       const request = requestRequisitions.find(
-        (req) => req?.pr_number === pr?.pr_number
+        (req: Requisition) => req?.pr_number === pr?.pr_number
       );
       if (request) setRequisitionValues(request);
     }
@@ -365,9 +365,12 @@ const ViewRequisitions = () => {
                 </div>
               </div>
             )}
-            {
-              !showForSavedOnly&& <CommentSection entity_type="purchase_requisition" entity_id={pr?.id || ""}/>
-            }
+            {!showForSavedOnly && (
+              <CommentSection
+                entity_type="purchase_requisition"
+                entity_id={pr?.id || ""}
+              />
+            )}
           </div>
         </Modal>
       )}

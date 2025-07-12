@@ -1,18 +1,11 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
-import { auth } from "@/helpers/auths";
-import { FetchOrdersResponse } from "@/types";
+import { useFetchOrders } from "./useDataFetch";
 
-export default function useFetchAllOrders(orgId: string, status?: string) {
-  const { data, error, isLoading, isError } = useQuery<
-    FetchOrdersResponse,
-    Error
-  >({
-    queryKey: ["fetchOrders", orgId],
-    queryFn: () => auth.allOrders(orgId, status),
-    enabled: !!orgId,
-    refetchOnWindowFocus: false,
-  });
-
-  return { data, error, isLoading, isError };
+// Re-export for backward compatibility with parameter mapping
+export default function useFetchAllOrders(
+  orgId: string,
+  status?: string,
+  page: number = 1,
+  pageSize: number = 10
+) {
+  return useFetchOrders(orgId, status, page, pageSize);
 }

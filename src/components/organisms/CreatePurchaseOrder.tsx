@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import useFetchPurchaseRequisition from "@/hooks/useFetchPurchaseRequisition";
 import useCreateOrder from "@/hooks/useCreateOrder";
 import Button from "../atoms/Button";
+import { Order } from "@/types";
 import {
   IoClose,
   IoDocumentTextSharp,
@@ -137,7 +138,7 @@ const CreatePurchaseOrder = () => {
 
     return requisitions.data.requisitions.filter((requisition) => {
       return !ordersData.data.orders.some(
-        (order) =>
+        (order: Order) =>
           order.purchase_requisition.pr_number === requisition.pr_number
       );
     });

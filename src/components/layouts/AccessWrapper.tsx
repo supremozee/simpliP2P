@@ -18,7 +18,6 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [hasAccess, setHasAccess] = useState(false);
   const { orgName, userId } = useStore();
- 
   useAuthHandler();
   const handleOrganizationCheck = useCallback(async () => {
     if (isLoading || hasAccess) return;
