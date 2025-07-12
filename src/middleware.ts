@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
     x_timestamp: timestamp,
   };
   const isValidSubdomain = auth.verifySubDomain(subdomain, X);
+  console.log(JSON.stringify(isValidSubdomain, null, 2), "running");
   const { pathname } = request.nextUrl;
   const publicPaths = ["/login", "/register", "/forgot-password", "/"];
   const isPublicPath =
@@ -48,6 +49,7 @@ export async function middleware(request: NextRequest) {
   if (subdomain === "app" || subdomain === "www") {
     return NextResponse.next();
   }
+  return NextResponse.next();
 }
 
 export const config = {

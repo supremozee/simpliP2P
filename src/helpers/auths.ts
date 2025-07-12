@@ -460,7 +460,8 @@ const auth = {
     return await response.json();
   },
   verifySubDomain:async(subDomain:string, X:VerifySubDomainHeader)=> {
-     return await apiRequest(`${AUTH_ENDPOINTS.VERIFY_SUBDOMAIN}`, postVerifySubdomainConfig(subDomain, X));
+     const res = await apiRequest(`${AUTH_ENDPOINTS.VERIFY_SUBDOMAIN}`, postVerifySubdomainConfig(subDomain, X));
+     return res
   }
 };
 
