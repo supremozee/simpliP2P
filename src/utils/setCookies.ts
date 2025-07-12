@@ -1,22 +1,31 @@
 import Cookies from "js-cookie";
-
+const getDomain = () => {
+  const hostname = window.location.hostname;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return "localhost";
+  }
+  
+  if (hostname.includes("simplip2p.com")) {
+    return ".simplip2p.com"; 
+  }
+  
+  return hostname;
+};
 export const setCookies = (accessToken: string, refreshToken: string) => {
   const cookieOptions = {
     path: "/",
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
-    domain:
-      window.location.hostname === "localhost" ? "localhost" : ".simplip2p.com",
+    domain:getDomain()
   };
 
-  // Set cookies with longer expiration time
   Cookies.set("accessToken", accessToken, {
     ...cookieOptions,
-    expires: 1, // 1 day
+    expires: 1,
   });
   Cookies.set("refreshToken", refreshToken, {
     ...cookieOptions,
-    expires: 30, // 30 days
+    expires: 30, 
   });
 };
 
@@ -27,8 +36,7 @@ export const getCookies = () => {
 };
 
 export const clearCookies = () => {
-  const domain =
-    window.location.hostname === "localhost" ? "localhost" : ".simplip2p.com";
+  const domain =getDomain()
   Cookies.remove("accessToken", { path: "/", domain });
   Cookies.remove("refreshToken", { path: "/", domain });
 };
