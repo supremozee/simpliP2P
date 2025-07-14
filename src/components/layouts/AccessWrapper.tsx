@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import useGetUser from "@/hooks/useGetUser";
-import Loader from "../molecules/Loader";
+import FullScreenLoader from "../organisms/FullScreenLoader";
 import ErrorComponent from "../molecules/ErrorComponent";
 import isAuthenticated from "@/hooks/isAuthenticated";
 import useAuthHandler from "@/hooks/useAuthHandler";
@@ -29,7 +29,7 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
       setShowError(true);
       return;
     }
-  
+
     const userOrgs = user?.data.user_organisations || [];
     const findOrgName = user?.data?.user_organisations.find(
       (org) => sanitize(org.name) === orgName
@@ -50,13 +50,7 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   }, [handleOrganizationCheck]);
 
   if (isLoading || (!hasAccess && !showError)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-tertiary">
-        <div className="bg-white p-8 rounded-2xl shadow-sm">
-          <Loader />
-        </div>
-      </div>
-    );
+    return <FullScreenLoader />;
   }
 
   if (showError) {
