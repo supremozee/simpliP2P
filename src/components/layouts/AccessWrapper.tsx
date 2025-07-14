@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useGetUser from "@/hooks/useGetUser";
 import FullScreenLoader from "../organisms/FullScreenLoader";
 import ErrorComponent from "../molecules/ErrorComponent";
@@ -11,7 +11,7 @@ import { sanitize } from "@/utils/helpers";
 
 const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  // const pathname = usePathname();
+  const pathname = usePathname();
   const { user, isLoading } = useGetUser();
 
   const [showError, setShowError] = useState(false);
@@ -34,7 +34,7 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
     const findOrgName = user?.data?.user_organisations.find(
       (org) => sanitize(org.name) === orgName
     );
-    if (!findOrgName) {
+    if (!findOrgName && !pathname.includes("create-organization")) {
       router.replace(`/${userId}`);
     }
     // if (userOrgs.length === 0 && !pathname.includes("create-organization")) {

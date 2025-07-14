@@ -21,7 +21,7 @@ const OrganizationSchema = z.object({
 type OrganizationFormData = z.infer<typeof OrganizationSchema>;
 
 const CreateOrganizationPage = () => {
-  const { orgName } = useStore();
+  const { orgName, userId } = useStore();
   const {
     organization,
     loading,
@@ -138,15 +138,15 @@ const CreateOrganizationPage = () => {
           </Button>
         </form>
         <div className="flex items-center justify-center gap-2 my-4">
-          <div className="w-10 border-t border-[#BDBDBD]"></div>
-          <p className="text-center mb-0 px-2 text-[#BDBDBD]">Or</p>
-          <div className="w-10 border-t border-[#BDBDBD]"></div>
+          <div className="w-10 border-t border-tertiary"></div>
+          <p className="text-center mb-0 px-2 text-tertiary">Or</p>
+          <div className="w-10 border-t border-tertiary"></div>
         </div>
         <Link
-          href={`/${orgName}/dashboard`}
+          href={`/${userId}`}
           className="text-primary text-center mt-5 text-lg underline"
         >
-          Go Back to Dashboard
+          View organizations
         </Link>
       </div>
     </div>
