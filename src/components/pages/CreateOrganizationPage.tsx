@@ -12,6 +12,7 @@ import Loader from "../molecules/Loader";
 import useCreateOrganization from "@/hooks/useCreateOrganization";
 import { OrganizationData } from "@/types";
 import useStore from "@/store";
+import OrSeparator from "../atoms/OrSeparator";
 const OrganizationSchema = z.object({
   name: z.string().min(1, "Your Name is required"),
   address: z.string().min(1, "Your address is required"),
@@ -137,11 +138,7 @@ const CreateOrganizationPage = () => {
             {loading ? "Processing..." : "Create Organization"}
           </Button>
         </form>
-        <div className="flex items-center justify-center gap-2 my-4">
-          <div className="w-10 border-t border-tertiary"></div>
-          <p className="text-center mb-0 px-2 text-tertiary">Or</p>
-          <div className="w-10 border-t border-tertiary"></div>
-        </div>
+        <OrSeparator/>
         <Link
           href={`/${userId}`}
           className="text-primary text-center mt-5 text-lg underline"

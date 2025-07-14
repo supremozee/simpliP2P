@@ -12,6 +12,8 @@ import useRegister from "@/hooks/useRegister";
 import Loader from "../molecules/Loader";
 import useNotify from "@/hooks/useNotify";
 import LoginWithGoogle from "../molecules/LoginWithGoogle";
+import OrSeparator from "../atoms/OrSeparator";
+import Image from "next/image";
 const RegisterSchema = z
   .object({
     first_name: z.string().min(1, "First Name is required"),
@@ -98,121 +100,132 @@ const RegisterPage = () => {
     );
   }
   return (
-    <div className="flex h-auto w-full font-roboto">
+    <div className="flex h-screen w-full font-roboto">
       {loading && <Loader />}
-      <div className="bg-[url('//loginImage.png')] w-full sm:w-1/2 h-1/3 sm:h-auto object-cover bg-cover sm:flex hidden flex-col justify-center items-center pt-10"></div>
-      <div className="flex justify-center flex-col gap-4 w-full sm:w-1/2 p-5 sm:p-[150px]">
-        <div className="flex flex-col items-center justify-center">
-          <strong className="text-[24px] sm:text-[30px] font-[700]">
-            Create an Account
-          </strong>
-          <p className="text-[16px] sm:text-[12px] text-[#9E9E9E] text-center sm:text-left">
-            Set up your company&apos;s procurement system in minutes
-          </p>
+      <section className="flex w-full">
+        {/* Image Side - Hidden on mobile */}
+        <div className="hidden md:flex w-1/2 h-full">
+          <Image
+            src={"/loginImage.png"}
+            alt="Sign up image"
+            width={1000}
+            height={1000}
+            className="object-cover w-full h-full"
+          />
         </div>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <InputField
-            label="First Name"
-            placeholder="First Name"
-            type="text"
-            {...register("first_name")}
-          />
-          {errors.first_name && (
-            <p className="text-red-500">{errors.first_name.message}</p>
-          )}
-
-          <InputField
-            label="Last Name"
-            placeholder="Last Name"
-            type="text"
-            {...register("last_name")}
-          />
-          {errors.last_name && (
-            <p className="text-red-500">{errors.last_name.message}</p>
-          )}
-          <InputField
-            label="Email"
-            placeholder="johndoe@gmail.com"
-            type="email"
-            {...register("email")}
-          />
-          {errors.email && (
-            <p className="text-red-500">{errors.email.message}</p>
-          )}
-
-          <InputField
-            label="Phone Number"
-            placeholder="07000000000"
-            type="tel"
-            {...register("phone")}
-          />
-          {errors.phone && (
-            <p className="text-red-500">{errors.phone.message}</p>
-          )}
-
-          <InputField
-            label="Password"
-            value={password || ""}
-            type="password"
-            placeholder="********"
-            {...register("password")}
-          />
-          {errors.password && (
-            <p className="text-red-500">{errors.password.message}</p>
-          )}
-
-          <InputField
-            label="Confirm Password"
-            type="password"
-            placeholder="********"
-            {...register("confirm_password")}
-            onPaste={(e) => e.preventDefault()}
-          />
-          {errors.confirm_password && (
-            <p className="text-red-500">{errors.confirm_password.message}</p>
-          )}
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              {...register("agreeToTerms")}
-              className="mr-2"
-            />
-            <label htmlFor="agreeToTerms" className="text-sm #181819">
-              I agree to the terms and conditions
-            </label>
+        {/* Form Side */}
+        <div className="flex justify-center w-full md:w-1/2 flex-col gap-4 p-8 sm:px-20 overflow-y-auto min-h-screen">
+          <div className="flex flex-col items-center justify-center mt-[30rem]">
+            <strong className="text-[24px] sm:text-[30px] font-[700] text-center">
+              Create an Account
+            </strong>
+            <p className="text-[14px] sm:text-[16px] text-tertiary text-center mt-2">
+              Set up your company&apos;s procurement system in minutes
+            </p>
           </div>
-          {errors.agreeToTerms && (
-            <p className="text-red-500">{errors.agreeToTerms.message}</p>
-          )}
-
-          <p className="text-red-500 text-lg">{errorMessage}</p>
-          <Button
-            className="text-white rounded-[12px] justify-center"
-            type="submit"
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
           >
-            {loading ? "Processing..." : "Create Account"}
-          </Button>
-        </form>
-        <div className="flex items-center justify-center gap-2 my-4">
-          <div className="w-10 border-t border-[#BDBDBD]"></div>
-          <p className="text-center mb-0 px-2 text-[#BDBDBD]">Or</p>
-          <div className="w-10 border-t border-[#BDBDBD]"></div>
-        </div>
-        <LoginWithGoogle />
-        <div className="flex justify-center items-center text-center">
-          <p>Already have an account? </p>
-          <Link href={"/login"} className="text-primary font-[500] underline">
-            Sign in
+            <InputField
+              label="First Name"
+              placeholder="First Name"
+              type="text"
+              {...register("first_name")}
+            />
+            {errors.first_name && (
+              <p className="text-red-500">{errors.first_name.message}</p>
+            )}
+
+            <InputField
+              label="Last Name"
+              placeholder="Last Name"
+              type="text"
+              {...register("last_name")}
+            />
+            {errors.last_name && (
+              <p className="text-red-500">{errors.last_name.message}</p>
+            )}
+            <InputField
+              label="Email"
+              placeholder="johndoe@gmail.com"
+              type="email"
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="text-red-500">{errors.email.message}</p>
+            )}
+
+            <InputField
+              label="Phone Number"
+              placeholder="07000000000"
+              type="tel"
+              {...register("phone")}
+            />
+            {errors.phone && (
+              <p className="text-red-500">{errors.phone.message}</p>
+            )}
+
+            <InputField
+              label="Password"
+              value={password || ""}
+              type="password"
+              placeholder="********"
+              {...register("password")}
+            />
+            {errors.password && (
+              <p className="text-red-500">{errors.password.message}</p>
+            )}
+
+            <InputField
+              label="Confirm Password"
+              type="password"
+              placeholder="********"
+              {...register("confirm_password")}
+              onPaste={(e) => e.preventDefault()}
+            />
+            {errors.confirm_password && (
+              <p className="text-red-500">{errors.confirm_password.message}</p>
+            )}
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                {...register("agreeToTerms")}
+                className="mr-2"
+              />
+              <label htmlFor="agreeToTerms" className="text-sm #181819">
+                I agree to the terms and conditions
+              </label>
+            </div>
+            {errors.agreeToTerms && (
+              <p className="text-red-500">{errors.agreeToTerms.message}</p>
+            )}
+
+            <p className="text-red-500 text-lg">{errorMessage}</p>
+            <Button
+              className="text-white rounded-[12px] justify-center"
+              type="submit"
+            >
+              {loading ? "Processing..." : "Create Account"}
+            </Button>
+          </form>
+          <OrSeparator />
+          <LoginWithGoogle />
+          <div className="flex justify-center items-center text-center">
+            <p>Already have an account? </p>
+            <Link href={"/login"} className="text-primary font-[500] underline">
+              Sign in
+            </Link>
+          </div>
+          <Link
+            href={"/"}
+            className="text-primary text-center mt-5 text-lg underline"
+          >
+            Go Back Home
           </Link>
         </div>
-        <Link
-          href={"/"}
-          className="text-primary text-center mt-5 text-lg underline"
-        >
-          Go Back Home
-        </Link>
-      </div>
+      </section>
     </div>
   );
 };
