@@ -37,8 +37,8 @@ export function useDataFetch<T>(
 ): UseDataFetchResult<T> {
   const {
     enabled = true,
-    staleTime = 1 * 60 * 1000, // 1 minute default
-    gcTime = 5 * 60 * 1000, // 5 minutes default
+    staleTime = 1 * 60 * 1000, 
+    gcTime = 5 * 60 * 1000,
     refetchOnWindowFocus = false,
   } = options;
 

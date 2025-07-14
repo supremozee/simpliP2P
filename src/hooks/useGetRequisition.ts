@@ -12,8 +12,6 @@ interface UseGetRequisitionsOptions {
 export const useGetRequisitions = (options: UseGetRequisitionsOptions = {}) => {
   const { currentOrg, pr } = useStore();
   const { enablePagination = false, page = 1, pageSize = 20 } = options;
-
-  // Fetch data for different requisition states using the new dual-fetch approach
   const {
     paginatedData: allRequisitionsPagedData,
     allData: allRequisitionsCompleteData,

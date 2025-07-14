@@ -16,6 +16,7 @@ import {
 import Button from "../atoms/Button";
 import { sanitize } from "@/utils/helpers";
 import NotUser from "../atoms/Icons/NotUser";
+import BackButton from "../atoms/BackButton";
 
 const OrganizationsPage: React.FC = () => {
   const router = useRouter();
@@ -54,9 +55,12 @@ const OrganizationsPage: React.FC = () => {
     );
   }
 
-  if (user?.data?.user_organisations.length === 0) {
+  if (user?.data?.user_organisations.length !== 0) {
     return (
-      <section className="min-h-screen flex flex-col items-center justify-center bg-tertiary">
+      <section className="min-h-screen w-full flex flex-col items-center justify-center bg-tertiary relative">
+        <section className="max-w-6xl absolute z-20 h-full inset-0 left-24 top-24">
+            <BackButton/>
+        </section>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -71,7 +71,7 @@ export type RegisterFormData = {
 }
 export interface Organization {
   name: string;
-  tenant_code?: string;
+  // tenant_code?: string;
   address: string;
   logo?: string;
   creator_role?: string;

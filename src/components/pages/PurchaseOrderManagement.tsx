@@ -367,7 +367,7 @@ const PurchaseOrdersManagement: React.FC<PurchaseOrdersManagementProps> = ({
         )}
 
         <TableShadowWrapper maxHeight="calc(100vh - 320px)">
-          <table className="w-full border-collapse border border-[#80808050]">
+          <table className="w-full border-collapse border border-tertiary">
             <thead className="bg-tertiary">
               <tr>
                 {headers.map((header, index) => (

@@ -162,14 +162,14 @@ const OrganizationProfile = () => {
             </p>
           )}
 
-          <Input
+          {/* <Input
             type="text"
             label="Organization Code"
             placeholder="Enter Organization Code"
             value={organisation?.tenant_code}
             name="tenant_code"
             disabled={true}
-          />
+          /> */}
         </div>
 
         <div className="flex flex-col items-center space-y-4">

@@ -10,7 +10,7 @@ const useProductsData = (orgId: string, page?: number, limit?: number) => {
     ["fetchProducts", orgId, page, limit],
     () => auth.fetchProducts(orgId, page, limit),
     ["fetchProductsComplete", orgId],
-    () => auth.fetchProducts(orgId, 1, 10000), // Fetch all with high pageSize
+    () => auth.fetchProducts(orgId, 1, 10000),
     {
       enabled: !!orgId,
     }
