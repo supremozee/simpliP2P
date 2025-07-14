@@ -47,7 +47,7 @@ const OrganizationsPage: React.FC = () => {
   };
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-tertiary overflow-hidden">
         <div className="bg-white p-8 rounded-2xl shadow-sm">
           <LoaderSpinner size="lg" text="Loading organizations..." />
         </div>
@@ -57,9 +57,9 @@ const OrganizationsPage: React.FC = () => {
 
   if (user?.data?.user_organisations.length === 0) {
     return (
-      <section className="min-h-screen w-full flex flex-col items-center justify-center bg-tertiary relative">
+      <section className="min-h-screen overflow-hidden w-full flex flex-col items-center justify-center bg-tertiary relative">
         <section className="max-w-6xl absolute z-20 h-full inset-0 left-24 top-24">
-            <BackButton/>
+          <BackButton />
         </section>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -91,7 +91,7 @@ const OrganizationsPage: React.FC = () => {
   }
   if (!findUser) {
     return (
-      <section className="min-h-screen flex flex-col items-center justify-center bg-tertiary">
+      <section className="min-h-screen flex flex-col items-center justify-center bg-tertiary overflow-hidden">
         <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-[450px] drop-shadow-md w-full mx-4 flex flex-col gap-4">
           <div className="w-24 h-24 bg-red-300 rounded-full flex items-center justify-center mx-auto">
             <NotUser />
@@ -116,7 +116,7 @@ const OrganizationsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col gap-8 items-center py-8 px-3 bg-tertiary">
+    <div className="min-h-screen flex flex-col gap-8 items-center py-8 px-3 bg-tertiary overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
