@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useGetUser from "@/hooks/useGetUser";
 import FullScreenLoader from "../organisms/FullScreenLoader";
 import ErrorComponent from "../molecules/ErrorComponent";
@@ -11,7 +11,7 @@ import { sanitize } from "@/utils/helpers";
 
 const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
   const { user, isLoading } = useGetUser();
 
   const [showError, setShowError] = useState(false);
@@ -30,20 +30,20 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    const userOrgs = user?.data.user_organisations || [];
+    // const userOrgs = user?.data.user_organisations || [];
     const findOrgName = user?.data?.user_organisations.find(
       (org) => sanitize(org.name) === orgName
     );
     if (!findOrgName) {
       router.replace(`/${userId}`);
     }
-    if (userOrgs.length === 0 && !pathname.includes("create-organization")) {
-      router.replace("/create-organization");
-      return;
-    }
+    // if (userOrgs.length === 0 && !pathname.includes("create-organization")) {
+    //   router.replace("/create-organization");
+    //   return;
+    // }
 
     setHasAccess(true);
-  }, [isLoading, hasAccess, user, pathname, router, orgName, userId]);
+  }, [isLoading, hasAccess, user, router, orgName, userId]);
 
   useEffect(() => {
     handleOrganizationCheck();
