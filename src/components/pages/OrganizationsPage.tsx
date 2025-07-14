@@ -64,7 +64,7 @@ const OrganizationsPage: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-[450px] drop-shadow-md w-full mx-4 flex flex-col gap-4"
+          className="bg-white p-8 relative z-40 rounded-2xl shadow-sm text-center max-w-[450px] drop-shadow-md w-full mx-4 flex flex-col gap-4"
         >
           <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
             <IoBusinessOutline className="w-10 h-10 text-primary" />
@@ -79,7 +79,7 @@ const OrganizationsPage: React.FC = () => {
           <div className="flex justify-center items-center">
             <Button
               onClick={() => router.push("/create-organization")}
-              className="bg-primary text-white px-5 py-4 rounded-xl hover:bg-tertiary transition-all transform hover:scale-[1.02] flex items-center gap-3 justify-center mt-4 shadow-sm"
+              className="bg-primary cursor-pointer text-white px-5 py-4 rounded-xl hover:bg-tertiary transition-all transform hover:scale-[1.02] flex items-center gap-3 justify-center mt-4 shadow-sm"
             >
               <IoAddCircle className="w-6 h-6" />
               <span className="font-medium">Create Organization</span>
