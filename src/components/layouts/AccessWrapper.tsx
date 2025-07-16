@@ -43,7 +43,7 @@ const AccessWrapper = ({ children }: { children: React.ReactNode }) => {
     // }
 
     setHasAccess(true);
-  }, [isLoading, hasAccess, user, router, orgName, userId]);
+  }, [isLoading, hasAccess, user, pathname, router, orgName, userId]);
 
   useEffect(() => {
     handleOrganizationCheck();
